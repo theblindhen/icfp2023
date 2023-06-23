@@ -1,4 +1,4 @@
-The Blind Hen 2019 ICFP Contest submission
+The Blind Hen 2023 ICFP Contest submission
 ==========================================
 
 Team
