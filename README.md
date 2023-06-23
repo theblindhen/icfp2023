@@ -1,4 +1,4 @@
-The Blind Hen 2019 ICFP Contest submission
+The Blind Hen 2023 ICFP Contest submission
 ==========================================
 
 Team
@@ -39,12 +39,17 @@ to modify your shell rc:
 How to develop
 --------------
 
-For IDE support, start with
+For vim/emacs support, start with
 
     $ opam install merlin
 
 Now follow the instructions printed to stdout to configure vim or emacs support.
-Alternatively, find a suitable plugin for another IDE and document it here.
+
+For VS Code support, install the OCaml Language Server with
+
+    $ opam install ocaml-lsp-server
+
+Now install the VSCode OCaml platform extension
 
 Core library documentation can be found at
 https://ocaml.org/p/core/latest/doc/Core/index.html
