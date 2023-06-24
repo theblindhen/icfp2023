@@ -4,9 +4,9 @@ The Blind Hen 2023 ICFP Contest submission
 Team
 ----
 
-Jonas B. Jensen
-Christoffer R. Nielsen
-Johan S. H. Rosenkilde
+Jonas B. Jensen,
+Christoffer R. Nielsen,
+Johan S. H. Rosenkilde, and
 Kasper Svendsen
 
 All in Copenhagen, Denmark
@@ -16,7 +16,7 @@ How to build
 
 First install the "opam" package manager and configure it as follows:
 
-    $ sudo apt-get install opam
+    # apt-get install opam
     $ opam init # Answer `y` at the prompt
     $ opam switch create 5.0.0
     follow instructions after previous command if run
@@ -25,7 +25,7 @@ Install packages we need:
 
     $ opam install core dune bogue
 
-Now go into the right subdirectory and build and run this program:
+Now go into the right subdirectory and build and run one of these commands:
 
     $ dune build
     $ dune test
