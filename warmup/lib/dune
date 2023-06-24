@@ -1,2 +1,3 @@
 (library
- (name warmup))
+ (name warmup)
+ (libraries bogue))

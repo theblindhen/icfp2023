@@ -1,4 +1,11 @@
 (executable
  (public_name warmup)
  (name main)
+ (modules main)
+ (libraries warmup))
+
+(executable
+ (public_name gui)
+ (name gui)
+ (modules gui)
  (libraries warmup))

@@ -23,7 +23,7 @@ First install the "opam" package manager and configure it as follows:
 
 Install packages we need:
 
-    $ opam install core dune
+    $ opam install core dune bogue
 
 Now go into the right subdirectory and build and run this program:
 
@@ -61,3 +61,8 @@ same settings (format on save!).
 
 Core library documentation can be found at
 https://ocaml.org/p/core/latest/doc/Core/index.html
+
+We use the GUI library Bogue, which has a good introductory guide at
+http://sanette.github.io/bogue/Principles.html
+and API documentation at
+https://ocaml.org/p/bogue/latest/doc/Bogue/index.html
