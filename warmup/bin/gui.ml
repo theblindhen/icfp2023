@@ -8,9 +8,7 @@ let () =
   let a_layout = L.resident a in
   let top_label = Widget.label "Drawing is below" in
   let bottom_label = Widget.label "Drawing is above" in
-  Sdl_area.draw_circle area
-    ~color:Draw.(opaque red)
-    ~thick:10 ~radius:50 (100, 200);
+  Sdl_area.draw_circle area ~color:Draw.(opaque red) ~thick:10 ~radius:50 (100, 200);
 
   let connection =
     W.connect a a
@@ -23,9 +21,7 @@ let () =
         Printf.eprintf " really at %d, %d\n%!" x y;
         let x, y = Sdl_area.to_pixels (x, y) in
         Printf.eprintf " really at %d, %d\n%!" x y;
-        Sdl_area.draw_circle area
-          ~color:Draw.(opaque blue)
-          ~thick:4 ~radius:3 (x, y))
+        Sdl_area.draw_circle area ~color:Draw.(opaque blue) ~thick:4 ~radius:3 (x, y))
       Trigger.buttons_down
   in
   L.tower [ L.resident top_label; a_layout; L.resident bottom_label ]
