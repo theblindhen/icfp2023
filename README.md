@@ -23,7 +23,7 @@ First install the "opam" package manager and configure it as follows:
 
 Install packages we need:
 
-    $ opam install core dune bogue
+    $ opam install core dune
 
 Now go into the right subdirectory and build and run one of these commands:
 
@@ -38,6 +38,16 @@ to modify your shell rc:
 
 How to develop
 --------------
+
+### GUI support
+
+To compile the GUI portion of our code, run
+
+    $ opam install bogue
+
+The GUI is run from the OCaml project subdirectory by running
+
+    $ dune exec gui [OPTIONS]
 
 ### Copilot in VSCode
 

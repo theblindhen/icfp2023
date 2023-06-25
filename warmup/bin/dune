@@ -8,4 +8,4 @@
  (public_name gui)
  (name gui)
  (modules gui)
- (libraries warmup))
+ (libraries warmup bogue))
