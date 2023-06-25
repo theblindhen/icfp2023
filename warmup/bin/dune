@@ -9,3 +9,9 @@
  (name gui)
  (modules gui)
  (libraries warmup bogue))
+
+(executable
+ (public_name elmish)
+ (name elmish)
+ (modules elmish)
+ (libraries warmup bogue tsdl))
