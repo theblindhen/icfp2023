@@ -15,3 +15,15 @@
  (name mine)
  (modules mine)
  (libraries warmup))
+
+(executable
+ (public_name elmish)
+ (name elmish)
+ (modules elmish)
+ (libraries warmup bogue tsdl))
+
+(executable
+ (public_name canvas)
+ (name canvas)
+ (modules canvas)
+ (libraries warmup ocaml-canvas))
