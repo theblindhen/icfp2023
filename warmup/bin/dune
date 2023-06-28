@@ -9,3 +9,9 @@
  (name gui)
  (modules gui)
  (libraries warmup bogue))
+
+(executable
+ (public_name mine)
+ (name mine)
+ (modules mine)
+ (libraries warmup))
