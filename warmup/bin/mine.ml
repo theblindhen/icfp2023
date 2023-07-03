@@ -34,23 +34,19 @@ let () =
             | Some () -> eprintf ".%!"
           else search ~seed:(seed + threads) ~iterations:(iterations + 1)
         in
-        let pool = Task.setup_pool ~num_domains:threads () in
-        eprintf "Scheduling threads\n%!";
-        Task.run pool (fun () ->
-            eprintf "Creating promises\n%!";
-            let promises =
-              Array.init threads ~f:(fun i ->
-                  Task.async pool (fun () -> search ~seed:i ~iterations:0))
-            in
-            eprintf "Waiting for result\n%!";
-            let result = Chan.recv i_found_it in
-            eprintf "Sending stop signal to threads\n%!";
-            for _ = 1 to threads - 1 do
-              Chan.send stop_searching ()
-            done;
-            Array.iter promises ~f:(Task.await pool);
-            eprintf "\n%!";
-            eprintf "Threads stopped\n%!";
-            result)
+        eprintf "Creating domains\n%!";
+        let domains =
+          Array.init threads ~f:(fun i -> Domain.spawn (fun () -> search ~seed:i ~iterations:0))
+        in
+        eprintf "Waiting for result\n%!";
+        let result = Chan.recv i_found_it in
+        eprintf "Sending stop signal to threads\n%!";
+        for _ = 1 to threads - 1 do
+          Chan.send stop_searching ()
+        done;
+        Array.iter domains ~f:Domain.join;
+        eprintf "\n%!";
+        eprintf "Threads stopped\n%!";
+        result
   in
   Printf.printf "%2d %s\n%!" seed h
