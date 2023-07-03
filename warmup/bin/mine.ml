@@ -28,11 +28,10 @@ let () =
           let h = Icfpennies.hash_block ~seed in
           let score = Icfpennies.count_zero_nybbles h in
           if score >= difficulty then Chan.send i_found_it (h, seed)
-          else if iterations mod 10_000 = 0 then (
-            eprintf "Thread: %d iterations; checking\n%!" iterations;
+          else if iterations mod 1_000 = 0 then
             match Chan.recv_poll stop_searching with
             | None -> search ~seed:(seed + threads) ~iterations:(iterations + 1)
-            | Some () -> eprintf "Thread: stopping\n%!")
+            | Some () -> eprintf ".%!"
           else search ~seed:(seed + threads) ~iterations:(iterations + 1)
         in
         let pool = Task.setup_pool ~num_domains:threads () in
@@ -49,8 +48,8 @@ let () =
             for _ = 1 to threads - 1 do
               Chan.send stop_searching ()
             done;
-            eprintf "Waiting for threads to stop\n%!";
             Array.iter promises ~f:(Task.await pool);
+            eprintf "\n%!";
             eprintf "Threads stopped\n%!";
             result)
   in
