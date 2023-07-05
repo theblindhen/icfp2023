@@ -1,0 +1,38 @@
+/* Use pastel colors for the background and text */
+body {
+    background-color: #f0f0f0;
+    color: #404040;
+}
+
+/* Use a large font size and center the title */
+h1 {
+    font-size: 3rem;
+    text-align: center;
+}
+
+/* Use a smaller font size and center the game_id */
+h2 {
+    font-size: 2rem;
+    text-align: center;
+}
+
+/* Use Bootstrap classes to style the button */
+.btn {
+    background-color: #80ff80;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1.5rem;
+}
+
+/* Center the button and the spinner */
+.text-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Add some margin between the button and the spinner */
+.spinner-border {
+    margin-left: 20px;
+}
