@@ -27,3 +27,9 @@
  (name canvas)
  (modules canvas)
  (libraries warmup ocaml-canvas))
+
+(executable
+ (public_name punting_server)
+ (name punting_server)
+ (modules punting_server)
+ (libraries warmup core opium))
