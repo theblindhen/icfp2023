@@ -16,6 +16,18 @@ function App() {
     // });
   }, []);
 
+  async function deep() {
+    // Start the game when the button is clicked
+    const deep = {
+      a: 5,
+      b: { c: false, d: [7, 6, 5] },
+    };
+    await send("/deep", deep).then((data) => {
+      setGameId("doh");
+      setState("ready");
+    });
+  }
+
   async function startGame() {
     // Start the game when the button is clicked
     setState("loading");
@@ -31,10 +43,15 @@ function App() {
       {state === "new" && (
         <div className="d-flex justify-content-center">
           <Button variant="success" onClick={startGame}>
-            Stat
+            Start
           </Button>
         </div>
       )}
+      <div className="d-flex justify-content-center">
+        <Button variant="success" onClick={deep}>
+          Deep
+        </Button>
+      </div>
       {state === "loading" && (
         <div className="d-flex justify-content-center">
           <Spinner animation="border" />

@@ -1,0 +1,26 @@
+(* This file will compile into a set of OCaml types as well as conversion
+ * functions between those types and JSON.
+ * Compile with atdgen (opam install) using the command:
+    * atdgen -t messages.atd  # for types
+    * atdgen -j messages.atd  # for JSON conversion functions
+ * See http://dev.realworldocaml.org/json.html
+ *)
+
+type title_msg = {
+    title: string;
+} <ocaml field_prefix="title_">
+
+type start_msg = {
+    game_id: int;
+} <ocaml field_prefix="start_">
+
+type deep_b = {
+    c: bool;
+    d: int list;
+} <ocaml field_prefix="deep_">
+
+type deep_msg = {
+    a: int;
+    b: deep_b;
+} <ocaml field_prefix="deep_">
+

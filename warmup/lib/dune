@@ -1,8 +1,23 @@
+(rule
+ (targets punting_j.ml punting_j.mli)
+ (deps punting.atd)
+ (mode fallback)
+ (action
+  (run atdgen -j %{deps})))
+
+(rule
+ (targets punting_t.ml punting_t.mli)
+ (deps punting.atd)
+ (mode fallback)
+ (action
+  (run atdgen -t %{deps})))
+
 (library
  (name warmup)
  (inline_tests)
  (preprocess
   (pps ppx_jane))
+ (modules punting_j punting_t icfpennies)
  (flags
   -strict-sequence
   -strict-formats
@@ -10,4 +25,4 @@
   -keep-locs
   -w
   +a-4-29-33-40-41-42-44-45-48-70)
- (libraries core))
+ (libraries core yojson atdgen))
