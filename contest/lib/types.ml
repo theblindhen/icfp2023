@@ -1,5 +1,5 @@
 type position = { x : float; y : float }
-type attendee = { pos : position; tastes : float list }
+type attendee = { pos : position; tastes : float array }
 
 type problem = {
   room_width : float;
@@ -24,10 +24,14 @@ let problem_of_json_problem (json_problem : Json_j.json_problem) =
     attendees =
       json_problem.attendees
       |> List.map (fun (json_attendee : Json_j.json_attendee) ->
-             { pos = { x = json_attendee.x; y = json_attendee.y }; tastes = json_attendee.tastes });
+             {
+               pos = { x = json_attendee.x; y = json_attendee.y };
+               tastes = Array.of_list json_attendee.tastes;
+             });
   }
 
 type solution = position list
+type musician = { pos : position; instrument : int }
 
 let json_solution_of_solution (solution : solution) : Json_j.json_solution =
   { placements = solution |> List.map (fun { x; y } : Json_j.json_placement -> { x; y }) }
