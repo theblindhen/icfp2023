@@ -32,7 +32,8 @@ let problem_of_json_problem (json_problem : Json_j.json_problem) =
              });
   }
 
-type musician = { id : int; pos : position; instrument : int }
+type instrument = int
+type musician = { id : int; pos : position; instrument : instrument }
 type solution = musician array
 
 let json_solution_of_solution (solution : solution) : Json_j.json_solution =
