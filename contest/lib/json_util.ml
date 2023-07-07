@@ -12,9 +12,9 @@ let make_submission (problem_id : int) (solution : Types.solution) : Json_j.json
   let submission : Json_j.json_submission_post = { problem_id; contents = solution_json } in
   submission
 
-(** Write the solution to the "../problems/solutions-%d.json" directory. For
- * now, each file is named "positive.json" because we only write out the file if
- * the score is positive. *)
+(** Write the solution to the "../problems/solutions-%d" directory. For
+* now, each file is named "positive.json" because we only write out the file if
+* the score is positive. *)
 let write_solution_if_positive (problem_id : int) problem (solution : Types.solution) : unit =
   let score : float = Score.score_solution problem solution in
   if Float.is_positive score then (
