@@ -28,3 +28,6 @@ let problem_of_json_problem (json_problem : Json_j.json_problem) =
   }
 
 type solution = position list
+
+let json_solution_of_solution (solution : solution) : Json_j.json_solution =
+  { placement = solution |> List.map (fun { x; y } : Json_j.json_placement -> { x; y }) }
