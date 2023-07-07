@@ -28,7 +28,7 @@ type json_placement = {
 }
 
 type json_solution = {
-  placement: json_placement list;
+  placements: json_placement list;
 }
 
 type json_score = {

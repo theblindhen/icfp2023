@@ -1,18 +1,27 @@
 open Core
-open Contest.Json_j
+open Contest
+open Contest.Types
 
 let get_problem problem_id =
-  let json = In_channel.read_all ("../problems/problem-" ^ problem_id ^ ".json") in
-  json_problem_of_string json
+  let json = In_channel.read_all ("../problems/problem-" ^ string_of_int problem_id ^ ".json") in
+  json |> Json_j.json_problem_of_string |> problem_of_json_problem
 
-(* let dump_solution () =
-   let solution : json_solution =
-     { solution_placement = [ { placement_x = 1.; placement_y = 2.5 } ] }
-   in
-   print_endline (string_of_json_solution solution) *)
+let get_solution () =
+  let solution : solution = [ { x = 1.; y = 2.5 } ] in
+  solution
+
+let make_submission (problem_id : int) (solution : solution) : Json_j.json_submission_post =
+  let solution_json = solution |> json_solution_of_solution |> Json_j.string_of_json_solution in
+  let submission : Json_j.json_submission_post = { problem_id; contents = solution_json } in
+  submission
 
 let () =
-  let problem = get_problem "1" in
-  print_endline (string_of_json_problem problem);
-  let json = In_channel.read_all "test.json" in
-  print_endline (string_of_json_submission_get (json_submission_get_of_string json))
+  let args = Sys.get_argv () in
+  let problem = get_problem 1 in
+  print_endline (List.length problem.musicians |> string_of_int);
+  let solution = get_solution () in
+  let submission = make_submission 1 solution in
+  let out_file = args.(1) in
+  (* write solution_json to file *)
+  Out_channel.write_all out_file ~data:(Json_j.string_of_json_submission_post submission);
+  print_endline "Done"

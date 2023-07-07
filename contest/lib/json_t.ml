@@ -25,7 +25,7 @@ type json_submission_get = {
 
 type json_placement = { x: float; y: float }
 
-type json_solution = { placement: json_placement list }
+type json_solution = { placements: json_placement list }
 
 type json_attendee = { x: float; y: float; tastes: float list }
 

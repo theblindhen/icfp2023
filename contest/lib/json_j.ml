@@ -33,7 +33,7 @@ type json_submission_get = Json_t.json_submission_get = {
 type json_placement = Json_t.json_placement = { x: float; y: float }
 
 type json_solution = Json_t.json_solution = {
-  placement: json_placement list
+  placements: json_placement list
 }
 
 type json_attendee = Json_t.json_attendee = {
@@ -1328,11 +1328,11 @@ let write_json_solution : _ -> json_solution -> _ = (
       is_first := false
     else
       Buffer.add_char ob ',';
-      Buffer.add_string ob "\"placement\":";
+      Buffer.add_string ob "\"placements\":";
     (
       write__json_placement_list
     )
-      ob x.placement;
+      ob x.placements;
     Buffer.add_char ob '}';
 )
 let string_of_json_solution ?(len = 1024) x =
@@ -1343,7 +1343,7 @@ let read_json_solution = (
   fun p lb ->
     Yojson.Safe.read_space p lb;
     Yojson.Safe.read_lcurl p lb;
-    let field_placement = ref (None) in
+    let field_placements = ref (None) in
     try
       Yojson.Safe.read_space p lb;
       Yojson.Safe.read_object_end lb;
@@ -1352,7 +1352,7 @@ let read_json_solution = (
         fun s pos len ->
           if pos < 0 || len < 0 || pos + len > String.length s then
             invalid_arg (Printf.sprintf "out-of-bounds substring position or length: string = %S, requested position = %i, requested length = %i" s pos len);
-          if len = 9 && String.unsafe_get s pos = 'p' && String.unsafe_get s (pos+1) = 'l' && String.unsafe_get s (pos+2) = 'a' && String.unsafe_get s (pos+3) = 'c' && String.unsafe_get s (pos+4) = 'e' && String.unsafe_get s (pos+5) = 'm' && String.unsafe_get s (pos+6) = 'e' && String.unsafe_get s (pos+7) = 'n' && String.unsafe_get s (pos+8) = 't' then (
+          if len = 10 && String.unsafe_get s pos = 'p' && String.unsafe_get s (pos+1) = 'l' && String.unsafe_get s (pos+2) = 'a' && String.unsafe_get s (pos+3) = 'c' && String.unsafe_get s (pos+4) = 'e' && String.unsafe_get s (pos+5) = 'm' && String.unsafe_get s (pos+6) = 'e' && String.unsafe_get s (pos+7) = 'n' && String.unsafe_get s (pos+8) = 't' && String.unsafe_get s (pos+9) = 's' then (
             0
           )
           else (
@@ -1364,7 +1364,7 @@ let read_json_solution = (
       (
         match i with
           | 0 ->
-            field_placement := (
+            field_placements := (
               Some (
                 (
                   read__json_placement_list
@@ -1383,7 +1383,7 @@ let read_json_solution = (
           fun s pos len ->
             if pos < 0 || len < 0 || pos + len > String.length s then
               invalid_arg (Printf.sprintf "out-of-bounds substring position or length: string = %S, requested position = %i, requested length = %i" s pos len);
-            if len = 9 && String.unsafe_get s pos = 'p' && String.unsafe_get s (pos+1) = 'l' && String.unsafe_get s (pos+2) = 'a' && String.unsafe_get s (pos+3) = 'c' && String.unsafe_get s (pos+4) = 'e' && String.unsafe_get s (pos+5) = 'm' && String.unsafe_get s (pos+6) = 'e' && String.unsafe_get s (pos+7) = 'n' && String.unsafe_get s (pos+8) = 't' then (
+            if len = 10 && String.unsafe_get s pos = 'p' && String.unsafe_get s (pos+1) = 'l' && String.unsafe_get s (pos+2) = 'a' && String.unsafe_get s (pos+3) = 'c' && String.unsafe_get s (pos+4) = 'e' && String.unsafe_get s (pos+5) = 'm' && String.unsafe_get s (pos+6) = 'e' && String.unsafe_get s (pos+7) = 'n' && String.unsafe_get s (pos+8) = 't' && String.unsafe_get s (pos+9) = 's' then (
               0
             )
             else (
@@ -1395,7 +1395,7 @@ let read_json_solution = (
         (
           match i with
             | 0 ->
-              field_placement := (
+              field_placements := (
                 Some (
                   (
                     read__json_placement_list
@@ -1411,7 +1411,7 @@ let read_json_solution = (
     with Yojson.End_of_object -> (
         (
           {
-            placement = (match !field_placement with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "placement");
+            placements = (match !field_placements with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "placements");
           }
          : json_solution)
       )

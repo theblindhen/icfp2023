@@ -33,7 +33,7 @@ type json_submission_get = Json_t.json_submission_get = {
 type json_placement = Json_t.json_placement = { x: float; y: float }
 
 type json_solution = Json_t.json_solution = {
-  placement: json_placement list
+  placements: json_placement list
 }
 
 type json_attendee = Json_t.json_attendee = {
