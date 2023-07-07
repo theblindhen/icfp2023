@@ -25,16 +25,14 @@ let () =
         Sdl_area.clear area;
         (* Determine a scale factor to ensure that the max dimension of the room is
            exactly 1000. *)
-        let scale = 1000. /. Float.max problem.problem_room_width problem.problem_room_height in
-        let room_width = Float.to_int (scale *. problem.problem_room_width) in
-        let room_height = Float.to_int (scale *. problem.problem_room_height) in
+        let scale = 1000. /. Float.max problem.room_width problem.room_height in
+        let room_width = Float.to_int (scale *. problem.room_width) in
+        let room_height = Float.to_int (scale *. problem.room_height) in
         let stage_xy =
-          Tuple2.map
-            ~f:(fun coord -> Float.to_int (scale *. coord))
-            problem.problem_stage_bottom_left
+          Tuple2.map ~f:(fun coord -> Float.to_int (scale *. coord)) problem.stage_bottom_left
         in
-        let stage_width = Float.to_int (scale *. problem.problem_stage_width) in
-        let stage_height = Float.to_int (scale *. problem.problem_stage_height) in
+        let stage_width = Float.to_int (scale *. problem.stage_width) in
+        let stage_height = Float.to_int (scale *. problem.stage_height) in
 
         Sdl_area.draw_rectangle area
           ~color:Draw.(opaque black)
@@ -42,9 +40,9 @@ let () =
         Sdl_area.draw_rectangle area
           ~color:Draw.(opaque red)
           ~thick:1 ~w:stage_width ~h:stage_height stage_xy;
-        List.iter problem.problem_attendees ~f:(fun attendee ->
-            let x = Float.to_int (scale *. attendee.attendee_x) in
-            let y = Float.to_int (scale *. attendee.attendee_y) in
+        List.iter problem.attendees ~f:(fun attendee ->
+            let x = Float.to_int (scale *. attendee.x) in
+            let y = Float.to_int (scale *. attendee.y) in
             Sdl_area.draw_circle area ~color:Draw.(opaque blue) ~thick:3 ~radius:2 (x, y))
   in
 
