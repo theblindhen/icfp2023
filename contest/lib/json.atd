@@ -6,27 +6,27 @@
  * See http://dev.realworldocaml.org/json.html
  *)
 
-type attendee = {
+type json_attendee = {
   x: float;
   y: float;
   tastes: float list
 } <ocaml field_prefix="attendee_">
 
-type problem = {
+type json_problem = {
   room_width: float;
   room_height: float;
   stage_width: float;
   stage_height: float;
   stage_bottom_left: (float * float);
   musicians: int list;
-  attendees: attendee list
+  attendees: json_attendee list
 } <ocaml field_prefix="problem_">
 
-type solution_placement = {
+type json_placement = {
   x: float;
   y: float;
 } <ocaml field_prefix="placement_">
 
-type solution = {
-  placement: solution_placement list;
+type json_solution = {
+  placement: json_placement list;
 } <ocaml field_prefix="solution_">

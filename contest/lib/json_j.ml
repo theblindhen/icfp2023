@@ -1,33 +1,33 @@
 (* Auto-generated from "json.atd" *)
 [@@@ocaml.warning "-27-32-33-35-39"]
 
-type solution_placement = Json_t.solution_placement = {
+type json_placement = Json_t.json_placement = {
   placement_x (*atd x *): float;
   placement_y (*atd y *): float
 }
 
-type solution = Json_t.solution = {
-  solution_placement (*atd placement *): solution_placement list
+type json_solution = Json_t.json_solution = {
+  solution_placement (*atd placement *): json_placement list
 }
 
-type attendee = Json_t.attendee = {
+type json_attendee = Json_t.json_attendee = {
   attendee_x (*atd x *): float;
   attendee_y (*atd y *): float;
   attendee_tastes (*atd tastes *): float list
 }
 
-type problem = Json_t.problem = {
+type json_problem = Json_t.json_problem = {
   problem_room_width (*atd room_width *): float;
   problem_room_height (*atd room_height *): float;
   problem_stage_width (*atd stage_width *): float;
   problem_stage_height (*atd stage_height *): float;
   problem_stage_bottom_left (*atd stage_bottom_left *): (float * float);
   problem_musicians (*atd musicians *): int list;
-  problem_attendees (*atd attendees *): attendee list
+  problem_attendees (*atd attendees *): json_attendee list
 }
 
-let write_solution_placement : _ -> solution_placement -> _ = (
-  fun ob (x : solution_placement) ->
+let write_json_placement : _ -> json_placement -> _ = (
+  fun ob (x : json_placement) ->
     Buffer.add_char ob '{';
     let is_first = ref true in
     if !is_first then
@@ -50,11 +50,11 @@ let write_solution_placement : _ -> solution_placement -> _ = (
       ob x.placement_y;
     Buffer.add_char ob '}';
 )
-let string_of_solution_placement ?(len = 1024) x =
+let string_of_json_placement ?(len = 1024) x =
   let ob = Buffer.create len in
-  write_solution_placement ob x;
+  write_json_placement ob x;
   Buffer.contents ob
-let read_solution_placement = (
+let read_json_placement = (
   fun p lb ->
     Yojson.Safe.read_space p lb;
     Yojson.Safe.read_lcurl p lb;
@@ -164,29 +164,29 @@ let read_solution_placement = (
             placement_x = (match !field_placement_x with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "placement_x");
             placement_y = (match !field_placement_y with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "placement_y");
           }
-         : solution_placement)
+         : json_placement)
       )
 )
-let solution_placement_of_string s =
-  read_solution_placement (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
-let write__solution_placement_list = (
+let json_placement_of_string s =
+  read_json_placement (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let write__json_placement_list = (
   Atdgen_runtime.Oj_run.write_list (
-    write_solution_placement
+    write_json_placement
   )
 )
-let string_of__solution_placement_list ?(len = 1024) x =
+let string_of__json_placement_list ?(len = 1024) x =
   let ob = Buffer.create len in
-  write__solution_placement_list ob x;
+  write__json_placement_list ob x;
   Buffer.contents ob
-let read__solution_placement_list = (
+let read__json_placement_list = (
   Atdgen_runtime.Oj_run.read_list (
-    read_solution_placement
+    read_json_placement
   )
 )
-let _solution_placement_list_of_string s =
-  read__solution_placement_list (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
-let write_solution : _ -> solution -> _ = (
-  fun ob (x : solution) ->
+let _json_placement_list_of_string s =
+  read__json_placement_list (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let write_json_solution : _ -> json_solution -> _ = (
+  fun ob (x : json_solution) ->
     Buffer.add_char ob '{';
     let is_first = ref true in
     if !is_first then
@@ -195,16 +195,16 @@ let write_solution : _ -> solution -> _ = (
       Buffer.add_char ob ',';
       Buffer.add_string ob "\"placement\":";
     (
-      write__solution_placement_list
+      write__json_placement_list
     )
       ob x.solution_placement;
     Buffer.add_char ob '}';
 )
-let string_of_solution ?(len = 1024) x =
+let string_of_json_solution ?(len = 1024) x =
   let ob = Buffer.create len in
-  write_solution ob x;
+  write_json_solution ob x;
   Buffer.contents ob
-let read_solution = (
+let read_json_solution = (
   fun p lb ->
     Yojson.Safe.read_space p lb;
     Yojson.Safe.read_lcurl p lb;
@@ -232,7 +232,7 @@ let read_solution = (
             field_solution_placement := (
               Some (
                 (
-                  read__solution_placement_list
+                  read__json_placement_list
                 ) p lb
               )
             );
@@ -263,7 +263,7 @@ let read_solution = (
               field_solution_placement := (
                 Some (
                   (
-                    read__solution_placement_list
+                    read__json_placement_list
                   ) p lb
                 )
               );
@@ -278,11 +278,11 @@ let read_solution = (
           {
             solution_placement = (match !field_solution_placement with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "solution_placement");
           }
-         : solution)
+         : json_solution)
       )
 )
-let solution_of_string s =
-  read_solution (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let json_solution_of_string s =
+  read_json_solution (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 let write__float_list = (
   Atdgen_runtime.Oj_run.write_list (
     Yojson.Safe.write_float
@@ -299,8 +299,8 @@ let read__float_list = (
 )
 let _float_list_of_string s =
   read__float_list (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
-let write_attendee : _ -> attendee -> _ = (
-  fun ob (x : attendee) ->
+let write_json_attendee : _ -> json_attendee -> _ = (
+  fun ob (x : json_attendee) ->
     Buffer.add_char ob '{';
     let is_first = ref true in
     if !is_first then
@@ -332,11 +332,11 @@ let write_attendee : _ -> attendee -> _ = (
       ob x.attendee_tastes;
     Buffer.add_char ob '}';
 )
-let string_of_attendee ?(len = 1024) x =
+let string_of_json_attendee ?(len = 1024) x =
   let ob = Buffer.create len in
-  write_attendee ob x;
+  write_json_attendee ob x;
   Buffer.contents ob
-let read_attendee = (
+let read_json_attendee = (
   fun p lb ->
     Yojson.Safe.read_space p lb;
     Yojson.Safe.read_lcurl p lb;
@@ -482,11 +482,27 @@ let read_attendee = (
             attendee_y = (match !field_attendee_y with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "attendee_y");
             attendee_tastes = (match !field_attendee_tastes with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "attendee_tastes");
           }
-         : attendee)
+         : json_attendee)
       )
 )
-let attendee_of_string s =
-  read_attendee (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let json_attendee_of_string s =
+  read_json_attendee (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let write__json_attendee_list = (
+  Atdgen_runtime.Oj_run.write_list (
+    write_json_attendee
+  )
+)
+let string_of__json_attendee_list ?(len = 1024) x =
+  let ob = Buffer.create len in
+  write__json_attendee_list ob x;
+  Buffer.contents ob
+let read__json_attendee_list = (
+  Atdgen_runtime.Oj_run.read_list (
+    read_json_attendee
+  )
+)
+let _json_attendee_list_of_string s =
+  read__json_attendee_list (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 let write__int_list = (
   Atdgen_runtime.Oj_run.write_list (
     Yojson.Safe.write_int
@@ -503,24 +519,8 @@ let read__int_list = (
 )
 let _int_list_of_string s =
   read__int_list (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
-let write__attendee_list = (
-  Atdgen_runtime.Oj_run.write_list (
-    write_attendee
-  )
-)
-let string_of__attendee_list ?(len = 1024) x =
-  let ob = Buffer.create len in
-  write__attendee_list ob x;
-  Buffer.contents ob
-let read__attendee_list = (
-  Atdgen_runtime.Oj_run.read_list (
-    read_attendee
-  )
-)
-let _attendee_list_of_string s =
-  read__attendee_list (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
-let write_problem : _ -> problem -> _ = (
-  fun ob (x : problem) ->
+let write_json_problem : _ -> json_problem -> _ = (
+  fun ob (x : json_problem) ->
     Buffer.add_char ob '{';
     let is_first = ref true in
     if !is_first then
@@ -596,16 +596,16 @@ let write_problem : _ -> problem -> _ = (
       Buffer.add_char ob ',';
       Buffer.add_string ob "\"attendees\":";
     (
-      write__attendee_list
+      write__json_attendee_list
     )
       ob x.problem_attendees;
     Buffer.add_char ob '}';
 )
-let string_of_problem ?(len = 1024) x =
+let string_of_json_problem ?(len = 1024) x =
   let ob = Buffer.create len in
-  write_problem ob x;
+  write_json_problem ob x;
   Buffer.contents ob
-let read_problem = (
+let read_json_problem = (
   fun p lb ->
     Yojson.Safe.read_space p lb;
     Yojson.Safe.read_lcurl p lb;
@@ -794,7 +794,7 @@ let read_problem = (
             field_problem_attendees := (
               Some (
                 (
-                  read__attendee_list
+                  read__json_attendee_list
                 ) p lb
               )
             );
@@ -980,7 +980,7 @@ let read_problem = (
               field_problem_attendees := (
                 Some (
                   (
-                    read__attendee_list
+                    read__json_attendee_list
                   ) p lb
                 )
               );
@@ -1001,8 +1001,8 @@ let read_problem = (
             problem_musicians = (match !field_problem_musicians with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "problem_musicians");
             problem_attendees = (match !field_problem_attendees with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "problem_attendees");
           }
-         : problem)
+         : json_problem)
       )
 )
-let problem_of_string s =
-  read_problem (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let json_problem_of_string s =
+  read_json_problem (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
