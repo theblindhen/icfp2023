@@ -4,7 +4,8 @@ open Contest
 module W = Widget
 module L = Layout
 
-let draw_concert (area : Sdl_area.t) (problem : Types.problem) (solution : Types.solution option) =
+let draw_concert (area : Sdl_area.t) (problem : Types.problem) (solution : Types.solution option)
+    (selected_instrument : int option) =
   (* Determine a scale factor to ensure that the max dimension of the room is
       exactly 1000. *)
   let scale = 1000. /. Float.max problem.room_width problem.room_height in
@@ -24,7 +25,15 @@ let draw_concert (area : Sdl_area.t) (problem : Types.problem) (solution : Types
   List.iter problem.attendees ~f:(fun attendee ->
       let x = Float.to_int (scale *. attendee.pos.x) in
       let y = Float.to_int (scale *. attendee.pos.y) in
-      Sdl_area.draw_circle area ~color:Draw.(opaque blue) ~thick:2 ~radius:1 (x, y));
+      let color =
+        match selected_instrument with
+        | None -> Draw.blue
+        | Some instrument ->
+            if instrument >= 0 && instrument < Array.length attendee.tastes then
+              if Float.is_positive attendee.tastes.(instrument) then Draw.green else Draw.red
+            else Draw.grey
+      in
+      Sdl_area.draw_circle area ~color:Draw.(opaque color) ~thick:2 ~radius:1 (x, y));
 
   (* Draw the solution if it's there. *)
   match solution with
@@ -34,7 +43,12 @@ let draw_concert (area : Sdl_area.t) (problem : Types.problem) (solution : Types
       Array.iter solution ~f:(fun musician ->
           let x = Float.to_int (musician.pos.x *. scale) in
           let y = Float.to_int (musician.pos.y *. scale) in
-          Sdl_area.draw_circle area ~radius ~thick:1 ~color:Draw.(opaque green) (x, y))
+          let color =
+            match selected_instrument with
+            | None -> Draw.blue
+            | Some instrument -> if instrument = musician.instrument then Draw.green else Draw.red
+          in
+          Sdl_area.draw_circle area ~radius ~thick:1 ~color:Draw.(opaque color) (x, y))
 
 let () =
   let problem_widget =
@@ -44,8 +58,20 @@ let () =
   let a_widget = W.sdl_area ~w:1000 ~h:1000 () in
   let area = W.get_sdl_area a_widget in
 
+  (* GUI model state *)
+  let cur_instrument = ref None in
   let cur_problem = ref None in
   let cur_solution = ref None in
+
+  let instrument_widget = W.text_display "No instrument" in
+  let instrument_text_display = W.get_text_display instrument_widget in
+
+  let redraw_instrument_display () =
+    match !cur_instrument with
+    | None -> Text_display.update_verbatim instrument_text_display "No instrument"
+    | Some instrument ->
+        Text_display.update_verbatim instrument_text_display (Int.to_string instrument)
+  in
 
   let load_problem id =
     eprintf "Loading problem %s\n%!" id;
@@ -61,7 +87,35 @@ let () =
     Sdl_area.clear area;
     match !cur_problem with
     | None -> ()
-    | Some problem -> draw_concert area problem !cur_solution
+    | Some problem ->
+        redraw_instrument_display ();
+        draw_concert area problem !cur_solution !cur_instrument
+  in
+
+  let instrument_prev =
+    W.button
+      ~action:(fun _ ->
+        (match !cur_instrument with
+        | None -> cur_instrument := Some 0
+        | Some instrument -> cur_instrument := Some (instrument - 1));
+        redraw ())
+      "Prev"
+  in
+  let instrument_next =
+    W.button
+      ~action:(fun _ ->
+        (match !cur_instrument with
+        | None -> cur_instrument := Some 0
+        | Some instrument -> cur_instrument := Some (instrument + 1));
+        redraw ())
+      "Next"
+  in
+  let instrument_clear =
+    W.button
+      ~action:(fun _ ->
+        cur_instrument := None;
+        redraw ())
+      "Clear"
   in
 
   let random_solve () =
@@ -88,6 +142,11 @@ let () =
     ]
   in
   let a_layout = L.resident a_widget in
-  L.tower [ L.flat_of_w [ problem_widget; solve_button ]; a_layout ]
+  L.tower
+    [
+      L.flat_of_w [ problem_widget; solve_button ];
+      L.flat_of_w [ instrument_widget; instrument_prev; instrument_next; instrument_clear ];
+      a_layout;
+    ]
   |> Bogue.of_layout ~connections
   |> Bogue.run
