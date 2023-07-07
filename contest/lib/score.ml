@@ -15,10 +15,8 @@ let score_I (s : solution) (a : attendee) (m : musician) : float =
 let score_attendee (s : solution) (a : attendee) : float =
   Array.sum (module Float) ~f:(score_I s a) s
 
-let score_musician (p : problem) (m : musician) : float =
-  failwith "Must be changed to take a solution as argument"
-(* Uncomment below once this change is made *)
-(* List.sum (module Float) ~f:(fun attendee -> score_I s attendee m) p.attendees *)
+let score_musician (p : problem) (s : solution) (m : musician) : float =
+  List.sum (module Float) ~f:(fun attendee -> score_I s attendee m) p.attendees
 
 let score_solution (p : problem) (s : solution) : float =
   List.sum (module Float) ~f:(score_attendee s) p.attendees
