@@ -17,11 +17,14 @@ let () =
   let a_widget = W.sdl_area ~w:1000 ~h:1000 () in
   let area = W.get_sdl_area a_widget in
 
+  let cur_problem = ref None in
+
   let draw_problem id =
     eprintf "Drawing problem %s\n%!" id;
     match get_problem id with
     | None -> ()
     | Some problem ->
+        cur_problem := Some problem;
         Sdl_area.clear area;
         (* Determine a scale factor to ensure that the max dimension of the room is
            exactly 1000. *)
@@ -45,6 +48,21 @@ let () =
             Sdl_area.draw_circle area ~color:Draw.(opaque blue) ~thick:2 ~radius:1 (x, y))
   in
 
+  let random_solve () =
+    match !cur_problem with
+    | None -> eprintf "No problem loaded\n%!"
+    | Some problem ->
+        let solution = Random_solver.random_placements problem in
+        let scale = 1000. /. Float.max problem.room_width problem.room_height in
+        let radius = Float.to_int (scale *. 10.0) in
+        List.iter solution ~f:(fun musician ->
+            let x = Float.to_int (musician.x *. scale) in
+            let y = Float.to_int (musician.y *. scale) in
+            Sdl_area.draw_circle area ~radius ~thick:1 ~color:Draw.(opaque green) (x, y))
+  in
+
+  let solve_button = W.button ~action:(fun _ -> random_solve ()) "Random solve" in
+
   let connections =
     [
       W.connect_main problem_widget problem_widget
@@ -53,4 +71,6 @@ let () =
     ]
   in
   let a_layout = L.resident a_widget in
-  L.tower [ L.resident problem_widget; a_layout ] |> Bogue.of_layout ~connections |> Bogue.run
+  L.tower [ L.flat_of_w [ problem_widget; solve_button ]; a_layout ]
+  |> Bogue.of_layout ~connections
+  |> Bogue.run
