@@ -23,7 +23,7 @@ First install the "opam" package manager and configure it as follows:
 
 Install packages we need:
 
-    $ opam install core dune
+    $ opam install core core_unix atdgen yojson dune
 
 Now go into the right subdirectory and build and run one of these commands:
 
