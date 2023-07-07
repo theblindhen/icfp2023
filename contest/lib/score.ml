@@ -9,8 +9,8 @@ let is_blocked (s : solution) (a : attendee) (m : musician) : bool =
 let score_I (s : solution) (a : attendee) (m : musician) : float =
   if is_blocked s a m then 0.0
   else
-    let d = distance a.pos m.pos in
-    Float.round_up (1_000_000.0 *. a.tastes.(m.instrument) /. (d *. d))
+    let d_sq = distance_squared a.pos m.pos in
+    Float.round_up (1_000_000.0 *. a.tastes.(m.instrument) /. d_sq)
 
 let score_attendee (s : solution) (a : attendee) : float =
   Array.sum (module Float) ~f:(score_I s a) s
