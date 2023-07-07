@@ -4,10 +4,6 @@ open Contest.Types
 
 let problem_count = 45
 
-let get_problem problem_id =
-  let json = In_channel.read_all ("../problems/problem-" ^ string_of_int problem_id ^ ".json") in
-  json |> Json_j.json_problem_of_string |> problem_of_json_problem
-
 type stats = { room_dim : string; stage_dim : string; musicians_count : int; attendees_count : int }
 
 let problem_stats problem =
@@ -35,6 +31,9 @@ let stats_to_string (problem_stats : stats) =
 
 let () =
   for i = 1 to problem_count do
-    let stats = get_problem i |> problem_stats |> stats_to_string in
-    print_endline (sprintf "Problem %02d:\n%s\n" i stats)
+    match Json_util.get_problem i with
+    | None -> print_endline (sprintf "Problem %02d: not found" i)
+    | Some problem ->
+        let stats = problem |> problem_stats |> stats_to_string in
+        print_endline (sprintf "Problem %02d:\n%s\n" i stats)
   done
