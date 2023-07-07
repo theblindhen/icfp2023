@@ -23,7 +23,7 @@ let problem_stats problem =
     instrument_count =
       (match List.max_elt problem.musicians ~compare:Int.compare with
       | None -> 0
-      | Some x -> x);
+      | Some x -> x + 1);
   }
 
 let stats_to_string (problem_stats : stats) =
