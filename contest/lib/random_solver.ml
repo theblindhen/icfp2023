@@ -9,7 +9,7 @@ let random_placement (p : problem) : position =
 let is_valid_placement (_ : problem) (placed : position list) (potential : position) : bool =
   placed |> List.for_all (fun x -> distance x potential >= 10.0)
 
-let random_placements (p : problem) : solution =
+let random_placements (p : problem) : position list =
   Random.self_init ();
   let rec random (acc : position list) (toPlace : int list) (fuel : int) =
     match toPlace with
@@ -20,4 +20,7 @@ let random_placements (p : problem) : solution =
         else if fuel == 0 then failwith "ran out of fuel"
         else random acc toPlace (fuel - 1)
   in
-  solution_of_positions p (random [] p.musicians 10_000)
+  random [] p.musicians 10_000
+
+let random_placement_solution (p : problem) : solution =
+  random_placements p |> solution_of_positions p

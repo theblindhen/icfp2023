@@ -1,7 +1,7 @@
 open Core
 open Contest
 
-let get_solution (p : Types.problem) = Random_solver.random_placements p
+let get_solution (p : Types.problem) = Random_solver.random_placement_solution p
 
 let () =
   let args = Sys.get_argv () in
