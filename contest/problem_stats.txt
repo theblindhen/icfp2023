@@ -2,269 +2,314 @@ Problem 01:
 room: 3649 x 4350
 stage: 1176 x 605
 musicians: 1059
+instruments: 132
 attendees: 1000
 
 Problem 02:
 room: 8689 x 6523
 stage: 1103 x 491
 musicians: 635
+instruments: 438
 attendees: 1000
 
 Problem 03:
 room: 2426 x 6421
 stage: 240 x 896
 musicians: 190
+instruments: 101
 attendees: 1000
 
 Problem 04:
 room: 9340 x 2339
 stage: 418 x 411
 musicians: 360
+instruments: 314
 attendees: 1000
 
 Problem 05:
 room: 7859 x 5821
 stage: 831 x 1843
 musicians: 3535
+instruments: 2198
 attendees: 1000
 
 Problem 06:
 room: 4677 x 8826
 stage: 1481 x 2717
 musicians: 205
+instruments: 27
 attendees: 1000
 
 Problem 07:
 room: 6111 x 9953
 stage: 841 x 2931
 musicians: 4391
+instruments: 2
 attendees: 1000
 
 Problem 08:
 room: 2166 x 5248
 stage: 124 x 949
 musicians: 124
+instruments: 40
 attendees: 5000
 
 Problem 09:
 room: 1000 x 1000
 stage: 175 x 200
 musicians: 56
+instruments: 38
 attendees: 1000
 
 Problem 10:
 room: 1000 x 1000
 stage: 253 x 164
 musicians: 94
+instruments: 4
 attendees: 1000
 
 Problem 11:
 room: 1000 x 1000
 stage: 232 x 277
 musicians: 149
+instruments: 115
 attendees: 1000
 
 Problem 12:
 room: 1000 x 1000
 stage: 227 x 194
 musicians: 32
+instruments: 11
 attendees: 5000
 
 Problem 13:
 room: 1000 x 1000
 stage: 276 x 318
 musicians: 52
+instruments: 22
 attendees: 1000
 
 Problem 14:
 room: 1000 x 1000
 stage: 156 x 168
 musicians: 34
+instruments: 15
 attendees: 1000
 
 Problem 15:
 room: 1000 x 1000
 stage: 208 x 167
 musicians: 56
+instruments: 9
 attendees: 1000
 
 Problem 16:
 room: 1000 x 1000
 stage: 129 x 207
 musicians: 13
+instruments: 6
 attendees: 1000
 
 Problem 17:
 room: 1547 x 3049
 stage: 299 x 716
 musicians: 56
+instruments: 51
 attendees: 5000
 
 Problem 18:
 room: 4444 x 5794
 stage: 1243 x 1464
 musicians: 2591
+instruments: 563
 attendees: 5000
 
 Problem 19:
 room: 2954 x 7680
 stage: 791 x 388
 musicians: 326
+instruments: 236
 attendees: 5000
 
 Problem 20:
 room: 6073 x 3064
 stage: 1904 x 498
 musicians: 1013
+instruments: 452
 attendees: 500
 
 Problem 21:
 room: 5853 x 8495
 stage: 303 x 543
 musicians: 129
+instruments: 46
 attendees: 1000
 
 Problem 22:
 room: 1000 x 1000
 stage: 1000 x 12
 musicians: 16
+instruments: 9
 attendees: 400
 
 Problem 23:
 room: 1000 x 1000
 stage: 1000 x 12
 musicians: 9
+instruments: 1
 attendees: 1000
 
 Problem 24:
 room: 1000 x 1000
 stage: 1000 x 12
 musicians: 5
+instruments: 1
 attendees: 5000
 
 Problem 25:
 room: 1000 x 1000
 stage: 1000 x 12
 musicians: 26
+instruments: 26
 attendees: 5000
 
 Problem 26:
 room: 1000 x 1000
 stage: 1000 x 12
 musicians: 12
+instruments: 12
 attendees: 5000
 
 Problem 27:
 room: 1000 x 1000
 stage: 1000 x 12
 musicians: 14
+instruments: 14
 attendees: 500
 
 Problem 28:
 room: 1000 x 1000
 stage: 181 x 134
 musicians: 13
+instruments: 6
 attendees: 1000
 
 Problem 29:
 room: 1000 x 1000
 stage: 193 x 203
 musicians: 68
+instruments: 10
 attendees: 1000
 
 Problem 30:
 room: 1000 x 1000
 stage: 221 x 160
 musicians: 70
+instruments: 3
 attendees: 1000
 
 Problem 31:
 room: 1462 x 9133
 stage: 200 x 2168
 musicians: 792
+instruments: 306
 attendees: 1000
 
 Problem 32:
 room: 3968 x 9921
 stage: 831 x 1094
 musicians: 1365
+instruments: 642
 attendees: 1000
 
 Problem 33:
 room: 9963 x 9102
 stage: 1984 x 2450
 musicians: 1484
+instruments: 107
 attendees: 500
 
 Problem 34:
 room: 8882 x 5656
 stage: 1324 x 669
 musicians: 895
+instruments: 375
 attendees: 500
 
 Problem 35:
 room: 8085 x 3225
 stage: 1489 x 596
 musicians: 567
+instruments: 561
 attendees: 500
 
 Problem 36:
 room: 2159 x 1047
 stage: 275 x 334
 musicians: 95
+instruments: 82
 attendees: 500
 
 Problem 37:
 room: 2372 x 1101
 stage: 636 x 279
 musicians: 201
+instruments: 82
 attendees: 500
 
 Problem 38:
 room: 1369 x 2047
 stage: 210 x 496
 musicians: 243
+instruments: 82
 attendees: 1000
 
 Problem 39:
 room: 4758 x 1374
 stage: 102 x 309
 musicians: 46
+instruments: 21
 attendees: 1000
 
 Problem 40:
 room: 1000 x 1000
 stage: 182 x 195
 musicians: 10
+instruments: 2
 attendees: 1000
 
 Problem 41:
 room: 1000 x 1000
 stage: 159 x 248
 musicians: 10
+instruments: 5
 attendees: 400
 
 Problem 42:
 room: 1000 x 1000
 stage: 148 x 169
 musicians: 5
+instruments: 2
 attendees: 100
 
 Problem 43:
 room: 1000 x 1000
 stage: 105 x 175
 musicians: 5
+instruments: 2
 attendees: 100
 
 Problem 44:
 room: 1000 x 1000
 stage: 256 x 330
 musicians: 10
+instruments: 6
 attendees: 400
 
 Problem 45:
 room: 1000 x 1000
 stage: 104 x 198
 musicians: 10
+instruments: 5
 attendees: 400
 
