@@ -53,3 +53,9 @@ type json_submission_get = {
   ?success <json name="Success">: json_submission_get_success option;
   ?failure <json name="Failure">: string option;
 } <ocaml field_prefix="submission_get">
+
+type json_submission_post = {
+  problem_id: int,
+  contents: string
+} <ocaml field_prefix="submission_post">
+
