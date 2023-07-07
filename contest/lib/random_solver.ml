@@ -21,4 +21,4 @@ let random_placements (p : problem) : solution =
         else if fuel == 0 then failwith "ran out of fuel"
         else random acc toPlace (fuel - 1)
   in
-  random [] p.musicians 10_000
+  solution_of_positions p (random [] p.musicians 10_000)
