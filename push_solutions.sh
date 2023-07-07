@@ -13,7 +13,9 @@ for i in {1..45}; do
                     jq '{"problem_id": '$i', "contents": .|tojson}' problems/solutions-$i/$BEST \
                     | curl -L -sS -X POST \
                         -H "Authorization: Bearer $APIKEY" \
-                        --json @- \
+                        -H "Content-Type: application/json" \
+                        -H "Accept: application/json" \
+                        --data @- \
                         https://api.icfpcontest.com/submission \
                     | tee /dev/stderr \
                     | grep -q '"........................"'
