@@ -1,12 +1,12 @@
 open Core
-open Contest.Json_j
 open Bogue
+open Contest
 module W = Widget
 module L = Layout
 
 let get_problem problem_id =
   match In_channel.read_all ("../problems/problem-" ^ problem_id ^ ".json") with
-  | json -> Some (json_problem_of_string json)
+  | json -> Some (Types.problem_of_json_problem (Json_j.json_problem_of_string json))
   | exception _ -> None
 
 let () =
@@ -28,9 +28,8 @@ let () =
         let scale = 1000. /. Float.max problem.room_width problem.room_height in
         let room_width = Float.to_int (scale *. problem.room_width) in
         let room_height = Float.to_int (scale *. problem.room_height) in
-        let stage_xy =
-          Tuple2.map ~f:(fun coord -> Float.to_int (scale *. coord)) problem.stage_bottom_left
-        in
+        let stage_x = Float.to_int (scale *. problem.stage_bottom_left.x) in
+        let stage_y = Float.to_int (scale *. problem.stage_bottom_left.y) in
         let stage_width = Float.to_int (scale *. problem.stage_width) in
         let stage_height = Float.to_int (scale *. problem.stage_height) in
 
@@ -39,10 +38,10 @@ let () =
           ~thick:1 ~w:room_width ~h:room_height (0, 0);
         Sdl_area.draw_rectangle area
           ~color:Draw.(opaque red)
-          ~thick:1 ~w:stage_width ~h:stage_height stage_xy;
+          ~thick:1 ~w:stage_width ~h:stage_height (stage_x, stage_y);
         List.iter problem.attendees ~f:(fun attendee ->
-            let x = Float.to_int (scale *. attendee.x) in
-            let y = Float.to_int (scale *. attendee.y) in
+            let x = Float.to_int (scale *. attendee.pos.x) in
+            let y = Float.to_int (scale *. attendee.pos.y) in
             Sdl_area.draw_circle area ~color:Draw.(opaque blue) ~thick:3 ~radius:2 (x, y))
   in
 
