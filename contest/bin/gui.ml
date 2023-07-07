@@ -27,13 +27,14 @@ let draw_concert (area : Sdl_area.t) (problem : Types.problem) (solution : Types
       let y = Float.to_int (scale *. attendee.pos.y) in
       let color =
         match selected_instrument with
-        | None -> Draw.blue
+        | None -> Draw.(opaque blue)
         | Some instrument ->
             if instrument >= 0 && instrument < Array.length attendee.tastes then
-              if Float.is_positive attendee.tastes.(instrument) then Draw.green else Draw.red
-            else Draw.grey
+              if Float.is_positive attendee.tastes.(instrument) then Draw.(darker (opaque green))
+              else Draw.(opaque red)
+            else Draw.(opaque grey)
       in
-      Sdl_area.draw_circle area ~color:Draw.(opaque color) ~thick:2 ~radius:1 (x, y));
+      Sdl_area.draw_circle area ~color ~thick:2 ~radius:1 (x, y));
 
   (* Draw the solution if it's there. *)
   match solution with
@@ -45,10 +46,12 @@ let draw_concert (area : Sdl_area.t) (problem : Types.problem) (solution : Types
           let y = Float.to_int (musician.pos.y *. scale) in
           let color =
             match selected_instrument with
-            | None -> Draw.blue
-            | Some instrument -> if instrument = musician.instrument then Draw.green else Draw.red
+            | None -> Draw.(opaque blue)
+            | Some instrument ->
+                if instrument = musician.instrument then Draw.(darker (opaque green))
+                else Draw.(opaque red)
           in
-          Sdl_area.draw_circle area ~radius ~thick:1 ~color:Draw.(opaque color) (x, y))
+          Sdl_area.draw_circle area ~radius ~thick:1 ~color (x, y))
 
 let () =
   let problem_widget =
