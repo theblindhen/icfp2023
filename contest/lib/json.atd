@@ -30,3 +30,26 @@ type json_placement = {
 type json_solution = {
   placement: json_placement list;
 } <ocaml field_prefix="solution_">
+
+type json_score = {
+  ?failure <json name="Failure">: string option;
+  ?success <json name="Success">: float option;
+} <ocaml field_prefix="score_">
+
+type json_submission_get_success_submission = {
+  _id: string;
+  problem_id: float;
+  user_id: string;
+  score: json_score;
+  submitted_at: string
+} <ocaml field_prefix="submission_get_">
+
+type json_submission_get_success = {
+  submission: json_submission_get_success_submission;
+  contents: string;
+} <ocaml field_prefix="submission_get_">
+
+type json_submission_get = {
+  ?success <json name="Success">: json_submission_get_success option;
+  ?failure <json name="Failure">: string option;
+} <ocaml field_prefix="submission_get">

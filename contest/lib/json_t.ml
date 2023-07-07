@@ -1,6 +1,30 @@
 (* Auto-generated from "json.atd" *)
 [@@@ocaml.warning "-27-32-33-35-39"]
 
+type json_score = {
+  score_failure (*atd failure *): string option;
+  score_success (*atd success *): float option
+}
+
+type json_submission_get_success_submission = {
+  submission_get__id (*atd _id *): string;
+  submission_get_problem_id (*atd problem_id *): float;
+  submission_get_user_id (*atd user_id *): string;
+  submission_get_score (*atd score *): json_score;
+  submission_get_submitted_at (*atd submitted_at *): string
+}
+
+type json_submission_get_success = {
+  submission_get_submission (*atd submission *):
+    json_submission_get_success_submission;
+  submission_get_contents (*atd contents *): string
+}
+
+type json_submission_get = {
+  submission_getsuccess (*atd success *): json_submission_get_success option;
+  submission_getfailure (*atd failure *): string option
+}
+
 type json_placement = {
   placement_x (*atd x *): float;
   placement_y (*atd y *): float
