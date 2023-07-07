@@ -3,3 +3,9 @@
  (name main)
  (modules main)
  (libraries contest))
+
+(executable
+ (public_name gui)
+ (name gui)
+ (modules gui)
+ (libraries contest bogue))
