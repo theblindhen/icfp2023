@@ -4,7 +4,13 @@ open Contest.Types
 
 let problem_count = 45
 
-type stats = { room_dim : string; stage_dim : string; musicians_count : int; attendees_count : int }
+type stats = {
+  room_dim : string;
+  stage_dim : string;
+  musicians_count : int;
+  attendees_count : int;
+  instrument_count : int;
+}
 
 let problem_stats problem =
   {
@@ -14,6 +20,10 @@ let problem_stats problem =
       sprintf "%d x %d" (int_of_float problem.stage_width) (int_of_float problem.stage_height);
     musicians_count = List.length problem.musicians;
     attendees_count = List.length problem.attendees;
+    instrument_count =
+      (match List.max_elt problem.musicians ~compare:Int.compare with
+      | None -> 0
+      | Some x -> x);
   }
 
 let stats_to_string (problem_stats : stats) =
@@ -25,6 +35,9 @@ let stats_to_string (problem_stats : stats) =
   ^ "\n"
   ^ "musicians: "
   ^ string_of_int problem_stats.musicians_count
+  ^ "\n"
+  ^ "instruments: "
+  ^ string_of_int problem_stats.instrument_count
   ^ "\n"
   ^ "attendees: "
   ^ string_of_int problem_stats.attendees_count
