@@ -1,5 +1,5 @@
 type position = { x : float; y : float }
-type attendee = { pos : position; tastes : float list }
+type attendee = { pos : position; tastes : float array }
 
 type problem = {
   room_width : float;
@@ -12,3 +12,8 @@ type problem = {
 }
 
 type solution = position list
+
+type musician = {
+  pos: position;
+  instrument: int;
+}

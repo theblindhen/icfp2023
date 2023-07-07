@@ -1,13 +1,11 @@
 open Types
 open Random
+open Misc
 
 let random_placement (p : problem) : position =
   let x_offset = Random.float (p.stage_width -. 20.0) in
   let y_offset = Random.float (p.stage_height -. 20.0) in
   { x = x_offset +. 10.0 +. p.stage_bottom_left.x; y = y_offset +. 10.0 +. p.stage_bottom_left.y }
-
-let distance (p1 : position) (p2 : position) : float =
-  sqrt (((p1.x -. p2.x) ** 2.0) +. ((p1.y -. p2.y) ** 2.0))
 
 let is_valid_placement (_ : problem) (placed : position list) (potential : position) : bool =
   placed |> List.for_all (fun x -> distance x potential >= 10.0)
