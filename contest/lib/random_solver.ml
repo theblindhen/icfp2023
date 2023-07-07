@@ -1,5 +1,4 @@
 open Types
-open Random
 open Misc
 
 let random_placement (p : problem) : position =
