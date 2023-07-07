@@ -3,7 +3,7 @@ if [ -z $APIKEY ]; then
     echo "Please set your APIKEY environment variable."
     exit 1
 fi
-for i in {1..45}; do
+for i in {1..55}; do
     if [ -d problems/solutions-$i ]; then
         if [ -n "$(ls problems/solutions-$i)" ]; then
             BEST=$(cd problems/solutions-$i/; ls | grep '^[0-9]*[.]json$' | sort -n | tail -n 1)
