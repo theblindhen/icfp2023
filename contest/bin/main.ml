@@ -14,6 +14,9 @@ let () =
       let submission = Json_util.make_submission 1 solution in
       let score = Score.score_solution problem solution in
       printf "Expected score: %f\n" score;
+      let optimised_solution = Improver.improve problem solution in
+      let optimised_score = Score.score_solution problem optimised_solution in
+      printf "Improved score: %f\n" optimised_score;
       let out_file = args.(1) in
       (* write solution_json to file *)
       Out_channel.write_all out_file ~data:(Json_j.string_of_json_submission_post submission);
