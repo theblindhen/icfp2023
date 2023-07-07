@@ -51,9 +51,9 @@ let () =
         let solution = Random_solver.random_placements problem in
         let scale = 1000. /. Float.max problem.room_width problem.room_height in
         let radius = Float.to_int (scale *. 10.0) in
-        List.iter solution ~f:(fun musician ->
-            let x = Float.to_int (musician.x *. scale) in
-            let y = Float.to_int (musician.y *. scale) in
+        Array.iter solution ~f:(fun musician ->
+            let x = Float.to_int (musician.pos.x *. scale) in
+            let y = Float.to_int (musician.pos.y *. scale) in
             Sdl_area.draw_circle area ~radius ~thick:1 ~color:Draw.(opaque green) (x, y))
   in
 

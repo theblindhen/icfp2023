@@ -30,8 +30,15 @@ let problem_of_json_problem (json_problem : Json_j.json_problem) =
              });
   }
 
-type solution = position list
-type musician = { pos : position; instrument : int }
+type musician = { id : int; pos : position; instrument : int }
+type solution = musician array
 
 let json_solution_of_solution (solution : solution) : Json_j.json_solution =
-  { placements = solution |> List.map (fun { x; y } : Json_j.json_placement -> { x; y }) }
+  {
+    placements =
+      solution
+      |> Array.to_list
+      |> List.sort (fun m1 m2 -> Stdlib.compare m1.id m2.id)
+      |> List.map (fun { pos = { x; y }; id = _; instrument = _ } : Json_j.json_placement ->
+             { x; y });
+  }
