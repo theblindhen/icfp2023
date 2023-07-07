@@ -15,5 +15,8 @@ let score_I (s : solution) (a : attendee) (m : musician) : float =
 let score_attendee (s : solution) (a : attendee) : float =
   Array.sum (module Float) ~f:(score_I s a) s
 
+let score_musician (p : problem) (m : musician) : float =
+  List.fold_left (fun sum attendee -> sum +. score_I attendee m) 0.0 p.attendees
+
 let score_solution (p : problem) (s : solution) : float =
   List.sum (module Float) ~f:(score_attendee s) p.attendees

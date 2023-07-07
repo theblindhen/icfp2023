@@ -13,6 +13,9 @@ let () =
       let solution = get_solution problem in
       let score = Score.score_solution problem solution in
       printf "Expected score: %f\n" score;
-      Json_util.write_solution_if_positive problem_id problem solution;
+      let optimised_solution = Improver.improve problem solution in
+      let optimised_score = Score.score_solution problem optimised_solution in
+      printf "Improved score: %f\n" optimised_score;
+      Json_util.write_solution_if_best problem_id problem optimised_solution;
       (* write solution_json to file *)
       print_endline "Done"
