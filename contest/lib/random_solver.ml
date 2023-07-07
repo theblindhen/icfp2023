@@ -1,0 +1,26 @@
+open Types
+open Random
+
+let random_placement (p : problem) : position =
+  let x_offset = Random.float (p.stage_width -. 20.0) in
+  let y_offset = Random.float (p.stage_height -. 20.0) in
+  { x = x_offset +. 10.0 +. p.stage_bottom_left.x; y = y_offset +. 10.0 +. p.stage_bottom_left.y }
+
+let distance (p1 : position) (p2 : position) : float =
+  sqrt (((p1.x -. p2.x) ** 2.0) +. ((p1.y -. p2.y) ** 2.0))
+
+let is_valid_placement (_ : problem) (placed : position list) (potential : position) : bool =
+  placed |> List.for_all (fun x -> distance x potential >= 10.0)
+
+let random_placements (p : problem) : solution =
+  Random.self_init ();
+  let rec random (acc : position list) (toPlace : int list) (fuel : int) =
+    match toPlace with
+    | [] -> acc
+    | _ :: t ->
+        let potential = random_placement p in
+        if is_valid_placement p acc potential then random (potential :: acc) t fuel
+        else if fuel == 0 then failwith "ran out of fuel"
+        else random acc toPlace (fuel - 1)
+  in
+  random [] p.musicians 10_000
