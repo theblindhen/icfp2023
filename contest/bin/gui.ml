@@ -4,11 +4,6 @@ open Contest
 module W = Widget
 module L = Layout
 
-let get_problem problem_id =
-  match In_channel.read_all ("../problems/problem-" ^ problem_id ^ ".json") with
-  | json -> Some (Types.problem_of_json_problem (Json_j.json_problem_of_string json))
-  | exception _ -> None
-
 let () =
   let problem_widget =
     W.text_input ~text:"" ~prompt:"Problem number" ~filter:Text_input.uint_filter ()
@@ -21,7 +16,8 @@ let () =
 
   let draw_problem id =
     eprintf "Drawing problem %s\n%!" id;
-    match get_problem id with
+    let problem_id = Int.of_string id in
+    match Json_util.get_problem problem_id with
     | None -> ()
     | Some problem ->
         cur_problem := Some problem;

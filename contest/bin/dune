@@ -9,3 +9,9 @@
  (name gui)
  (modules gui)
  (libraries contest bogue))
+
+(executable
+ (public_name stats)
+ (name stats)
+ (modules stats)
+ (libraries contest))
