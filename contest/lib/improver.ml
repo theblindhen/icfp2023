@@ -42,4 +42,5 @@ let improve (p : problem) (s : solution) : solution =
         scores.(j) <- { score = score_j'; musician = { musician_i with pos = musician_j.pos } })
     done
   done;
+  printf "Score should be: %f\n%!" (Array.sum (module Float) scores ~f:(fun s -> s.score));
   Array.map scores ~f:(fun s -> s.musician)
