@@ -1,52 +1,56 @@
 open Core
-open Contest.Json_j
 open Bogue
+open Contest
 module W = Widget
 module L = Layout
 
 let get_problem problem_id =
-  let json = In_channel.read_all ("../problems/problem-" ^ problem_id ^ ".json") in
-  json_problem_of_string json
+  match In_channel.read_all ("../problems/problem-" ^ problem_id ^ ".json") with
+  | json -> Some (Types.problem_of_json_problem (Json_j.json_problem_of_string json))
+  | exception _ -> None
 
 let () =
-  let problem = get_problem "10" in
-  (* Determine a scale factor to ensure that the max dimension of the room is
-     exactly 1000. *)
-  let scale = 1000. /. Float.max problem.problem_room_width problem.problem_room_height in
-  let room_width = Float.to_int (scale *. problem.problem_room_width) in
-  let room_height = Float.to_int (scale *. problem.problem_room_height) in
-  let stage_xy =
-    Tuple2.map ~f:(fun coord -> Float.to_int (scale *. coord)) problem.problem_stage_bottom_left
+  let problem_widget =
+    W.text_input ~text:"" ~prompt:"Problem number" ~filter:Text_input.uint_filter ()
   in
-  let stage_width = Float.to_int (scale *. problem.problem_stage_width) in
-  let stage_height = Float.to_int (scale *. problem.problem_stage_height) in
-
-  let a_widget = W.sdl_area ~w:room_width ~h:room_height () in
+  let problem_text_input = W.get_text_input problem_widget in
+  let a_widget = W.sdl_area ~w:1000 ~h:1000 () in
   let area = W.get_sdl_area a_widget in
-  let a_layout = L.resident a_widget in
-  Sdl_area.draw_rectangle area
-    ~color:Draw.(opaque black)
-    ~thick:1 ~w:room_width ~h:room_height (0, 0);
-  Sdl_area.draw_rectangle area
-    ~color:Draw.(opaque red)
-    ~thick:1 ~w:stage_width ~h:stage_height stage_xy;
-  List.iter problem.problem_attendees ~f:(fun attendee ->
-      let x = Float.to_int (scale *. attendee.attendee_x) in
-      let y = Float.to_int (scale *. attendee.attendee_y) in
-      Sdl_area.draw_circle area ~color:Draw.(opaque green) ~thick:3 ~radius:2 (x, y));
 
-  let connection =
-    W.connect a_widget a_widget
-      (fun _ _ event ->
-        let x, y = Mouse.button_pos event in
-        Printf.eprintf "clicked at %d, %d\n%!" x y;
-        let ax, ay = (L.xpos a_layout, L.ypos a_layout) in
-        Printf.eprintf " offset by %d, %d\n%!" ax ay;
-        let x, y = (x - ax, y - ay) in
-        Printf.eprintf " really at %d, %d\n%!" x y;
-        let x, y = Sdl_area.to_pixels (x, y) in
-        Printf.eprintf " really at %d, %d\n%!" x y;
-        Sdl_area.draw_circle area ~color:Draw.(opaque blue) ~thick:4 ~radius:3 (x, y))
-      Trigger.buttons_down
+  let draw_problem id =
+    eprintf "Drawing problem %s\n%!" id;
+    match get_problem id with
+    | None -> ()
+    | Some problem ->
+        Sdl_area.clear area;
+        (* Determine a scale factor to ensure that the max dimension of the room is
+           exactly 1000. *)
+        let scale = 1000. /. Float.max problem.room_width problem.room_height in
+        let room_width = Float.to_int (scale *. problem.room_width) in
+        let room_height = Float.to_int (scale *. problem.room_height) in
+        let stage_x = Float.to_int (scale *. problem.stage_bottom_left.x) in
+        let stage_y = Float.to_int (scale *. problem.stage_bottom_left.y) in
+        let stage_width = Float.to_int (scale *. problem.stage_width) in
+        let stage_height = Float.to_int (scale *. problem.stage_height) in
+
+        Sdl_area.draw_rectangle area
+          ~color:Draw.(opaque black)
+          ~thick:1 ~w:room_width ~h:room_height (0, 0);
+        Sdl_area.draw_rectangle area
+          ~color:Draw.(opaque red)
+          ~thick:1 ~w:stage_width ~h:stage_height (stage_x, stage_y);
+        List.iter problem.attendees ~f:(fun attendee ->
+            let x = Float.to_int (scale *. attendee.pos.x) in
+            let y = Float.to_int (scale *. attendee.pos.y) in
+            Sdl_area.draw_circle area ~color:Draw.(opaque blue) ~thick:3 ~radius:2 (x, y))
   in
-  L.tower [ a_layout ] |> Bogue.of_layout ~connections:[ connection ] |> Bogue.run
+
+  let connections =
+    [
+      W.connect_main problem_widget problem_widget
+        (fun _ _ _ -> draw_problem (Text_input.text problem_text_input))
+        [ Trigger.text_input ];
+    ]
+  in
+  let a_layout = L.resident a_widget in
+  L.tower [ L.resident problem_widget; a_layout ] |> Bogue.of_layout ~connections |> Bogue.run

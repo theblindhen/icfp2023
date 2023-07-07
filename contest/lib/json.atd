@@ -10,7 +10,7 @@ type json_attendee = {
   x: float;
   y: float;
   tastes: float list
-} <ocaml field_prefix="attendee_">
+}
 
 type json_problem = {
   room_width: float;
@@ -20,21 +20,21 @@ type json_problem = {
   stage_bottom_left: (float * float);
   musicians: int list;
   attendees: json_attendee list
-} <ocaml field_prefix="problem_">
+}
 
 type json_placement = {
   x: float;
   y: float;
-} <ocaml field_prefix="placement_">
+}
 
 type json_solution = {
-  placement: json_placement list;
-} <ocaml field_prefix="solution_">
+  placements: json_placement list;
+}
 
 type json_score = {
   ?failure <json name="Failure">: string option;
   ?success <json name="Success">: float option;
-} <ocaml field_prefix="score_">
+}
 
 type json_submission_get_success_submission = {
   _id: string;
@@ -42,20 +42,20 @@ type json_submission_get_success_submission = {
   user_id: string;
   score: json_score;
   submitted_at: string
-} <ocaml field_prefix="submission_get_">
+}
 
 type json_submission_get_success = {
   submission: json_submission_get_success_submission;
   contents: string;
-} <ocaml field_prefix="submission_get_">
+}
 
 type json_submission_get = {
   ?success <json name="Success">: json_submission_get_success option;
   ?failure <json name="Failure">: string option;
-} <ocaml field_prefix="submission_get">
+}
 
 type json_submission_post = {
-  problem_id: int,
+  problem_id: int;
   contents: string
-} <ocaml field_prefix="submission_post">
+}
 
