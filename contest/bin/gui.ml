@@ -42,7 +42,7 @@ let () =
         List.iter problem.attendees ~f:(fun attendee ->
             let x = Float.to_int (scale *. attendee.pos.x) in
             let y = Float.to_int (scale *. attendee.pos.y) in
-            Sdl_area.draw_circle area ~color:Draw.(opaque blue) ~thick:3 ~radius:2 (x, y))
+            Sdl_area.draw_circle area ~color:Draw.(opaque blue) ~thick:2 ~radius:1 (x, y))
   in
 
   let connections =
