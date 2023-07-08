@@ -27,6 +27,8 @@ type json_placement = { x: float; y: float }
 
 type json_solution = { placements: json_placement list }
 
+type json_pillar = { center: (float * float); radius: float }
+
 type json_attendee = { x: float; y: float; tastes: float list }
 
 type json_problem = {
@@ -36,5 +38,6 @@ type json_problem = {
   stage_height: float;
   stage_bottom_left: (float * float);
   musicians: int list;
-  attendees: json_attendee list
+  attendees: json_attendee list;
+  pillars: json_pillar list option
 }
