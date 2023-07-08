@@ -75,7 +75,7 @@ type Msg
     | Swap
     | LP
     | InitSim
-    | StepSim
+    | StepSim Int
     | Save
     | FocusOnInstrument Int
     | SolutionReturned (Result Http.Error String)
@@ -161,10 +161,10 @@ update msg model = case msg of
         , Cmd.none )
     LoadedProblem (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
     PlaceRandomly -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/place_randomly" ] )
-    Swap -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/swap" ] )
-    LP -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/lp" ] )
+    Swap -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/swap/1" ] )
+    LP -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/lp/1" ] )
     InitSim -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/init_sim" ] )
-    StepSim -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/step_sim" ] )
+    StepSim i -> ( model, Cmd.batch [ postExpectSolution ("http://localhost:3000/step_sim/" ++ (String.fromInt i)) ] )
     Save -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/save" ] )
     FocusOnInstrument i -> ( { model | focus = Just i }, Cmd.none )
     SolutionReturned (Ok res) -> (
@@ -212,7 +212,16 @@ instrumentDescription : Model -> Problem -> String
 instrumentDescription m p =
     case m.focus of
         Nothing -> "No instrument in focus"
-        Just i -> "Focusing on instrument: " ++ (String.fromInt i)
+        Just i -> 
+            let 
+                tastes = List.map (\a -> 
+                    Maybe.withDefault 0 (Extra.getAt i a.tastes)) p.attendees
+                min = Maybe.withDefault 0 (List.minimum tastes)
+                max = Maybe.withDefault 0 (List.maximum tastes)
+                noMusicians = 
+                    List.filter (\musician -> musician == i) p.musicians
+                    |> List.length
+            in "Focusing on instrument: " ++ (String.fromInt i) ++ "; min: " ++ (String.fromFloat min) ++ "; max: " ++ (String.fromFloat max) ++ "; number of musicians with instrument: " ++ (String.fromInt noMusicians)
 
 viewProblem : Model -> Problem -> Html Msg
 viewProblem m p =
@@ -253,7 +262,8 @@ viewProblem m p =
                             [ BButton.onClick (nextFocus m.focus 1), BButton.primary ]) [ text "Next Instrument" ],
                     BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ],
                     BButton.button [ BButton.onClick InitSim, BButton.primary ] [ text "Init Sim" ],
-                    BButton.button [ BButton.onClick StepSim, BButton.primary ] [ text "Step Sim" ]
+                    BButton.button [ BButton.onClick (StepSim 1), BButton.primary ] [ text "Step Sim" ],
+                    BButton.button [ BButton.onClick (StepSim 100), BButton.primary ] [ text "Step Sim 100" ]
                 ],
             div [ ]
                 [ 

@@ -32,10 +32,13 @@ let init_solution_handler f _ =
       current_solution := Some solution;
       Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
 
-let optimiser_handler f _ =
+let rec repeat f n a = if n = 0 then a else repeat f (n - 1) (f a)
+
+let optimiser_handler f req =
+  let n = Router.param req "n" |> int_of_string in
   match (!current_problem, !current_solution) with
   | Some p, Some s ->
-      let solution' = f p s in
+      let solution' = repeat (f p) n s in
       let solution_json =
         solution' |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
       in
@@ -60,9 +63,9 @@ let _ =
   |> App.get "/problem/:id" problem_handler
   |> App.post "/place_randomly"
        (init_solution_handler (fun p -> Random_solver.random_placement_solution p []))
-  |> App.post "/swap" (optimiser_handler Improver.improve)
-  |> App.post "/lp" (optimiser_handler Lp_solver.lp_optimize_solution)
+  |> App.post "/swap/:n" (optimiser_handler Improver.improve)
+  |> App.post "/lp/:n" (optimiser_handler Lp_solver.lp_optimize_solution)
   |> App.post "/init_sim" (init_solution_handler init_solution_sol_stage1)
-  |> App.post "/step_sim" (optimiser_handler simulate_step_sol_stage1)
+  |> App.post "/step_sim/:n" (optimiser_handler simulate_step_sol_stage1)
   |> App.post "/save" save_handler
   |> App.run_command
