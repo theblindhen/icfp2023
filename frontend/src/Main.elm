@@ -12,12 +12,22 @@ import Html.Attributes exposing (style)
 import Json.Decode exposing (..)
 import Html exposing (table)
 
+import Bootstrap.CDN as CDN
+import Bootstrap.Button as BButton
+import Bootstrap.Form.Input as BInput
+import Bootstrap.Grid as Grid
+
 type alias Musician = Int
 
 type alias Attendee =
     { x : Float
     , y : Float
     , tastes : List Float 
+    }
+
+type alias Pillar =
+    { center : (Float, Float)
+    , radius : Float
     }
 
 type alias Problem = 
@@ -28,6 +38,7 @@ type alias Problem =
     , stageBottomLeft : (Float, Float)
     , musicians: List Musician
     , attendees: List Attendee
+    , pillars: List Pillar
     }
 
 type alias Model =
@@ -72,9 +83,23 @@ decodeStageBottomLeft =
             _ -> (0, 0)
         ) (list float)
 
+decodeCenter : Decoder (Float, Float)
+decodeCenter =
+    map (\l ->
+        case l of
+            [x, y] -> (x, y)
+            _ -> (0, 0)
+        ) (list float)
+
+decodePillar : Decoder Pillar
+decodePillar =
+    map2 Pillar
+        (field "center" decodeCenter)
+        (field "radius" float)
+
 decodeProblem : Decoder Problem
 decodeProblem =
-    map7 Problem
+    map8 Problem
         (field "room_width" float)
         (field "room_height" float)
         (field "stage_width" float)
@@ -82,6 +107,7 @@ decodeProblem =
         (field "stage_bottom_left" decodeStageBottomLeft)
         (field "musicians" (list decodeMusicians))
         (field "attendees" (list decodeAttendee))
+        (field "pillars" (list decodePillar))
 
 decodePlacement : Decoder Placement
 decodePlacement =
@@ -135,15 +161,22 @@ main =
 
 viewLoadProblem : Model -> Html Msg
 viewLoadProblem m =
-    div [] [
-        text "Problem Id: ",
-        input [ onInput ProblemFieldUpdated ] [],
-        button [ onClick (LoadProblem m.problemId) ] [ text "Load problem" ]
-    ]
-
+    Grid.container []         -- Responsive fixed width container
+        [ CDN.stylesheet      -- Inlined Bootstrap CSS for use with reactor
+        ,  div [
+                style "margin" "20px"
+            ] [
+                text "Problem Id: ",
+                BInput.text [ BInput.onInput ProblemFieldUpdated ],
+                BButton.button [ BButton.onClick (LoadProblem m.problemId), BButton.primary ] [ text "Load problem" ]
+            ]
+        ]
+   
 viewProblem : Model -> Problem -> Html Msg
 viewProblem m p =
-    div [] [
+    div [
+        style "margin" "20px"
+    ] [
         div [ style "display" "flex"
             , style "height" "auto"
             , style "align-items" "center" ] 
@@ -165,7 +198,7 @@ viewProblem m p =
                 ]
             ],
         div [ ] [
-            button [ onClick (PlaceRandomly) ] [ text "Random solve" ]
+            BButton.button [ BButton.onClick (PlaceRandomly), BButton.primary ] [ text "Random solve" ]
         ]
     ]
 
@@ -195,6 +228,9 @@ renderProblem p s =
         , shapes
             [ stroke Color.blue ]
             (List.map (\a -> circle (a.x * scale, a.y * scale) (3.0 * scale)) p.attendees)
+        , shapes
+            [ fill Color.gray ]
+            (List.map (\pillar -> circle (Tuple.first pillar.center * scale, Tuple.second pillar.center * scale) (pillar.radius * scale)) p.pillars)
         , shapes
             [ stroke Color.red ]
             (case s of

@@ -5479,9 +5479,9 @@ var $author$project$Main$LoadedProblem = function (a) {
 var $author$project$Main$SolutionReturned = function (a) {
 	return {$: 'SolutionReturned', a: a};
 };
-var $author$project$Main$Problem = F7(
-	function (roomWidth, roomHeight, stageWidth, stageHeight, stageBottomLeft, musicians, attendees) {
-		return {attendees: attendees, musicians: musicians, roomHeight: roomHeight, roomWidth: roomWidth, stageBottomLeft: stageBottomLeft, stageHeight: stageHeight, stageWidth: stageWidth};
+var $author$project$Main$Problem = F8(
+	function (roomWidth, roomHeight, stageWidth, stageHeight, stageBottomLeft, musicians, attendees, pillars) {
+		return {attendees: attendees, musicians: musicians, pillars: pillars, roomHeight: roomHeight, roomWidth: roomWidth, stageBottomLeft: stageBottomLeft, stageHeight: stageHeight, stageWidth: stageWidth};
 	});
 var $author$project$Main$Attendee = F3(
 	function (x, y, tastes) {
@@ -5502,6 +5502,28 @@ var $author$project$Main$decodeAttendee = A4(
 		$elm$json$Json$Decode$list($elm$json$Json$Decode$float)));
 var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $author$project$Main$decodeMusicians = $elm$json$Json$Decode$int;
+var $author$project$Main$Pillar = F2(
+	function (center, radius) {
+		return {center: center, radius: radius};
+	});
+var $author$project$Main$decodeCenter = A2(
+	$elm$json$Json$Decode$map,
+	function (l) {
+		if ((l.b && l.b.b) && (!l.b.b.b)) {
+			var x = l.a;
+			var _v1 = l.b;
+			var y = _v1.a;
+			return _Utils_Tuple2(x, y);
+		} else {
+			return _Utils_Tuple2(0, 0);
+		}
+	},
+	$elm$json$Json$Decode$list($elm$json$Json$Decode$float));
+var $author$project$Main$decodePillar = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Main$Pillar,
+	A2($elm$json$Json$Decode$field, 'center', $author$project$Main$decodeCenter),
+	A2($elm$json$Json$Decode$field, 'radius', $elm$json$Json$Decode$float));
 var $author$project$Main$decodeStageBottomLeft = A2(
 	$elm$json$Json$Decode$map,
 	function (l) {
@@ -5515,9 +5537,9 @@ var $author$project$Main$decodeStageBottomLeft = A2(
 		}
 	},
 	$elm$json$Json$Decode$list($elm$json$Json$Decode$float));
-var $elm$json$Json$Decode$map7 = _Json_map7;
-var $author$project$Main$decodeProblem = A8(
-	$elm$json$Json$Decode$map7,
+var $elm$json$Json$Decode$map8 = _Json_map8;
+var $author$project$Main$decodeProblem = A9(
+	$elm$json$Json$Decode$map8,
 	$author$project$Main$Problem,
 	A2($elm$json$Json$Decode$field, 'room_width', $elm$json$Json$Decode$float),
 	A2($elm$json$Json$Decode$field, 'room_height', $elm$json$Json$Decode$float),
@@ -5531,7 +5553,11 @@ var $author$project$Main$decodeProblem = A8(
 	A2(
 		$elm$json$Json$Decode$field,
 		'attendees',
-		$elm$json$Json$Decode$list($author$project$Main$decodeAttendee)));
+		$elm$json$Json$Decode$list($author$project$Main$decodeAttendee)),
+	A2(
+		$elm$json$Json$Decode$field,
+		'pillars',
+		$elm$json$Json$Decode$list($author$project$Main$decodePillar)));
 var $author$project$Main$Solution = function (placements) {
 	return {placements: placements};
 };
@@ -6452,24 +6478,371 @@ var $author$project$Main$ProblemFieldUpdated = function (a) {
 	return {$: 'ProblemFieldUpdated', a: a};
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$applyModifier = F2(
+	function (modifier, options) {
+		switch (modifier.$) {
+			case 'Size':
+				var size = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						size: $elm$core$Maybe$Just(size)
+					});
+			case 'Coloring':
+				var coloring = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						coloring: $elm$core$Maybe$Just(coloring)
+					});
+			case 'Block':
+				return _Utils_update(
+					options,
+					{block: true});
+			case 'Disabled':
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{disabled: val});
+			default:
+				var attrs = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						attributes: _Utils_ap(options.attributes, attrs)
+					});
+		}
+	});
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $elm$html$Html$Attributes$classList = function (classes) {
+	return $elm$html$Html$Attributes$class(
+		A2(
+			$elm$core$String$join,
+			' ',
+			A2(
+				$elm$core$List$map,
+				$elm$core$Tuple$first,
+				A2($elm$core$List$filter, $elm$core$Tuple$second, classes))));
+};
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$defaultOptions = {attributes: _List_Nil, block: false, coloring: $elm$core$Maybe$Nothing, disabled: false, size: $elm$core$Maybe$Nothing};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$roleClass = function (role) {
+	switch (role.$) {
+		case 'Primary':
+			return 'primary';
+		case 'Secondary':
+			return 'secondary';
+		case 'Success':
+			return 'success';
+		case 'Info':
+			return 'info';
+		case 'Warning':
+			return 'warning';
+		case 'Danger':
+			return 'danger';
+		case 'Dark':
+			return 'dark';
+		case 'Light':
+			return 'light';
+		default:
+			return 'link';
+	}
+};
+var $rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption = function (size) {
+	switch (size.$) {
+		case 'XS':
+			return $elm$core$Maybe$Nothing;
+		case 'SM':
+			return $elm$core$Maybe$Just('sm');
+		case 'MD':
+			return $elm$core$Maybe$Just('md');
+		case 'LG':
+			return $elm$core$Maybe$Just('lg');
+		default:
+			return $elm$core$Maybe$Just('xl');
+	}
+};
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$buttonAttributes = function (modifiers) {
+	var options = A3($elm$core$List$foldl, $rundis$elm_bootstrap$Bootstrap$Internal$Button$applyModifier, $rundis$elm_bootstrap$Bootstrap$Internal$Button$defaultOptions, modifiers);
+	return _Utils_ap(
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$classList(
+				_List_fromArray(
+					[
+						_Utils_Tuple2('btn', true),
+						_Utils_Tuple2('btn-block', options.block),
+						_Utils_Tuple2('disabled', options.disabled)
+					])),
+				$elm$html$Html$Attributes$disabled(options.disabled)
+			]),
+		_Utils_ap(
+			function () {
+				var _v0 = A2($elm$core$Maybe$andThen, $rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption, options.size);
+				if (_v0.$ === 'Just') {
+					var s = _v0.a;
+					return _List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('btn-' + s)
+						]);
+				} else {
+					return _List_Nil;
+				}
+			}(),
+			_Utils_ap(
+				function () {
+					var _v1 = options.coloring;
+					if (_v1.$ === 'Just') {
+						if (_v1.a.$ === 'Roled') {
+							var role = _v1.a.a;
+							return _List_fromArray(
+								[
+									$elm$html$Html$Attributes$class(
+									'btn-' + $rundis$elm_bootstrap$Bootstrap$Internal$Button$roleClass(role))
+								]);
+						} else {
+							var role = _v1.a.a;
+							return _List_fromArray(
+								[
+									$elm$html$Html$Attributes$class(
+									'btn-outline-' + $rundis$elm_bootstrap$Bootstrap$Internal$Button$roleClass(role))
+								]);
+						}
+					} else {
+						return _List_Nil;
+					}
+				}(),
+				options.attributes)));
+};
+var $rundis$elm_bootstrap$Bootstrap$Button$button = F2(
+	function (options, children) {
+		return A2(
+			$elm$html$Html$button,
+			$rundis$elm_bootstrap$Bootstrap$Internal$Button$buttonAttributes(options),
+			children);
+	});
+var $rundis$elm_bootstrap$Bootstrap$Grid$container = F2(
+	function (attributes, children) {
+		return A2(
+			$elm$html$Html$div,
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$class('container')
+					]),
+				attributes),
+			children);
+	});
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs = function (a) {
+	return {$: 'Attrs', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Button$attrs = function (attrs_) {
+	return $rundis$elm_bootstrap$Bootstrap$Internal$Button$Attrs(attrs_);
+};
+var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 'MayPreventDefault', a: a};
 };
 var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
+var $elm$html$Html$Events$preventDefaultOn = F2(
 	function (event, decoder) {
 		return A2(
 			$elm$virtual_dom$VirtualDom$on,
 			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
+			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
 	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
+var $rundis$elm_bootstrap$Bootstrap$Button$onClick = function (message) {
+	return $rundis$elm_bootstrap$Bootstrap$Button$attrs(
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$Events$preventDefaultOn,
+				'click',
+				$elm$json$Json$Decode$succeed(
+					_Utils_Tuple2(message, true)))
+			]));
 };
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$OnInput = function (a) {
+	return {$: 'OnInput', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$onInput = function (toMsg) {
+	return $rundis$elm_bootstrap$Bootstrap$Form$Input$OnInput(toMsg);
+};
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Coloring = function (a) {
+	return {$: 'Coloring', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Primary = {$: 'Primary'};
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Roled = function (a) {
+	return {$: 'Roled', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Button$primary = $rundis$elm_bootstrap$Bootstrap$Internal$Button$Coloring(
+	$rundis$elm_bootstrap$Bootstrap$Internal$Button$Roled($rundis$elm_bootstrap$Bootstrap$Internal$Button$Primary));
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $elm$virtual_dom$VirtualDom$node = function (tag) {
+	return _VirtualDom_node(
+		_VirtualDom_noScript(tag));
+};
+var $elm$html$Html$node = $elm$virtual_dom$VirtualDom$node;
+var $elm$html$Html$Attributes$rel = _VirtualDom_attribute('rel');
+var $rundis$elm_bootstrap$Bootstrap$CDN$stylesheet = A3(
+	$elm$html$Html$node,
+	'link',
+	_List_fromArray(
+		[
+			$elm$html$Html$Attributes$rel('stylesheet'),
+			$elm$html$Html$Attributes$href('https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css')
+		]),
+	_List_Nil);
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$Text = {$: 'Text'};
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$Input = function (a) {
+	return {$: 'Input', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$Type = function (a) {
+	return {$: 'Type', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$create = F2(
+	function (tipe, options) {
+		return $rundis$elm_bootstrap$Bootstrap$Form$Input$Input(
+			{
+				options: A2(
+					$elm$core$List$cons,
+					$rundis$elm_bootstrap$Bootstrap$Form$Input$Type(tipe),
+					options)
+			});
+	});
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$applyModifier = F2(
+	function (modifier, options) {
+		switch (modifier.$) {
+			case 'Size':
+				var size_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						size: $elm$core$Maybe$Just(size_)
+					});
+			case 'Id':
+				var id_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						id: $elm$core$Maybe$Just(id_)
+					});
+			case 'Type':
+				var tipe = modifier.a;
+				return _Utils_update(
+					options,
+					{tipe: tipe});
+			case 'Disabled':
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{disabled: val});
+			case 'Value':
+				var value_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						value: $elm$core$Maybe$Just(value_)
+					});
+			case 'Placeholder':
+				var value_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						placeholder: $elm$core$Maybe$Just(value_)
+					});
+			case 'OnInput':
+				var onInput_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						onInput: $elm$core$Maybe$Just(onInput_)
+					});
+			case 'Validation':
+				var validation_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						validation: $elm$core$Maybe$Just(validation_)
+					});
+			case 'Readonly':
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{readonly: val});
+			case 'PlainText':
+				var val = modifier.a;
+				return _Utils_update(
+					options,
+					{plainText: val});
+			default:
+				var attrs_ = modifier.a;
+				return _Utils_update(
+					options,
+					{
+						attributes: _Utils_ap(options.attributes, attrs_)
+					});
+		}
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$defaultOptions = {attributes: _List_Nil, disabled: false, id: $elm$core$Maybe$Nothing, onInput: $elm$core$Maybe$Nothing, placeholder: $elm$core$Maybe$Nothing, plainText: false, readonly: false, size: $elm$core$Maybe$Nothing, tipe: $rundis$elm_bootstrap$Bootstrap$Form$Input$Text, validation: $elm$core$Maybe$Nothing, value: $elm$core$Maybe$Nothing};
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -6502,30 +6875,134 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
+var $elm$html$Html$Attributes$readonly = $elm$html$Html$Attributes$boolProperty('readOnly');
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$sizeAttribute = function (size) {
+	return A2(
+		$elm$core$Maybe$map,
+		function (s) {
+			return $elm$html$Html$Attributes$class('form-control-' + s);
+		},
+		$rundis$elm_bootstrap$Bootstrap$General$Internal$screenSizeOption(size));
+};
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$typeAttribute = function (inputType) {
+	return $elm$html$Html$Attributes$type_(
+		function () {
+			switch (inputType.$) {
+				case 'Text':
+					return 'text';
+				case 'Password':
+					return 'password';
+				case 'DatetimeLocal':
+					return 'datetime-local';
+				case 'Date':
+					return 'date';
+				case 'Month':
+					return 'month';
+				case 'Time':
+					return 'time';
+				case 'Week':
+					return 'week';
+				case 'Number':
+					return 'number';
+				case 'Email':
+					return 'email';
+				case 'Url':
+					return 'url';
+				case 'Search':
+					return 'search';
+				case 'Tel':
+					return 'tel';
+				default:
+					return 'color';
+			}
+		}());
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$FormInternal$validationToString = function (validation) {
+	if (validation.$ === 'Success') {
+		return 'is-valid';
+	} else {
+		return 'is-invalid';
+	}
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$validationAttribute = function (validation) {
+	return $elm$html$Html$Attributes$class(
+		$rundis$elm_bootstrap$Bootstrap$Form$FormInternal$validationToString(validation));
+};
+var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$toAttributes = function (modifiers) {
+	var options = A3($elm$core$List$foldl, $rundis$elm_bootstrap$Bootstrap$Form$Input$applyModifier, $rundis$elm_bootstrap$Bootstrap$Form$Input$defaultOptions, modifiers);
+	return _Utils_ap(
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class(
+				options.plainText ? 'form-control-plaintext' : 'form-control'),
+				$elm$html$Html$Attributes$disabled(options.disabled),
+				$elm$html$Html$Attributes$readonly(options.readonly || options.plainText),
+				$rundis$elm_bootstrap$Bootstrap$Form$Input$typeAttribute(options.tipe)
+			]),
+		_Utils_ap(
+			A2(
+				$elm$core$List$filterMap,
+				$elm$core$Basics$identity,
+				_List_fromArray(
+					[
+						A2($elm$core$Maybe$map, $elm$html$Html$Attributes$id, options.id),
+						A2($elm$core$Maybe$andThen, $rundis$elm_bootstrap$Bootstrap$Form$Input$sizeAttribute, options.size),
+						A2($elm$core$Maybe$map, $elm$html$Html$Attributes$value, options.value),
+						A2($elm$core$Maybe$map, $elm$html$Html$Attributes$placeholder, options.placeholder),
+						A2($elm$core$Maybe$map, $elm$html$Html$Events$onInput, options.onInput),
+						A2($elm$core$Maybe$map, $rundis$elm_bootstrap$Bootstrap$Form$Input$validationAttribute, options.validation)
+					])),
+			options.attributes));
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$view = function (_v0) {
+	var options = _v0.a.options;
+	return A2(
+		$elm$html$Html$input,
+		$rundis$elm_bootstrap$Bootstrap$Form$Input$toAttributes(options),
+		_List_Nil);
+};
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$input = F2(
+	function (tipe, options) {
+		return $rundis$elm_bootstrap$Bootstrap$Form$Input$view(
+			A2($rundis$elm_bootstrap$Bootstrap$Form$Input$create, tipe, options));
+	});
+var $rundis$elm_bootstrap$Bootstrap$Form$Input$text = $rundis$elm_bootstrap$Bootstrap$Form$Input$input($rundis$elm_bootstrap$Bootstrap$Form$Input$Text);
 var $author$project$Main$viewLoadProblem = function (m) {
 	return A2(
-		$elm$html$Html$div,
+		$rundis$elm_bootstrap$Bootstrap$Grid$container,
 		_List_Nil,
 		_List_fromArray(
 			[
-				$elm$html$Html$text('Problem Id: '),
+				$rundis$elm_bootstrap$Bootstrap$CDN$stylesheet,
 				A2(
-				$elm$html$Html$input,
+				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Events$onInput($author$project$Main$ProblemFieldUpdated)
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick(
-						$author$project$Main$LoadProblem(m.problemId))
+						A2($elm$html$Html$Attributes$style, 'margin', '20px')
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Load problem')
+						$elm$html$Html$text('Problem Id: '),
+						$rundis$elm_bootstrap$Bootstrap$Form$Input$text(
+						_List_fromArray(
+							[
+								$rundis$elm_bootstrap$Bootstrap$Form$Input$onInput($author$project$Main$ProblemFieldUpdated)
+							])),
+						A2(
+						$rundis$elm_bootstrap$Bootstrap$Button$button,
+						_List_fromArray(
+							[
+								$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+								$author$project$Main$LoadProblem(m.problemId)),
+								$rundis$elm_bootstrap$Bootstrap$Button$primary
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Load problem')
+							]))
 					]))
 			]));
 };
@@ -6720,10 +7197,6 @@ var $joakin$elm_canvas$Canvas$group = F2(
 				}));
 	});
 var $avh4$elm_color$Color$red = A4($avh4$elm_color$Color$RgbaSpace, 204 / 255, 0 / 255, 0 / 255, 1.0);
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
-};
 var $joakin$elm_canvas$Canvas$Settings$stroke = function (color) {
 	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingDrawOp(
 		$joakin$elm_canvas$Canvas$Internal$Canvas$Stroke(color));
@@ -6783,6 +7256,21 @@ var $author$project$Main$renderProblem = F2(
 					$joakin$elm_canvas$Canvas$shapes,
 					_List_fromArray(
 						[
+							$joakin$elm_canvas$Canvas$Settings$fill($avh4$elm_color$Color$gray)
+						]),
+					A2(
+						$elm$core$List$map,
+						function (pillar) {
+							return A2(
+								$joakin$elm_canvas$Canvas$circle,
+								_Utils_Tuple2(pillar.center.a * scale, pillar.center.b * scale),
+								pillar.radius * scale);
+						},
+						p.pillars)),
+					A2(
+					$joakin$elm_canvas$Canvas$shapes,
+					_List_fromArray(
+						[
 							$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$red)
 						]),
 					function () {
@@ -6803,8 +7291,6 @@ var $author$project$Main$renderProblem = F2(
 					}())
 				]));
 	});
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$canvas = _VirtualDom_node('canvas');
 var $joakin$elm_canvas$Canvas$cnvs = A2($elm$html$Html$canvas, _List_Nil, _List_Nil);
 var $elm$json$Json$Encode$list = F2(
@@ -6855,7 +7341,6 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			_Json_emptyObject(_Utils_Tuple0),
 			pairs));
 };
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$fn = F2(
 	function (name, args) {
 		return $elm$json$Json$Encode$object(
@@ -6951,7 +7436,6 @@ var $joakin$elm_canvas$Canvas$renderClear = F4(
 			A4($joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$clearRect, x, y, w, h),
 			cmds);
 	});
-var $elm$json$Json$Encode$bool = _Json_wrap;
 var $joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$arc = F6(
 	function (x, y, radius, startAngle, endAngle, anticlockwise) {
 		return A2(
@@ -7570,12 +8054,15 @@ var $joakin$elm_canvas$Canvas$Internal$Texture$decodeTextureImage = A2(
 	$elm$json$Json$Decode$value);
 var $joakin$elm_canvas$Canvas$Internal$Texture$decodeImageLoadEvent = A2($elm$json$Json$Decode$field, 'target', $joakin$elm_canvas$Canvas$Internal$Texture$decodeTextureImage);
 var $elm$html$Html$img = _VirtualDom_node('img');
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
 		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
 	});
 var $elm$html$Html$Attributes$src = function (url) {
 	return A2(
@@ -7648,7 +8135,10 @@ var $author$project$Main$viewProblem = F2(
 	function (m, p) {
 		return A2(
 			$elm$html$Html$div,
-			_List_Nil,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'margin', '20px')
+				]),
 			_List_fromArray(
 				[
 					A2(
@@ -7696,10 +8186,11 @@ var $author$project$Main$viewProblem = F2(
 					_List_fromArray(
 						[
 							A2(
-							$elm$html$Html$button,
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
 							_List_fromArray(
 								[
-									$elm$html$Html$Events$onClick($author$project$Main$PlaceRandomly)
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$PlaceRandomly),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
 								]),
 							_List_fromArray(
 								[
