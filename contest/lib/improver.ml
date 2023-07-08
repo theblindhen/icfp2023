@@ -10,13 +10,14 @@ let instrument_count (p : problem) : int =
   p.attendees |> List.hd_exn |> fun attendee -> Array.length attendee.tastes
 
 let score_cache (env : Score.scoring_env) : (position * instrument, float) Hashtbl.Poly.t =
+  printf "computing cache%!";
   let cache = Hashtbl.Poly.create () in
   let instrument_count = instrument_count env.problem in
-  Array.iteri env.solution ~f:(fun i m ->
+  Array.iter env.solution ~f:(fun m ->
       let constants =
         List.map env.problem.attendees ~f:(fun a -> (Score.score_I_partial env a m.id m.pos, a))
       in
-      printf "computing cache for %dnth position\n%!" i;
+      printf ".%!";
       for i = 0 to instrument_count - 1 do
         let score =
           List.map constants ~f:(fun (c, a) -> Float.round_up (c *. a.tastes.(i)))
@@ -24,6 +25,7 @@ let score_cache (env : Score.scoring_env) : (position * instrument, float) Hasht
         in
         Hashtbl.Poly.add_exn cache ~key:(m.pos, i) ~data:score
       done);
+  printf "\n%!";
   cache
 
 let get_score cache scores pos_of_i instrument_of_j =
