@@ -7,24 +7,29 @@ module L = Layout
 let draw_concert (area : Sdl_area.t) (problem : Types.problem) (solution : Types.solution option)
     (selected_instrument : int option) =
   (* Determine a scale factor to ensure that the max dimension of the room is
-      exactly 1000. *)
+   * exactly 1000. *)
   let scale = 1000. /. Float.max problem.room_width problem.room_height in
-  let room_width = Float.to_int (scale *. problem.room_width) in
-  let room_height = Float.to_int (scale *. problem.room_height) in
-  let stage_x = Float.to_int (scale *. problem.stage_bottom_left.x) in
-  let stage_y = Float.to_int (scale *. problem.stage_bottom_left.y) in
-  let stage_width = Float.to_int (scale *. problem.stage_width) in
-  let stage_height = Float.to_int (scale *. problem.stage_height) in
+  (* The tr function translates problem sizes to screen sizes *)
+  let tr length = Float.to_int (scale *. length) in
+  (* The xy function translates problem coordinates to screen coordinates *)
+  let xy (x, y) = (Float.to_int (scale *. x), 1000 - Float.to_int (scale *. y)) in
 
+  let room_width, room_height = (tr problem.room_width, tr problem.room_height) in
+  let stage_left, stage_top =
+    xy (problem.stage_bottom_left.x, problem.stage_bottom_left.y +. problem.stage_height)
+  in
+  let stage_width, stage_height = (tr problem.stage_width, tr problem.stage_height) in
+
+  (* Draw the room *)
   Sdl_area.draw_rectangle area
     ~color:Draw.(opaque black)
-    ~thick:1 ~w:room_width ~h:room_height (0, 0);
+    ~thick:1 ~w:room_width ~h:room_height
+    (0, 1000 - room_height);
   Sdl_area.draw_rectangle area
     ~color:Draw.(opaque red)
-    ~thick:1 ~w:stage_width ~h:stage_height (stage_x, stage_y);
+    ~thick:1 ~w:stage_width ~h:stage_height (stage_left, stage_top);
   List.iter problem.attendees ~f:(fun attendee ->
-      let x = Float.to_int (scale *. attendee.pos.x) in
-      let y = Float.to_int (scale *. attendee.pos.y) in
+      let attendee_pos = xy (attendee.pos.x, attendee.pos.y) in
       let color =
         match selected_instrument with
         | None -> Draw.(opaque blue)
@@ -34,16 +39,15 @@ let draw_concert (area : Sdl_area.t) (problem : Types.problem) (solution : Types
               else Draw.(opaque red)
             else Draw.(opaque grey)
       in
-      Sdl_area.draw_circle area ~color ~thick:2 ~radius:1 (x, y));
+      Sdl_area.draw_circle area ~color ~thick:2 ~radius:1 attendee_pos);
 
   (* Draw the solution if it's there. *)
   match solution with
   | None -> ()
   | Some solution ->
-      let radius = Float.to_int (scale *. 5.0) in
+      let radius = tr 5.0 in
       Array.iter solution ~f:(fun musician ->
-          let x = Float.to_int (musician.pos.x *. scale) in
-          let y = Float.to_int (musician.pos.y *. scale) in
+          let musician_pos = xy (musician.pos.x, musician.pos.y) in
           let color =
             match selected_instrument with
             | None -> Draw.(opaque blue)
@@ -51,7 +55,7 @@ let draw_concert (area : Sdl_area.t) (problem : Types.problem) (solution : Types
                 if instrument = musician.instrument then Draw.(darker (opaque green))
                 else Draw.(opaque red)
           in
-          Sdl_area.draw_circle area ~radius ~thick:1 ~color (x, y))
+          Sdl_area.draw_circle area ~radius ~thick:1 ~color musician_pos)
 
 let () =
   let problem_widget =
