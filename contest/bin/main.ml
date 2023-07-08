@@ -22,7 +22,7 @@ let run_invocation inv =
         | LP -> Lp_solver.lp_optimize_solution problem solution
       in
       let optimised_score = Score.score_solution problem optimized_solution in
-      printf "Improved score: %f\n%!" optimised_score;
+      printf "Improved Problem %d with score: %f\n%!" inv.problem_id optimised_score;
       Json_util.write_solution_if_best optimised_score inv.problem_id optimized_solution;
       (* write solution_json to file *)
       print_endline "Done"
