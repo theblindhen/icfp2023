@@ -35,17 +35,12 @@ let improve (p : problem) (s : solution) : solution =
       let score_j = get_score cache scores j j in
       let score_i' = get_score cache scores i j in
       let score_j' = get_score cache scores j i in
-      if Float.(score_i' + score_j' > score_i + score_j) then
-        scores.(i) <-
-          {
-            score = score_i';
-            musician = { scores.(i).musician with instrument = scores.(j).musician.instrument };
-          };
-      scores.(j) <-
-        {
-          score = score_j';
-          musician = { scores.(j).musician with instrument = scores.(i).musician.instrument };
-        }
+      if Float.(score_i' + score_j' > score_i + score_j) then (
+        let musician_i = scores.(i).musician in
+        let musician_j = scores.(j).musician in
+        scores.(i) <- { score = score_i'; musician = { musician_j with pos = musician_i.pos } };
+        scores.(j) <- { score = score_j'; musician = { musician_i with pos = musician_j.pos } })
     done
   done;
+  printf "Score should be: %f\n%!" (Array.sum (module Float) scores ~f:(fun s -> s.score));
   Array.map scores ~f:(fun s -> s.musician)
