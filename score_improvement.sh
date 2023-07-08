@@ -1,5 +1,5 @@
 #!/bin/zsh
-for p in {1..55}; do
+for p in {1..90}; do
   if [ -d problems/solutions-$p ]; then
     echo $p
     pushd problems/solutions-$p;

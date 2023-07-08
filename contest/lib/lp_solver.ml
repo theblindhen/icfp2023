@@ -90,5 +90,4 @@ let lp_assign_positions (problem : problem) (positions : position list) =
 (** Completely disregards the placement in the given solution and reassigns all
   placements *)
 let lp_optimize_solution (problem : problem) (solution : solution) =
-  if problem.problem_id > 55 then failwith "LP solver not yet working for problems with qfactors";
   lp_assign_positions problem (solution |> List.of_array |> List.map ~f:(fun { pos; _ } -> pos))
