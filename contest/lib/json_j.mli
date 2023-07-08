@@ -36,6 +36,11 @@ type json_solution = Json_t.json_solution = {
   placements: json_placement list
 }
 
+type json_pillar = Json_t.json_pillar = {
+  center: (float * float);
+  radius: float
+}
+
 type json_attendee = Json_t.json_attendee = {
   x: float;
   y: float;
@@ -49,7 +54,8 @@ type json_problem = Json_t.json_problem = {
   stage_height: float;
   stage_bottom_left: (float * float);
   musicians: int list;
-  attendees: json_attendee list
+  attendees: json_attendee list;
+  pillars: json_pillar list option
 }
 
 val write_json_submission_post :
@@ -191,6 +197,26 @@ val read_json_solution :
 val json_solution_of_string :
   string -> json_solution
   (** Deserialize JSON data of type {!type:json_solution}. *)
+
+val write_json_pillar :
+  Buffer.t -> json_pillar -> unit
+  (** Output a JSON value of type {!type:json_pillar}. *)
+
+val string_of_json_pillar :
+  ?len:int -> json_pillar -> string
+  (** Serialize a value of type {!type:json_pillar}
+      into a JSON string.
+      @param len specifies the initial length
+                 of the buffer used internally.
+                 Default: 1024. *)
+
+val read_json_pillar :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> json_pillar
+  (** Input JSON data of type {!type:json_pillar}. *)
+
+val json_pillar_of_string :
+  string -> json_pillar
+  (** Deserialize JSON data of type {!type:json_pillar}. *)
 
 val write_json_attendee :
   Buffer.t -> json_attendee -> unit

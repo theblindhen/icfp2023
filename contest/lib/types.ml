@@ -2,6 +2,7 @@ open Core
 
 type position = { x : float; y : float } [@@deriving compare, sexp]
 type attendee = { pos : position; tastes : float array } [@@deriving compare, sexp]
+type pillar = { center : position; radius : float } [@@deriving compare, sexp]
 
 type problem = {
   problem_id : int;
@@ -12,6 +13,7 @@ type problem = {
   stage_bottom_left : position;
   musicians : int list;
   attendees : attendee list;
+  pillars : pillar list;
 }
 [@@deriving sexp]
 
@@ -33,6 +35,13 @@ let problem_of_json_problem ~problem_id (json_problem : Json_j.json_problem) =
                pos = { x = json_attendee.x; y = json_attendee.y };
                tastes = Array.of_list json_attendee.tastes;
              });
+    pillars =
+      (match json_problem.pillars with
+      | None -> []
+      | Some pillars ->
+          List.map pillars ~f:(fun (json_pillar : Json_j.json_pillar) ->
+              let x, y = json_pillar.center in
+              { center = { x; y }; radius = json_pillar.radius }));
   }
 
 type instrument = int [@@deriving sexp]

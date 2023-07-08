@@ -2,7 +2,7 @@ open Core
 open Contest
 open Contest.Types
 
-let problem_count = 45
+let problem_count = 90
 
 type stats = {
   room_dim : string;
@@ -10,6 +10,7 @@ type stats = {
   musicians_count : int;
   attendees_count : int;
   instrument_count : int; (* instrument_count_per_instrument : int array; *)
+  pillar_count : int;
 }
 
 let problem_stats problem =
@@ -30,6 +31,7 @@ let problem_stats problem =
        List.fold problem.musicians ~init:(Array.create ~len:instrument_count 0) ~f:(fun acc i ->
            acc.(i) <- acc.(i) + 1;
            acc); *)
+    pillar_count = List.length problem.pillars;
   }
 
 let solution_stats (problem_id : int) total_score =
@@ -56,6 +58,9 @@ let stats_to_string (problem_stats : stats) =
   ^ "\n"
   ^ "attendees: "
   ^ string_of_int problem_stats.attendees_count
+  ^ "\n"
+  ^ "pillars: "
+  ^ string_of_int problem_stats.pillar_count
 
 let () =
   let total_score = ref 0. in

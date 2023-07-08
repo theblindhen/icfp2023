@@ -4,8 +4,9 @@ stage: 1176 x 605
 musicians: 1059
 instruments total: 132
 attendees: 1000
-Best score: 1393831724
-  % of our score: 17.79
+pillars: 0
+Best score: 1408506431
+  % of our score: 17.15
 
 Problem 02:
 room: 8689 x 6523
@@ -13,8 +14,9 @@ stage: 1103 x 491
 musicians: 635
 instruments total: 438
 attendees: 1000
-Best score: 1416007330
-  % of our score: 18.07
+pillars: 0
+Best score: 1422143386
+  % of our score: 17.31
 
 Problem 03:
 room: 2426 x 6421
@@ -22,8 +24,9 @@ stage: 240 x 896
 musicians: 190
 instruments total: 101
 attendees: 1000
-Best score: 92158607
-  % of our score: 1.18
+pillars: 0
+Best score: 92231143
+  % of our score: 1.12
 
 Problem 04:
 room: 9340 x 2339
@@ -31,8 +34,9 @@ stage: 418 x 411
 musicians: 360
 instruments total: 314
 attendees: 1000
-Best score: 39492912
-  % of our score: 0.50
+pillars: 0
+Best score: 40415671
+  % of our score: 0.49
 
 Problem 05:
 room: 7859 x 5821
@@ -40,8 +44,9 @@ stage: 831 x 1843
 musicians: 700
 instruments total: 700
 attendees: 1000
-Best score: 72726494
-  % of our score: 0.93
+pillars: 0
+Best score: 72943997
+  % of our score: 0.89
 
 Problem 06:
 room: 4677 x 8826
@@ -49,8 +54,9 @@ stage: 1481 x 2717
 musicians: 205
 instruments total: 27
 attendees: 1000
-Best score: 108496287
-  % of our score: 1.38
+pillars: 0
+Best score: 109875133
+  % of our score: 1.34
 
 Problem 07:
 room: 6111 x 9953
@@ -58,8 +64,9 @@ stage: 841 x 2931
 musicians: 551
 instruments total: 2
 attendees: 1000
-Best score: 88590664
-  % of our score: 1.13
+pillars: 0
+Best score: 88596424
+  % of our score: 1.08
 
 Problem 08:
 room: 2166 x 5248
@@ -67,8 +74,9 @@ stage: 124 x 949
 musicians: 124
 instruments total: 40
 attendees: 5000
-Best score: 1816833295
-  % of our score: 23.19
+pillars: 0
+Best score: 1831553621
+  % of our score: 22.30
 
 Problem 09:
 room: 1000 x 1000
@@ -76,8 +84,9 @@ stage: 175 x 200
 musicians: 56
 instruments total: 38
 attendees: 1000
-Best score: 77730375
-  % of our score: 0.99
+pillars: 0
+Best score: 87842100
+  % of our score: 1.07
 
 Problem 10:
 room: 1000 x 1000
@@ -85,6 +94,7 @@ stage: 253 x 164
 musicians: 94
 instruments total: 4
 attendees: 1000
+pillars: 0
 Best score: 0
   % of our score: 0.00
 
@@ -94,8 +104,9 @@ stage: 232 x 277
 musicians: 149
 instruments total: 115
 attendees: 1000
-Best score: 200946633
-  % of our score: 2.56
+pillars: 0
+Best score: 244315168
+  % of our score: 2.97
 
 Problem 12:
 room: 1000 x 1000
@@ -103,8 +114,9 @@ stage: 227 x 194
 musicians: 32
 instruments total: 11
 attendees: 5000
-Best score: 820459838
-  % of our score: 10.47
+pillars: 0
+Best score: 843916989
+  % of our score: 10.27
 
 Problem 13:
 room: 1000 x 1000
@@ -112,6 +124,7 @@ stage: 276 x 318
 musicians: 52
 instruments total: 22
 attendees: 1000
+pillars: 0
 Best score: 0
   % of our score: 0.00
 
@@ -121,6 +134,7 @@ stage: 156 x 168
 musicians: 34
 instruments total: 15
 attendees: 1000
+pillars: 0
 Best score: 0
   % of our score: 0.00
 
@@ -130,8 +144,9 @@ stage: 208 x 167
 musicians: 56
 instruments total: 9
 attendees: 1000
-Best score: 6712949
-  % of our score: 0.09
+pillars: 0
+Best score: 16768119
+  % of our score: 0.20
 
 Problem 16:
 room: 1000 x 1000
@@ -139,6 +154,7 @@ stage: 129 x 207
 musicians: 13
 instruments total: 6
 attendees: 1000
+pillars: 0
 Best score: 0
   % of our score: 0.00
 
@@ -148,8 +164,9 @@ stage: 299 x 716
 musicians: 56
 instruments total: 51
 attendees: 5000
+pillars: 0
 Best score: 407390
-  % of our score: 0.01
+  % of our score: 0.00
 
 Problem 18:
 room: 4444 x 5794
@@ -157,7 +174,8 @@ stage: 1243 x 1464
 musicians: 711
 instruments total: 563
 attendees: 5000
-Best score: 2330630
+pillars: 0
+Best score: 2363541
   % of our score: 0.03
 
 Problem 19:
@@ -166,7 +184,8 @@ stage: 791 x 388
 musicians: 326
 instruments total: 236
 attendees: 5000
-Best score: 219988
+pillars: 0
+Best score: 221150
   % of our score: 0.00
 
 Problem 20:
@@ -175,7 +194,8 @@ stage: 1904 x 498
 musicians: 1013
 instruments total: 452
 attendees: 500
-Best score: 155191
+pillars: 0
+Best score: 161045
   % of our score: 0.00
 
 Problem 21:
@@ -184,7 +204,8 @@ stage: 303 x 543
 musicians: 129
 instruments total: 46
 attendees: 1000
-Best score: 49537
+pillars: 0
+Best score: 52191
   % of our score: 0.00
 
 Problem 22:
@@ -193,8 +214,9 @@ stage: 1000 x 20
 musicians: 16
 instruments total: 9
 attendees: 400
-Best score: 38254993
-  % of our score: 0.49
+pillars: 0
+Best score: 38411081
+  % of our score: 0.47
 
 Problem 23:
 room: 1000 x 1000
@@ -202,7 +224,8 @@ stage: 1000 x 20
 musicians: 10
 instruments total: 1
 attendees: 500
-Best score: 26964150
+pillars: 0
+Best score: 27865298
   % of our score: 0.34
 
 Problem 24:
@@ -211,8 +234,9 @@ stage: 1000 x 20
 musicians: 15
 instruments total: 3
 attendees: 500
-Best score: 35638140
-  % of our score: 0.45
+pillars: 0
+Best score: 44279621
+  % of our score: 0.54
 
 Problem 25:
 room: 1000 x 1000
@@ -220,8 +244,9 @@ stage: 1000 x 20
 musicians: 25
 instruments total: 25
 attendees: 1500
-Best score: 172599535
-  % of our score: 2.20
+pillars: 0
+Best score: 188761481
+  % of our score: 2.30
 
 Problem 26:
 room: 1000 x 1000
@@ -229,8 +254,9 @@ stage: 1000 x 20
 musicians: 15
 instruments total: 10
 attendees: 1500
-Best score: 87250640
-  % of our score: 1.11
+pillars: 0
+Best score: 110759236
+  % of our score: 1.35
 
 Problem 27:
 room: 1000 x 1000
@@ -238,8 +264,9 @@ stage: 1000 x 20
 musicians: 20
 instruments total: 10
 attendees: 1000
-Best score: 73698629
-  % of our score: 0.94
+pillars: 0
+Best score: 93082339
+  % of our score: 1.13
 
 Problem 28:
 room: 1000 x 1000
@@ -247,8 +274,9 @@ stage: 181 x 134
 musicians: 13
 instruments total: 6
 attendees: 1000
-Best score: 86266128
-  % of our score: 1.10
+pillars: 0
+Best score: 98792275
+  % of our score: 1.20
 
 Problem 29:
 room: 1000 x 1000
@@ -256,8 +284,9 @@ stage: 193 x 203
 musicians: 68
 instruments total: 10
 attendees: 1000
-Best score: 214204717
-  % of our score: 2.73
+pillars: 0
+Best score: 269970218
+  % of our score: 3.29
 
 Problem 30:
 room: 1000 x 1000
@@ -265,8 +294,9 @@ stage: 221 x 160
 musicians: 70
 instruments total: 3
 attendees: 1000
-Best score: 379522540
-  % of our score: 4.84
+pillars: 0
+Best score: 425097261
+  % of our score: 5.18
 
 Problem 31:
 room: 1462 x 9133
@@ -274,8 +304,9 @@ stage: 200 x 2168
 musicians: 792
 instruments total: 306
 attendees: 1000
-Best score: 131623278
-  % of our score: 1.68
+pillars: 0
+Best score: 141215164
+  % of our score: 1.72
 
 Problem 32:
 room: 3968 x 9921
@@ -283,8 +314,9 @@ stage: 831 x 1094
 musicians: 1365
 instruments total: 642
 attendees: 1000
-Best score: 155210764
-  % of our score: 1.98
+pillars: 0
+Best score: 156570270
+  % of our score: 1.91
 
 Problem 33:
 room: 9963 x 9102
@@ -292,8 +324,9 @@ stage: 1984 x 2450
 musicians: 1484
 instruments total: 107
 attendees: 500
-Best score: 18189772
-  % of our score: 0.23
+pillars: 0
+Best score: 20881642
+  % of our score: 0.25
 
 Problem 34:
 room: 8882 x 5656
@@ -301,8 +334,9 @@ stage: 1324 x 669
 musicians: 895
 instruments total: 375
 attendees: 500
-Best score: 35900046
-  % of our score: 0.46
+pillars: 0
+Best score: 37299255
+  % of our score: 0.45
 
 Problem 35:
 room: 8085 x 3225
@@ -310,8 +344,9 @@ stage: 1489 x 596
 musicians: 567
 instruments total: 561
 attendees: 500
-Best score: 40829281
-  % of our score: 0.52
+pillars: 0
+Best score: 44193991
+  % of our score: 0.54
 
 Problem 36:
 room: 2159 x 1047
@@ -319,8 +354,9 @@ stage: 275 x 334
 musicians: 95
 instruments total: 82
 attendees: 500
+pillars: 0
 Best score: 36263016
-  % of our score: 0.46
+  % of our score: 0.44
 
 Problem 37:
 room: 2372 x 1101
@@ -328,8 +364,9 @@ stage: 636 x 279
 musicians: 201
 instruments total: 82
 attendees: 500
-Best score: 88578252
-  % of our score: 1.13
+pillars: 0
+Best score: 99792280
+  % of our score: 1.21
 
 Problem 38:
 room: 1369 x 2047
@@ -337,8 +374,9 @@ stage: 210 x 496
 musicians: 243
 instruments total: 82
 attendees: 1000
-Best score: 8138719
-  % of our score: 0.10
+pillars: 0
+Best score: 8629475
+  % of our score: 0.11
 
 Problem 39:
 room: 4758 x 1374
@@ -346,8 +384,9 @@ stage: 102 x 309
 musicians: 46
 instruments total: 21
 attendees: 1000
+pillars: 0
 Best score: 21281960
-  % of our score: 0.27
+  % of our score: 0.26
 
 Problem 40:
 room: 1000 x 1000
@@ -355,6 +394,7 @@ stage: 182 x 195
 musicians: 10
 instruments total: 2
 attendees: 1000
+pillars: 0
 Best score: 8088816
   % of our score: 0.10
 
@@ -364,6 +404,7 @@ stage: 159 x 248
 musicians: 10
 instruments total: 5
 attendees: 400
+pillars: 0
 Best score: 4836121
   % of our score: 0.06
 
@@ -373,8 +414,9 @@ stage: 148 x 169
 musicians: 5
 instruments total: 2
 attendees: 100
-Best score: 5534530
-  % of our score: 0.07
+pillars: 0
+Best score: 6277998
+  % of our score: 0.08
 
 Problem 43:
 room: 1000 x 1000
@@ -382,7 +424,8 @@ stage: 105 x 175
 musicians: 5
 instruments total: 2
 attendees: 100
-Best score: 706216
+pillars: 0
+Best score: 846915
   % of our score: 0.01
 
 Problem 44:
@@ -391,8 +434,9 @@ stage: 256 x 330
 musicians: 10
 instruments total: 6
 attendees: 400
-Best score: 18125508
-  % of our score: 0.23
+pillars: 0
+Best score: 18192894
+  % of our score: 0.22
 
 Problem 45:
 room: 1000 x 1000
@@ -400,9 +444,460 @@ stage: 104 x 198
 musicians: 10
 instruments total: 5
 attendees: 400
+pillars: 0
 Best score: 9662018
   % of our score: 0.12
 
+Problem 46:
+room: 9948 x 8811
+stage: 1301 x 1815
+musicians: 14
+instruments total: 3
+attendees: 300
+pillars: 0
+Best score: 624416
+  % of our score: 0.01
+
+Problem 47:
+room: 8531 x 3600
+stage: 216 x 1126
+musicians: 38
+instruments total: 7
+attendees: 200
+pillars: 0
+Best score: 1562111
+  % of our score: 0.02
+
+Problem 48:
+room: 5144 x 3291
+stage: 1611 x 801
+musicians: 40
+instruments total: 40
+attendees: 200
+pillars: 0
+Best score: 5327277
+  % of our score: 0.06
+
+Problem 49:
+room: 6863 x 7049
+stage: 1546 x 2328
+musicians: 19
+instruments total: 2
+attendees: 300
+pillars: 0
+Best score: 527984
+  % of our score: 0.01
+
+Problem 50:
+room: 4922 x 2260
+stage: 626 x 474
+musicians: 34
+instruments total: 2
+attendees: 300
+pillars: 0
+Best score: 8184083
+  % of our score: 0.10
+
+Problem 51:
+room: 7948 x 3504
+stage: 1704 x 415
+musicians: 2
+instruments total: 2
+attendees: 400
+pillars: 0
+Best score: 709793
+  % of our score: 0.01
+
+Problem 52:
+room: 7151 x 3876
+stage: 181 x 1273
+musicians: 34
+instruments total: 34
+attendees: 400
+pillars: 0
+Best score: 3618950
+  % of our score: 0.04
+
+Problem 53:
+room: 7396 x 2367
+stage: 1423 x 389
+musicians: 42
+instruments total: 4
+attendees: 400
+pillars: 0
+Best score: 5678149
+  % of our score: 0.07
+
+Problem 54:
+room: 7314 x 6807
+stage: 542 x 1606
+musicians: 26
+instruments total: 6
+attendees: 400
+pillars: 0
+Best score: 1725047
+  % of our score: 0.02
+
+Problem 55:
+room: 4200 x 6234
+stage: 198 x 909
+musicians: 3
+instruments total: 3
+attendees: 300
+pillars: 0
+Best score: 459522
+  % of our score: 0.01
+
+Problem 56:
+room: 6168 x 1514
+stage: 1231 x 326
+musicians: 161
+instruments total: 69
+attendees: 400
+pillars: 194
+Best score: 11999380
+  % of our score: 0.15
+
+Problem 57:
+room: 3039 x 2499
+stage: 1000 x 289
+musicians: 172
+instruments total: 72
+attendees: 400
+pillars: 103
+Best score: 0
+  % of our score: 0.00
+
+Problem 58:
+room: 3303 x 2620
+stage: 636 x 668
+musicians: 386
+instruments total: 4
+attendees: 400
+pillars: 32
+Best score: 0
+  % of our score: 0.00
+
+Problem 59:
+room: 6688 x 5054
+stage: 214 x 1427
+musicians: 128
+instruments total: 5
+attendees: 700
+pillars: 58
+Best score: 0
+  % of our score: 0.00
+
+Problem 60:
+room: 8642 x 7123
+stage: 1875 x 250
+musicians: 88
+instruments total: 6
+attendees: 400
+pillars: 47
+Best score: 0
+  % of our score: 0.00
+
+Problem 61:
+room: 5135 x 8578
+stage: 1263 x 720
+musicians: 844
+instruments total: 6
+attendees: 400
+pillars: 149
+Best score: 0
+  % of our score: 0.00
+
+Problem 62:
+room: 8701 x 7942
+stage: 866 x 2301
+musicians: 624
+instruments total: 4
+attendees: 400
+pillars: 81
+Best score: 0
+  % of our score: 0.00
+
+Problem 63:
+room: 9997 x 9776
+stage: 2584 x 2013
+musicians: 777
+instruments total: 4
+attendees: 700
+pillars: 86
+Best score: 0
+  % of our score: 0.00
+
+Problem 64:
+room: 5590 x 6364
+stage: 1741 x 1142
+musicians: 633
+instruments total: 21
+attendees: 700
+pillars: 78
+Best score: 0
+  % of our score: 0.00
+
+Problem 65:
+room: 4544 x 3526
+stage: 137 x 992
+musicians: 105
+instruments total: 20
+attendees: 700
+pillars: 125
+Best score: 0
+  % of our score: 0.00
+
+Problem 66:
+room: 7244 x 9899
+stage: 2172 x 2203
+musicians: 526
+instruments total: 27
+attendees: 700
+pillars: 86
+Best score: 0
+  % of our score: 0.00
+
+Problem 67:
+room: 6079 x 1663
+stage: 1578 x 530
+musicians: 468
+instruments total: 30
+attendees: 700
+pillars: 145
+Best score: 0
+  % of our score: 0.00
+
+Problem 68:
+room: 3016 x 4070
+stage: 642 x 1140
+musicians: 679
+instruments total: 25
+attendees: 700
+pillars: 157
+Best score: 0
+  % of our score: 0.00
+
+Problem 69:
+room: 9745 x 1634
+stage: 2382 x 382
+musicians: 330
+instruments total: 6
+attendees: 700
+pillars: 50
+Best score: 0
+  % of our score: 0.00
+
+Problem 70:
+room: 8342 x 4137
+stage: 718 x 572
+musicians: 587
+instruments total: 22
+attendees: 700
+pillars: 17
+Best score: 0
+  % of our score: 0.00
+
+Problem 71:
+room: 1550 x 9992
+stage: 511 x 2681
+musicians: 335
+instruments total: 11
+attendees: 700
+pillars: 50
+Best score: 0
+  % of our score: 0.00
+
+Problem 72:
+room: 6953 x 4553
+stage: 214 x 1136
+musicians: 576
+instruments total: 3
+attendees: 700
+pillars: 214
+Best score: 0
+  % of our score: 0.00
+
+Problem 73:
+room: 9314 x 3954
+stage: 858 x 543
+musicians: 436
+instruments total: 20
+attendees: 700
+pillars: 858
+Best score: 0
+  % of our score: 0.00
+
+Problem 74:
+room: 8624 x 6031
+stage: 1082 x 519
+musicians: 471
+instruments total: 20
+attendees: 700
+pillars: 27
+Best score: 0
+  % of our score: 0.00
+
+Problem 75:
+room: 9603 x 9226
+stage: 186 x 1354
+musicians: 262
+instruments total: 41
+attendees: 700
+pillars: 4
+Best score: 0
+  % of our score: 0.00
+
+Problem 76:
+room: 4022 x 8752
+stage: 663 x 2051
+musicians: 373
+instruments total: 36
+attendees: 700
+pillars: 16
+Best score: 0
+  % of our score: 0.00
+
+Problem 77:
+room: 6417 x 6984
+stage: 1588 x 2043
+musicians: 325
+instruments total: 38
+attendees: 700
+pillars: 39
+Best score: 0
+  % of our score: 0.00
+
+Problem 78:
+room: 3978 x 2318
+stage: 708 x 422
+musicians: 261
+instruments total: 39
+attendees: 700
+pillars: 17
+Best score: 0
+  % of our score: 0.00
+
+Problem 79:
+room: 6067 x 4027
+stage: 709 x 786
+musicians: 895
+instruments total: 881
+attendees: 400
+pillars: 29
+Best score: 0
+  % of our score: 0.00
+
+Problem 80:
+room: 1300 x 6058
+stage: 307 x 494
+musicians: 144
+instruments total: 22
+attendees: 700
+pillars: 91
+Best score: 0
+  % of our score: 0.00
+
+Problem 81:
+room: 6887 x 3930
+stage: 590 x 498
+musicians: 279
+instruments total: 59
+attendees: 700
+pillars: 95
+Best score: 0
+  % of our score: 0.00
+
+Problem 82:
+room: 4785 x 2577
+stage: 157 x 588
+musicians: 88
+instruments total: 82
+attendees: 700
+pillars: 57
+Best score: 0
+  % of our score: 0.00
+
+Problem 83:
+room: 1855 x 5516
+stage: 154 x 742
+musicians: 179
+instruments total: 82
+attendees: 700
+pillars: 153
+Best score: 0
+  % of our score: 0.00
+
+Problem 84:
+room: 4172 x 6853
+stage: 422 x 2237
+musicians: 206
+instruments total: 6
+attendees: 700
+pillars: 92
+Best score: 0
+  % of our score: 0.00
+
+Problem 85:
+room: 4504 x 4115
+stage: 448 x 1193
+musicians: 61
+instruments total: 3
+attendees: 400
+pillars: 76
+Best score: 0
+  % of our score: 0.00
+
+Problem 86:
+room: 7586 x 5764
+stage: 713 x 1050
+musicians: 504
+instruments total: 3
+attendees: 400
+pillars: 111
+Best score: 0
+  % of our score: 0.00
+
+Problem 87:
+room: 9797 x 4805
+stage: 1696 x 786
+musicians: 301
+instruments total: 5
+attendees: 400
+pillars: 64
+Best score: 0
+  % of our score: 0.00
+
+Problem 88:
+room: 1680 x 4552
+stage: 462 x 403
+musicians: 336
+instruments total: 5
+attendees: 400
+pillars: 194
+Best score: 0
+  % of our score: 0.00
+
+Problem 89:
+room: 8328 x 3370
+stage: 1600 x 698
+musicians: 123
+instruments total: 5
+attendees: 400
+pillars: 174
+Best score: 0
+  % of our score: 0.00
+
+Problem 90:
+room: 3196 x 8359
+stage: 614 x 1006
+musicians: 682
+instruments total: 5
+attendees: 400
+pillars: 183
+Best score: 0
+  % of our score: 0.00
 
 
-Total score: 7834517613
+
+Total score: 8213780836
