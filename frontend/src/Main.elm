@@ -228,8 +228,10 @@ viewProblem m p =
                 BButton.button [ BButton.onClick (PlaceRandomly), BButton.primary ] [ text "Random solve" ],
                 BButton.button [ BButton.onClick (Swap), BButton.primary ] [ text "Swap" ],
                 BButton.button [ BButton.onClick (LP), BButton.primary ] [ text "LP" ],
+                BButton.button 
+                    ((if m.focus == Nothing then [BButton.disabled True] else []) ++ 
+                        [ BButton.onClick (nextFocus m.focus (-1)), BButton.primary ]) [ text "Previous Instrument" ],
                 BButton.button [ BButton.onClick (nextFocus m.focus 1), BButton.primary ] [ text "Next Instrument" ],
-                BButton.button [ BButton.onClick (nextFocus m.focus (-1)), BButton.primary ] [ text "Previous Instrument" ],
                 BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ]
             ]
     ]

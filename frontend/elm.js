@@ -7077,6 +7077,12 @@ var $author$project$Main$clearScreen = A2(
 			1000,
 			1000)
 		]));
+var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Disabled = function (a) {
+	return {$: 'Disabled', a: a};
+};
+var $rundis$elm_bootstrap$Bootstrap$Button$disabled = function (disabled_) {
+	return $rundis$elm_bootstrap$Bootstrap$Internal$Button$Disabled(disabled_);
+};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -8195,6 +8201,23 @@ var $author$project$Main$viewProblem = F2(
 								])),
 							A2(
 							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_Utils_ap(
+								_Utils_eq(m.focus, $elm$core$Maybe$Nothing) ? _List_fromArray(
+									[
+										$rundis$elm_bootstrap$Bootstrap$Button$disabled(true)
+									]) : _List_Nil,
+								_List_fromArray(
+									[
+										$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+										A2($author$project$Main$nextFocus, m.focus, -1)),
+										$rundis$elm_bootstrap$Bootstrap$Button$primary
+									])),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Previous Instrument')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
 							_List_fromArray(
 								[
 									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
@@ -8204,18 +8227,6 @@ var $author$project$Main$viewProblem = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$text('Next Instrument')
-								])),
-							A2(
-							$rundis$elm_bootstrap$Bootstrap$Button$button,
-							_List_fromArray(
-								[
-									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
-									A2($author$project$Main$nextFocus, m.focus, -1)),
-									$rundis$elm_bootstrap$Bootstrap$Button$primary
-								]),
-							_List_fromArray(
-								[
-									$elm$html$Html$text('Previous Instrument')
 								])),
 							A2(
 							$rundis$elm_bootstrap$Bootstrap$Button$button,
