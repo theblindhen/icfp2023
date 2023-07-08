@@ -1,20 +1,21 @@
 open Core
 open Types
-open Score
 
 type musician_score = { mutable score : float; mutable musician : musician }
 
-let scores_of_musicians (p : problem) (s : solution) : musician_score array =
-  Array.map s ~f:(fun m -> { score = score_musician p s m; musician = m })
+let scores_of_musicians (env : Score.scoring_env) : musician_score array =
+  Array.map env.solution ~f:(fun m -> { score = Score.score_musician env m; musician = m })
 
 let instrument_count (p : problem) : int =
   p.attendees |> List.hd_exn |> fun attendee -> Array.length attendee.tastes
 
-let score_cache (p : problem) (s : solution) : (position * instrument, float) Hashtbl.Poly.t =
+let score_cache (env : Score.scoring_env) : (position * instrument, float) Hashtbl.Poly.t =
   let cache = Hashtbl.Poly.create () in
-  let instrument_count = instrument_count p in
-  Array.iteri s ~f:(fun i m ->
-      let constants = List.map p.attendees ~f:(fun a -> (score_I_partial p s a m.id m.pos, a)) in
+  let instrument_count = instrument_count env.problem in
+  Array.iteri env.solution ~f:(fun i m ->
+      let constants =
+        List.map env.problem.attendees ~f:(fun a -> (Score.score_I_partial env a m.id m.pos, a))
+      in
       printf "computing cache for %dnth position\n%!" i;
       for i = 0 to instrument_count - 1 do
         let score =
@@ -30,8 +31,13 @@ let get_score cache scores pos_of_i instrument_of_j =
     (scores.(pos_of_i).musician.pos, scores.(instrument_of_j).musician.instrument)
 
 let improve (p : problem) (s : solution) : solution =
-  let cache = score_cache p s in
-  let scores = scores_of_musicians p s in
+  (* TODO The env is assumed constant during the swaps, but this violates the qfactor
+     computations.
+  *)
+  if p.problem_id > 55 then failwith "Swap improver doesn't (yet) work for problems with q-factors";
+  let env = Score.get_scoring_env p s in
+  let cache = score_cache env in
+  let scores = scores_of_musicians env in
   let iter = ref true in
   while !iter do
     iter := false;

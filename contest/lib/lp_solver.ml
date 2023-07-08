@@ -19,7 +19,7 @@ let lp_of_problem (problem : problem) (positions : position list) (vars : Lp.Pol
   in
   let assignment_scores =
     let fake_solution = Misc.solution_of_positions problem positions in
-    Improver.score_cache problem fake_solution
+    Improver.score_cache (Score.get_scoring_env problem fake_solution)
   in
   let objective =
     maximize
@@ -90,4 +90,5 @@ let lp_assign_positions (problem : problem) (positions : position list) =
 (** Completely disregards the placement in the given solution and reassigns all
   placements *)
 let lp_optimize_solution (problem : problem) (solution : solution) =
+  if problem.problem_id > 55 then failwith "LP solver not yet working for problems with qfactors";
   lp_assign_positions problem (solution |> List.of_array |> List.map ~f:(fun { pos; _ } -> pos))
