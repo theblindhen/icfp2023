@@ -57,9 +57,107 @@ let hat_iter (p : point) ~count:n : point =
   | 3 -> { x = p.y; y = -.p.x }
   | _ -> failwith "hat_iter: count must be between 0 and 3"
 
+(** Determine, for each musician, which attendees can hear that musician. The
+ * output is an array indexed by musicians, containing an array of the attendee
+ * indexes that can hear the musician. *)
+let precompute_hearable ~(attendees : Types.position array) ~(musicians : Types.position array)
+    ~(block_radius : float) : int array array =
+  (* Process each musician independently. *)
+  Array.mapi musicians ~f:(fun base_idx base_musician ->
+      (* Map the attendees to their angle from the base musician *)
+      let attendee_angles =
+        Array.mapi attendees ~f:(fun i pos -> (angle_of base_musician pos, `attendee i))
+      in
+      let musician_start_stop_angles =
+        Array.filter_mapi musicians ~f:(fun idx musician ->
+            if Int.equal idx base_idx then None
+            else
+              let angle_to_center = angle_of base_musician musician in
+              let opposite = block_radius in
+              let hypotenuse = Misc.distance base_musician musician in
+              let delta_angle = asin (opposite /. hypotenuse) in
+              Some (angle_to_center -. delta_angle, angle_to_center +. delta_angle))
+      in
+      let block_events =
+        Array.concat_map musician_start_stop_angles ~f:(fun (start, stop) ->
+            [| (start, `start); (stop, `stop) |])
+      in
+      let events = Array.append block_events attendee_angles in
+      Array.sort events ~compare:(fun (angle1, type1) (angle2, type2) ->
+          let angle_cmp = Float.compare angle1 angle2 in
+          if Int.equal angle_cmp 0 then
+            (* In case of ties, sort the type in order of `start, `attendee, `stop. *)
+            match (type1, type2) with
+            | `start, `start -> 0
+            | `start, _ -> -1
+            | `attendee i1, `attendee i2 -> Int.compare i1 i2 (* just for determinism *)
+            | `attendee _, `start -> 1
+            | `attendee _, `stop -> -1
+            | `stop, `stop -> 0
+            | `stop, _ -> 1
+          else angle_cmp);
+      (* Our starting angle is always 0, and then we sweep around counter-clockwise. *)
+      (* Compute the number of blockades at angle 0 so we have something to start with.  *)
+      let blockades_at_0 : int =
+        Array.count musician_start_stop_angles ~f:(fun (start, stop) ->
+            (* A musician is blocking at angle 0 if their start angle is in the
+             * bottom half of the circle while their stop angle is in the top half. *)
+            Float.((start > pi || start = 0.) && stop < pi))
+      in
+      (* Sweep around the list of events counter-clockwise, appending to the
+       * list of attendees who can hear this musician and updating the current
+       * number of blockades. *)
+      let attendees_hearable, _ =
+        let open Int in
+        Array.fold events ~init:([], blockades_at_0)
+          ~f:(fun (attendees_hearable, blockades) (_angle, event_type) ->
+            match event_type with
+            | `start -> (attendees_hearable, blockades + 1)
+            | `attendee i ->
+                if blockades = 0 then (i :: attendees_hearable, blockades)
+                else (attendees_hearable, blockades)
+            | `stop -> (attendees_hearable, blockades - 1))
+      in
+      (* sorted for determinism *)
+      List.sort attendees_hearable ~compare:Int.compare |> Array.of_list)
+
 (* TESTS *)
 
 let to_point (x, y) : point = { x; y }
+
+let%test_unit "precompute_hearable" =
+  let attendees =
+    Array.map ~f:to_point
+      [|
+        (* to the east of the origin *)
+        (10., 0.);
+        (* even further to the east *)
+        (100., 1.);
+        (* straight north *)
+        (0., 100.);
+        (* straight south *)
+        (0., -100.);
+        (* to the west of the origin *)
+        (-10., 0.);
+      |]
+  in
+  let musicians =
+    Array.map ~f:to_point
+      [|
+        (* main musician, at origin *)
+        (0., 0.);
+        (* blocking to the east *)
+        (2., 0.);
+        (* same, slightly above the horizon *)
+        (2., 0.1);
+        (* same, slightly below the horizon *)
+        (2., -0.1);
+      |]
+  in
+  let block_radius = 1. in
+  let hearable = precompute_hearable ~attendees ~musicians ~block_radius in
+  [%test_eq: int array array] hearable
+    [| [| 2; 3; 4 |]; [| 0; 1; 2; 3 |]; [| 0; 1; 2; 3 |]; [| 0; 1; 2; 3 |] |]
 
 let%test_unit "angle_of" =
   let is (a : float) (b : float) = a < b +. 0.001 && a > b -. 0.001 in
