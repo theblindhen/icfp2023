@@ -64,8 +64,6 @@ let () =
   let problem_text_input = W.get_text_input problem_widget in
   let a_widget = W.sdl_area ~w:1000 ~h:1000 () in
   let area = W.get_sdl_area a_widget in
-  (let w, h = Sdl_area.drawing_size area in
-   printf "Canvas physical size: %d x %d (virtual: 1000 x 1000)\n%!" w h);
 
   (* GUI model *)
 
