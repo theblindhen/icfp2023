@@ -25,3 +25,26 @@ let score_musician (p : problem) (s : solution) (m : musician) : float =
 
 let score_solution (p : problem) (s : solution) : float =
   List.sum (module Float) ~f:(score_attendee s) p.attendees
+
+(* Alternative scoring function, using Geometry.precompute_hearable. *)
+let score_solution_wip_broken (p : problem) (s : solution) : float =
+  let hearable_sets =
+    Geometry.precompute_hearable
+      ~attendees:(Array.of_list p.attendees |> Array.map ~f:(fun a -> a.pos))
+      ~musicians:(Array.map s ~f:(fun m -> m.pos))
+      ~block_radius:5.0
+  in
+  (* Prepare an array for random access *)
+  let attendees = List.to_array p.attendees in
+  (* Sum over all musicians *)
+  Array.fold2_exn s hearable_sets ~init:0.0 ~f:(fun sum m hearable ->
+      (* Sum over all attendees that can hear this musician *)
+      (*eprintf "  hearable: %d\n" (Array.length hearable);*)
+      Array.sum
+        (module Float)
+        hearable
+        ~f:(fun attendee_index ->
+          printf "  %d hears someone\n" attendee_index;
+          let a = attendees.(attendee_index) in
+          let d_sq = distance_squared a.pos m.pos in
+          sum +. Float.round_up (1_000_000.0 *. a.tastes.(m.instrument) /. d_sq)))
