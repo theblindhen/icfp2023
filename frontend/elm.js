@@ -5476,6 +5476,9 @@ var $elm$browser$Browser$Events$onAnimationFrameDelta = $elm$browser$Browser$Ani
 var $author$project$Main$LoadedProblem = function (a) {
 	return {$: 'LoadedProblem', a: a};
 };
+var $author$project$Main$SolutionReturned = function (a) {
+	return {$: 'SolutionReturned', a: a};
+};
 var $author$project$Main$Problem = F7(
 	function (roomWidth, roomHeight, stageWidth, stageHeight, stageBottomLeft, musicians, attendees) {
 		return {attendees: attendees, musicians: musicians, roomHeight: roomHeight, roomWidth: roomWidth, stageBottomLeft: stageBottomLeft, stageHeight: stageHeight, stageWidth: stageWidth};
@@ -5529,6 +5532,25 @@ var $author$project$Main$decodeProblem = A8(
 		$elm$json$Json$Decode$field,
 		'attendees',
 		$elm$json$Json$Decode$list($author$project$Main$decodeAttendee)));
+var $author$project$Main$Solution = function (placements) {
+	return {placements: placements};
+};
+var $author$project$Main$Placement = F2(
+	function (x, y) {
+		return {x: x, y: y};
+	});
+var $author$project$Main$decodePlacement = A3(
+	$elm$json$Json$Decode$map2,
+	$author$project$Main$Placement,
+	A2($elm$json$Json$Decode$field, 'x', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'y', $elm$json$Json$Decode$float));
+var $author$project$Main$decodeSolution = A2(
+	$elm$json$Json$Decode$map,
+	$author$project$Main$Solution,
+	A2(
+		$elm$json$Json$Decode$field,
+		'placements',
+		$elm$json$Json$Decode$list($author$project$Main$decodePlacement)));
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $elm$http$Http$BadStatus_ = F2(
 	function (a, b) {
@@ -6071,6 +6093,7 @@ var $elm$core$Dict$update = F3(
 			return A2($elm$core$Dict$remove, targetKey, dictionary);
 		}
 	});
+var $elm$http$Http$emptyBody = _Http_emptyBody;
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -6135,7 +6158,6 @@ var $elm$http$Http$expectString = function (toMsg) {
 		toMsg,
 		$elm$http$Http$resolve($elm$core$Result$Ok));
 };
-var $elm$http$Http$emptyBody = _Http_emptyBody;
 var $elm$http$Http$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -6306,6 +6328,10 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
+var $elm$http$Http$post = function (r) {
+	return $elm$http$Http$request(
+		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
+};
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6335,7 +6361,7 @@ var $author$project$Main$update = F2(
 									url: 'http://localhost:3000/problem/' + problemId
 								})
 							])));
-			default:
+			case 'LoadedProblem':
 				if (msg.a.$ === 'Ok') {
 					var res = msg.a.a;
 					return _Utils_Tuple2(
@@ -6360,7 +6386,59 @@ var $author$project$Main$update = F2(
 						}(),
 						$elm$core$Platform$Cmd$none);
 				} else {
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('Failed')
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'PlaceRandomly':
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$elm$http$Http$post(
+								{
+									body: $elm$http$Http$emptyBody,
+									expect: $elm$http$Http$expectString($author$project$Main$SolutionReturned),
+									url: 'http://localhost:3000/place_randomly'
+								})
+							])));
+			default:
+				if (msg.a.$ === 'Ok') {
+					var res = msg.a.a;
+					return _Utils_Tuple2(
+						function () {
+							var _v2 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeSolution, res);
+							if (_v2.$ === 'Ok') {
+								var solution = _v2.a;
+								return _Utils_update(
+									model,
+									{
+										solution: $elm$core$Maybe$Just(solution)
+									});
+							} else {
+								var err = _v2.a;
+								return _Utils_update(
+									model,
+									{
+										error: $elm$core$Maybe$Just(
+											'Failed to decode solution: ' + $elm$json$Json$Decode$errorToString(err))
+									});
+							}
+						}(),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('Failed')
+							}),
+						$elm$core$Platform$Cmd$none);
 				}
 		}
 	});
@@ -6451,6 +6529,7 @@ var $author$project$Main$viewLoadProblem = function (m) {
 					]))
 			]));
 };
+var $author$project$Main$PlaceRandomly = {$: 'PlaceRandomly'};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
@@ -6640,7 +6719,7 @@ var $joakin$elm_canvas$Canvas$group = F2(
 					drawable: $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableGroup(entities)
 				}));
 	});
-var $elm$core$Debug$log = _Debug_log;
+var $avh4$elm_color$Color$red = A4($avh4$elm_color$Color$RgbaSpace, 204 / 255, 0 / 255, 0 / 255, 1.0);
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
@@ -6649,62 +6728,81 @@ var $joakin$elm_canvas$Canvas$Settings$stroke = function (color) {
 	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingDrawOp(
 		$joakin$elm_canvas$Canvas$Internal$Canvas$Stroke(color));
 };
-var $author$project$Main$renderProblem = function (p) {
-	var scale = 1000 / A2($elm$core$Basics$max, p.roomHeight, p.roomWidth);
-	var _v0 = A2(
-		$elm$core$Debug$log,
-		'Problem',
-		_Utils_Tuple3(p.roomHeight, p.roomWidth, scale));
-	return A2(
-		$joakin$elm_canvas$Canvas$group,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$joakin$elm_canvas$Canvas$shapes,
-				_List_fromArray(
-					[
-						$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$black)
-					]),
-				_List_fromArray(
-					[
-						A3(
-						$joakin$elm_canvas$Canvas$rect,
-						_Utils_Tuple2(0, 0),
-						p.roomWidth * scale,
-						p.roomHeight * scale)
-					])),
-				A2(
-				$joakin$elm_canvas$Canvas$shapes,
-				_List_fromArray(
-					[
-						$joakin$elm_canvas$Canvas$Settings$fill($avh4$elm_color$Color$gray)
-					]),
-				_List_fromArray(
-					[
-						A3(
-						$joakin$elm_canvas$Canvas$rect,
-						_Utils_Tuple2(p.stageBottomLeft.a * scale, p.stageBottomLeft.b * scale),
-						p.stageWidth * scale,
-						p.stageHeight * scale)
-					])),
-				A2(
-				$joakin$elm_canvas$Canvas$shapes,
-				_List_fromArray(
-					[
-						$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$blue)
-					]),
-				A2(
-					$elm$core$List$map,
-					function (a) {
-						return A2(
-							$joakin$elm_canvas$Canvas$circle,
-							_Utils_Tuple2(a.x * scale, a.y * scale),
-							3.0 * scale);
-					},
-					p.attendees))
-			]));
-};
+var $author$project$Main$renderProblem = F2(
+	function (p, s) {
+		var scale = 1000 / A2($elm$core$Basics$max, p.roomHeight, p.roomWidth);
+		return A2(
+			$joakin$elm_canvas$Canvas$group,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$joakin$elm_canvas$Canvas$shapes,
+					_List_fromArray(
+						[
+							$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$black)
+						]),
+					_List_fromArray(
+						[
+							A3(
+							$joakin$elm_canvas$Canvas$rect,
+							_Utils_Tuple2(0, 0),
+							p.roomWidth * scale,
+							p.roomHeight * scale)
+						])),
+					A2(
+					$joakin$elm_canvas$Canvas$shapes,
+					_List_fromArray(
+						[
+							$joakin$elm_canvas$Canvas$Settings$fill($avh4$elm_color$Color$gray)
+						]),
+					_List_fromArray(
+						[
+							A3(
+							$joakin$elm_canvas$Canvas$rect,
+							_Utils_Tuple2(p.stageBottomLeft.a * scale, p.stageBottomLeft.b * scale),
+							p.stageWidth * scale,
+							p.stageHeight * scale)
+						])),
+					A2(
+					$joakin$elm_canvas$Canvas$shapes,
+					_List_fromArray(
+						[
+							$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$blue)
+						]),
+					A2(
+						$elm$core$List$map,
+						function (a) {
+							return A2(
+								$joakin$elm_canvas$Canvas$circle,
+								_Utils_Tuple2(a.x * scale, a.y * scale),
+								3.0 * scale);
+						},
+						p.attendees)),
+					A2(
+					$joakin$elm_canvas$Canvas$shapes,
+					_List_fromArray(
+						[
+							$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$red)
+						]),
+					function () {
+						if (s.$ === 'Nothing') {
+							return _List_Nil;
+						} else {
+							var solution = s.a;
+							return A2(
+								$elm$core$List$map,
+								function (placement) {
+									return A2(
+										$joakin$elm_canvas$Canvas$circle,
+										_Utils_Tuple2(placement.x * scale, placement.y * scale),
+										5.0 * scale);
+								},
+								solution.placements);
+						}
+					}())
+				]));
+	});
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$html$Html$canvas = _VirtualDom_node('canvas');
@@ -7550,22 +7648,63 @@ var $author$project$Main$viewProblem = F2(
 	function (m, p) {
 		return A2(
 			$elm$html$Html$div,
+			_List_Nil,
 			_List_fromArray(
 				[
-					A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-					A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
-					A2($elm$html$Html$Attributes$style, 'align-items', 'center')
-				]),
-			_List_fromArray(
-				[
-					A3(
-					$joakin$elm_canvas$Canvas$toHtml,
-					_Utils_Tuple2(1000, 1000),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+							A2($elm$html$Html$Attributes$style, 'height', 'auto'),
+							A2($elm$html$Html$Attributes$style, 'align-items', 'center')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Attendes: '),
+							$elm$html$Html$text(
+							$elm$core$String$fromInt(
+								$elm$core$List$length(p.attendees))),
+							$elm$html$Html$text('; musicians: '),
+							$elm$html$Html$text(
+							$elm$core$String$fromInt(
+								$elm$core$List$length(p.musicians)))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+							A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+							A2($elm$html$Html$Attributes$style, 'align-items', 'center')
+						]),
+					_List_fromArray(
+						[
+							A3(
+							$joakin$elm_canvas$Canvas$toHtml,
+							_Utils_Tuple2(1000, 1000),
+							_List_Nil,
+							_List_fromArray(
+								[
+									$author$project$Main$clearScreen,
+									A2($author$project$Main$renderProblem, p, m.solution)
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
 					_List_Nil,
 					_List_fromArray(
 						[
-							$author$project$Main$clearScreen,
-							$author$project$Main$renderProblem(p)
+							A2(
+							$elm$html$Html$button,
+							_List_fromArray(
+								[
+									$elm$html$Html$Events$onClick($author$project$Main$PlaceRandomly)
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Random solve')
+								]))
 						]))
 				]));
 	});
@@ -7594,7 +7733,7 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 	{
 		init: function (_v0) {
 			return _Utils_Tuple2(
-				{count: 0, error: $elm$core$Maybe$Nothing, problem: $elm$core$Maybe$Nothing, problemId: ''},
+				{count: 0, error: $elm$core$Maybe$Nothing, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
 				$elm$core$Platform$Cmd$none);
 		},
 		subscriptions: function (model) {
