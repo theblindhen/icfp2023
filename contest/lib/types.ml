@@ -4,6 +4,7 @@ type position = { x : float; y : float } [@@deriving compare, sexp]
 type attendee = { pos : position; tastes : float array } [@@deriving compare, sexp]
 
 type problem = {
+  problem_id : int;
   room_width : float;
   room_height : float;
   stage_width : float;
@@ -16,8 +17,9 @@ type problem = {
 
 let position_from_json_tuple (x, y) = { x; y }
 
-let problem_of_json_problem (json_problem : Json_j.json_problem) =
+let problem_of_json_problem ~problem_id (json_problem : Json_j.json_problem) =
   {
+    problem_id;
     room_width = json_problem.room_width;
     room_height = json_problem.room_height;
     stage_width = json_problem.stage_width;
