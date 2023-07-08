@@ -6320,6 +6320,22 @@ var $author$project$Main$update = F2(
 							[
 								$author$project$Main$postExpectSolution('http://localhost:3000/lp')
 							])));
+			case 'InitSim':
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$author$project$Main$postExpectSolution('http://localhost:3000/init_sim')
+							])));
+			case 'StepSim':
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$author$project$Main$postExpectSolution('http://localhost:3000/step_sim')
+							])));
 			case 'Save':
 				return _Utils_Tuple2(
 					model,
@@ -6910,9 +6926,11 @@ var $author$project$Main$viewLoadProblem = function (m) {
 					]))
 			]));
 };
+var $author$project$Main$InitSim = {$: 'InitSim'};
 var $author$project$Main$LP = {$: 'LP'};
 var $author$project$Main$PlaceRandomly = {$: 'PlaceRandomly'};
 var $author$project$Main$Save = {$: 'Save'};
+var $author$project$Main$StepSim = {$: 'StepSim'};
 var $author$project$Main$Swap = {$: 'Swap'};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
 	return {$: 'Fill', a: a};
@@ -8277,6 +8295,28 @@ var $author$project$Main$viewProblem = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$text('Save')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$InitSim),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Init Sim')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$StepSim),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Step Sim')
 								]))
 						])),
 					A2(

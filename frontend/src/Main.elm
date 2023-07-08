@@ -74,6 +74,8 @@ type Msg
     | PlaceRandomly
     | Swap
     | LP
+    | InitSim
+    | StepSim
     | Save
     | FocusOnInstrument Int
     | SolutionReturned (Result Http.Error String)
@@ -161,6 +163,8 @@ update msg model = case msg of
     PlaceRandomly -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/place_randomly" ] )
     Swap -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/swap" ] )
     LP -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/lp" ] )
+    InitSim -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/init_sim" ] )
+    StepSim -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/step_sim" ] )
     Save -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/save" ] )
     FocusOnInstrument i -> ( { model | focus = Just i }, Cmd.none )
     SolutionReturned (Ok res) -> (
@@ -247,7 +251,9 @@ viewProblem m p =
                     BButton.button 
                         ((if m.focus == Just instruments then [BButton.disabled True] else []) ++
                             [ BButton.onClick (nextFocus m.focus 1), BButton.primary ]) [ text "Next Instrument" ],
-                    BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ]
+                    BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ],
+                    BButton.button [ BButton.onClick InitSim, BButton.primary ] [ text "Init Sim" ],
+                    BButton.button [ BButton.onClick StepSim, BButton.primary ] [ text "Step Sim" ]
                 ],
             div [ ]
                 [ 

@@ -1,6 +1,7 @@
 open Core
 open Contest
 open Opium
+open Physics
 
 let current_problem = ref None
 let current_solution = ref None
@@ -25,6 +26,17 @@ let place_randomly_handler _ =
   | None -> Lwt.return (Response.make ~status:`OK ~body:(Body.of_string "No problem") ())
   | Some p ->
       let solution = Random_solver.random_placement_solution p [] in
+      let solution_json =
+        solution |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
+      in
+      current_solution := Some solution;
+      Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
+
+let init_solution_handler f _ =
+  match !current_problem with
+  | None -> Lwt.return (Response.make ~status:`OK ~body:(Body.of_string "No problem") ())
+  | Some p ->
+      let solution = f p in
       let solution_json =
         solution |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
       in
@@ -60,5 +72,7 @@ let _ =
   |> App.post "/place_randomly" place_randomly_handler
   |> App.post "/swap" (optimiser_handler Improver.improve)
   |> App.post "/lp" (optimiser_handler Lp_solver.lp_optimize_solution)
+  |> App.post "/init_sim" (init_solution_handler init_solution_sol_stage1)
+  |> App.post "/step_sim" (optimiser_handler simulate_step_sol_stage1)
   |> App.post "/save" save_handler
   |> App.run_command
