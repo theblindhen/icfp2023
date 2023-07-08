@@ -42,6 +42,8 @@ let parse_edges_flag edges : Edge_placer.edges =
              match edge_str with
              | "north" -> Edge_placer.North
              | "south" -> Edge_placer.South
+             | "east" -> Edge_placer.East
+             | "west" -> Edge_placer.West
              | _ -> failwith "Invalid edge placement")
 
 let command =
