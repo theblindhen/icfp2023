@@ -14,10 +14,14 @@ let score_cache (p : problem) (s : solution) : (position * instrument, float) Ha
   let cache = Hashtbl.Poly.create () in
   let instrument_count = instrument_count p in
   Array.iteri s ~f:(fun i m ->
+      let constants = List.map p.attendees ~f:(fun a -> (score_I_partial s a m.id m.pos, a)) in
       printf "computing cache for %dnth position\n%!" i;
       for i = 0 to instrument_count - 1 do
-        Hashtbl.Poly.add_exn cache ~key:(m.pos, i)
-          ~data:(score_musician p s { m with instrument = i })
+        let score =
+          List.map constants ~f:(fun (c, a) -> Float.round_up (c *. a.tastes.(i)))
+          |> List.sum (module Float) ~f:Fn.id
+        in
+        Hashtbl.Poly.add_exn cache ~key:(m.pos, i) ~data:score
       done);
   cache
 
@@ -29,7 +33,6 @@ let improve (p : problem) (s : solution) : solution =
   let cache = score_cache p s in
   let scores = scores_of_musicians p s in
   for i = 0 to Array.length scores - 1 do
-    Core.printf "%d\n%!" i;
     for j = i + 1 to Array.length scores - 1 do
       let score_i = get_score cache scores i i in
       let score_j = get_score cache scores j j in
