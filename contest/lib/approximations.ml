@@ -20,6 +20,7 @@ let max_score_instrument_without_q (p : problem) (i : instrument) : float =
   List.sum (module Float) ~f:(fun a -> max_score_I p a i) p.attendees
 
 let max_q (inl : int list) : float =
+  (* TODO: Correctly account for the increasing size of outer rings *)
   let min_dl = List.mapi inl ~f:(fun i _ -> Float.round_up (float i /. 6.) *. 10.) in
   1.0 +. List.sum (module Float) ~f:(fun d -> if Float.(d = 0.) then 0. else 1. /. d) min_dl
 
