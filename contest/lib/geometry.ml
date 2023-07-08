@@ -11,6 +11,11 @@ type line = float * float * float [@@deriving sexp]
 (** A line in 2D space.
   * the line ax + by + c = 0 *)
 
+let distance_squared (p1 : point) (p2 : point) : float =
+  ((p1.x -. p2.x) ** 2.0) +. ((p1.y -. p2.y) ** 2.0)
+
+let distance (p1 : point) (p2 : point) : float = sqrt (distance_squared p1 p2)
+
 let point_to_line_squared ({ x; y } : point) ((a, b, c) : line) : float =
   let numerator = (a *. x) +. (b *. y) +. c in
   let denominator = (a *. a) +. (b *. b) in
@@ -74,7 +79,7 @@ let precompute_hearable ~(attendees : Types.position array) ~(musicians : Types.
             else
               let angle_to_center = angle_of base_musician musician in
               let opposite = block_radius in
-              let hypotenuse = Misc.distance base_musician musician in
+              let hypotenuse = distance base_musician musician in
               let delta_angle = asin (opposite /. hypotenuse) in
               Some (angle_to_center -. delta_angle, angle_to_center +. delta_angle))
       in

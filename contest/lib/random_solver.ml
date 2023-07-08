@@ -1,6 +1,5 @@
-open Types
-open Misc
 open Core
+open Types
 
 let random_placement (p : problem) : position =
   let x_offset = Random.float (p.stage_width -. 20.0) in
@@ -8,7 +7,7 @@ let random_placement (p : problem) : position =
   { x = x_offset +. 10.0 +. p.stage_bottom_left.x; y = y_offset +. 10.0 +. p.stage_bottom_left.y }
 
 let is_valid_placement (_ : problem) (placed : position list) (potential : position) : bool =
-  placed |> List.for_all ~f:(fun x -> Float.(distance x potential >= 10.0))
+  placed |> List.for_all ~f:(fun x -> Float.(Geometry.distance x potential >= 10.0))
 
 let random_placements (p : problem) (already_placed : position list) : position list =
   Random.self_init ();
@@ -24,4 +23,4 @@ let random_placements (p : problem) (already_placed : position list) : position 
   random already_placed (List.drop p.musicians (List.length already_placed)) 10_000
 
 let random_placement_solution (p : problem) (already_placed : position list) : solution =
-  random_placements p already_placed |> solution_of_positions p
+  random_placements p already_placed |> Misc.solution_of_positions p

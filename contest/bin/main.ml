@@ -16,7 +16,7 @@ let run_invocation inv =
       print_endline (List.length problem.musicians |> string_of_int);
       let edge = Edge_placer.place_edges problem inv.edges in
       let solution = random_solution problem edge in
-      Types.validate_solution problem solution;
+      Misc.validate_solution problem solution;
       print_endline "Scoring solution...";
       let score = Score.score_solution problem solution in
       printf "Random solution score: %f\n%!" score;
@@ -26,9 +26,8 @@ let run_invocation inv =
         | Swap -> Improver.improve problem solution
         | LP -> Lp_solver.lp_optimize_solution problem solution
       in
-      Types.validate_solution problem optimized_solution;
+      Misc.validate_solution problem optimized_solution;
       let optimised_score = Score.score_solution problem optimized_solution in
-      Types.validate_solution problem optimized_solution;
       printf "Improved Problem %d with score: %f\n%!" inv.problem_id optimised_score;
       Json_util.write_solution_if_best optimised_score inv.problem_id optimized_solution;
       (* write solution_json to file *)
