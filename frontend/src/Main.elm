@@ -21,6 +21,7 @@ import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.Utilities.Flex as Flex
+import Bootstrap.ButtonGroup as BGroup
 
 type alias Musician = Int
 
@@ -73,6 +74,7 @@ type Msg
     | PlaceRandomly
     | Swap
     | LP
+    | Save
     | FocusOnInstrument Int
     | SolutionReturned (Result Http.Error String)
 
@@ -132,6 +134,14 @@ decodeSolution =
     map Solution
         (field "placements" (list decodePlacement))
 
+postExpectSolution : String -> Cmd Msg
+postExpectSolution url =
+    Http.post
+        { body = Http.emptyBody
+        , url = url
+        , expect = Http.expectString SolutionReturned
+        }
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model = case msg of
     Frame _ -> ( { model | count = model.count + 1 }, Cmd.none )
@@ -148,27 +158,10 @@ update msg model = case msg of
             Err err -> { model | error = Just ("Failed to decode problem: " ++ errorToString err) }
         , Cmd.none )
     LoadedProblem (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
-    PlaceRandomly -> ( model, Cmd.batch [
-        Http.post 
-            { body = Http.emptyBody
-            , url = "http://localhost:3000/place_randomly"
-            , expect = Http.expectString SolutionReturned
-            }
-        ] )
-    Swap -> ( model, Cmd.batch [
-        Http.post
-            { body = Http.emptyBody
-            , url = "http://localhost:3000/swap"
-            , expect = Http.expectString SolutionReturned
-            }
-        ])
-    LP -> ( model, Cmd.batch [
-        Http.post
-            { body = Http.emptyBody
-            , url = "http://localhost:3000/lp"
-            , expect = Http.expectString SolutionReturned
-            }
-        ])
+    PlaceRandomly -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/place_randomly" ] )
+    Swap -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/swap" ] )
+    LP -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/lp" ] )
+    Save -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/save" ] )
     FocusOnInstrument i -> ( { model | focus = Just i }, Cmd.none )
     SolutionReturned (Ok res) -> (
         case decodeString decodeSolution res of
@@ -231,11 +224,13 @@ viewProblem m p =
                 ]
             ],
         div [ ] 
-            [ BButton.button [ BButton.onClick (PlaceRandomly), BButton.primary ] [ text "Random solve" ]
-            , BButton.button [ BButton.onClick (Swap), BButton.primary ] [ text "Swap" ]
-            , BButton.button [ BButton.onClick (LP), BButton.primary ] [ text "LP" ]
-            , BButton.button [ BButton.onClick (nextFocus m.focus 1), BButton.primary ] [ text "Next Instrument" ]
-            , BButton.button [ BButton.onClick (nextFocus m.focus (-1)), BButton.primary ] [ text "Previous Instrument" ]
+            [ 
+                BButton.button [ BButton.onClick (PlaceRandomly), BButton.primary ] [ text "Random solve" ],
+                BButton.button [ BButton.onClick (Swap), BButton.primary ] [ text "Swap" ],
+                BButton.button [ BButton.onClick (LP), BButton.primary ] [ text "LP" ],
+                BButton.button [ BButton.onClick (nextFocus m.focus 1), BButton.primary ] [ text "Next Instrument" ],
+                BButton.button [ BButton.onClick (nextFocus m.focus (-1)), BButton.primary ] [ text "Previous Instrument" ],
+                BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ]
             ]
     ]
 

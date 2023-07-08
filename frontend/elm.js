@@ -5341,9 +5341,6 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$LoadedProblem = function (a) {
 	return {$: 'LoadedProblem', a: a};
 };
-var $author$project$Main$SolutionReturned = function (a) {
-	return {$: 'SolutionReturned', a: a};
-};
 var $author$project$Main$Problem = F8(
 	function (roomWidth, roomHeight, stageWidth, stageHeight, stageBottomLeft, musicians, attendees, pillars) {
 		return {attendees: attendees, musicians: musicians, pillars: pillars, roomHeight: roomHeight, roomWidth: roomWidth, stageBottomLeft: stageBottomLeft, stageHeight: stageHeight, stageWidth: stageWidth};
@@ -5985,7 +5982,6 @@ var $elm$core$Dict$update = F3(
 			return A2($elm$core$Dict$remove, targetKey, dictionary);
 		}
 	});
-var $elm$http$Http$emptyBody = _Http_emptyBody;
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -6050,6 +6046,7 @@ var $elm$http$Http$expectString = function (toMsg) {
 		toMsg,
 		$elm$http$Http$resolve($elm$core$Result$Ok));
 };
+var $elm$http$Http$emptyBody = _Http_emptyBody;
 var $elm$http$Http$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -6222,9 +6219,20 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
+var $author$project$Main$SolutionReturned = function (a) {
+	return {$: 'SolutionReturned', a: a};
+};
 var $elm$http$Http$post = function (r) {
 	return $elm$http$Http$request(
 		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
+};
+var $author$project$Main$postExpectSolution = function (url) {
+	return $elm$http$Http$post(
+		{
+			body: $elm$http$Http$emptyBody,
+			expect: $elm$http$Http$expectString($author$project$Main$SolutionReturned),
+			url: url
+		});
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -6294,12 +6302,7 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
-								$elm$http$Http$post(
-								{
-									body: $elm$http$Http$emptyBody,
-									expect: $elm$http$Http$expectString($author$project$Main$SolutionReturned),
-									url: 'http://localhost:3000/place_randomly'
-								})
+								$author$project$Main$postExpectSolution('http://localhost:3000/place_randomly')
 							])));
 			case 'Swap':
 				return _Utils_Tuple2(
@@ -6307,12 +6310,7 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
-								$elm$http$Http$post(
-								{
-									body: $elm$http$Http$emptyBody,
-									expect: $elm$http$Http$expectString($author$project$Main$SolutionReturned),
-									url: 'http://localhost:3000/swap'
-								})
+								$author$project$Main$postExpectSolution('http://localhost:3000/swap')
 							])));
 			case 'LP':
 				return _Utils_Tuple2(
@@ -6320,12 +6318,15 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
-								$elm$http$Http$post(
-								{
-									body: $elm$http$Http$emptyBody,
-									expect: $elm$http$Http$expectString($author$project$Main$SolutionReturned),
-									url: 'http://localhost:3000/lp'
-								})
+								$author$project$Main$postExpectSolution('http://localhost:3000/lp')
+							])));
+			case 'Save':
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$author$project$Main$postExpectSolution('http://localhost:3000/save')
 							])));
 			case 'FocusOnInstrument':
 				var i = msg.a;
@@ -6911,6 +6912,7 @@ var $author$project$Main$viewLoadProblem = function (m) {
 };
 var $author$project$Main$LP = {$: 'LP'};
 var $author$project$Main$PlaceRandomly = {$: 'PlaceRandomly'};
+var $author$project$Main$Save = {$: 'Save'};
 var $author$project$Main$Swap = {$: 'Swap'};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
 	return {$: 'Fill', a: a};
@@ -8214,6 +8216,17 @@ var $author$project$Main$viewProblem = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$text('Previous Instrument')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$Save),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Save')
 								]))
 						]))
 				]));

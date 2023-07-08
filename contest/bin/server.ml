@@ -42,6 +42,16 @@ let optimiser_handler f _ =
       Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
   | _ -> Lwt.return (Response.make ~status:`OK ~body:(Body.of_string "No problem") ())
 
+let save_handler _ =
+  match (!current_problem, !current_solution) with
+  | Some p, Some s ->
+      let solution_json = s |> Types.json_solution_of_solution |> Json_j.string_of_json_solution in
+      let score = Score.score_solution p s in
+      Misc.validate_solution p s;
+      Json_util.write_solution_if_best score p.problem_id s;
+      Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
+  | _ -> Lwt.return (Response.make ~status:`OK ~body:(Body.of_string "No problem") ())
+
 let _ =
   App.empty
   |> App.get "/" index_handler
@@ -50,4 +60,5 @@ let _ =
   |> App.post "/place_randomly" place_randomly_handler
   |> App.post "/swap" (optimiser_handler Improver.improve)
   |> App.post "/lp" (optimiser_handler Lp_solver.lp_optimize_solution)
+  |> App.post "/save" save_handler
   |> App.run_command
