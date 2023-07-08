@@ -60,3 +60,8 @@ let solution_of_positions (p : problem) (s : position list) : solution =
   | Unequal_lengths -> failwith "solution_of_positions: unequal lengths"
 
 let string_of_score (score : float) : string = Int.to_string_hum (Float.to_int score)
+
+let instrument_count (p : problem) : int =
+  match List.max_elt p.musicians ~compare:Int.compare with
+  | None -> 0
+  | Some x -> x + 1

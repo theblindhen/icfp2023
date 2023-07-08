@@ -1,6 +1,7 @@
 open Core
 open Contest
 open Opium
+open Physics
 
 let current_problem = ref None
 let current_solution = ref None
@@ -31,10 +32,47 @@ let place_randomly_handler _ =
       current_solution := Some solution;
       Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
 
+let init_solution_handler f _ =
+  match !current_problem with
+  | None -> Lwt.return (Response.make ~status:`OK ~body:(Body.of_string "No problem") ())
+  | Some p ->
+      let solution = f p in
+      let solution_json =
+        solution |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
+      in
+      current_solution := Some solution;
+      Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
+
+let optimiser_handler f _ =
+  match (!current_problem, !current_solution) with
+  | Some p, Some s ->
+      let solution' = f p s in
+      let solution_json =
+        solution' |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
+      in
+      current_solution := Some solution';
+      Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
+  | _ -> Lwt.return (Response.make ~status:`OK ~body:(Body.of_string "No problem") ())
+
+let save_handler _ =
+  match (!current_problem, !current_solution) with
+  | Some p, Some s ->
+      let solution_json = s |> Types.json_solution_of_solution |> Json_j.string_of_json_solution in
+      let score = Score.score_solution p s in
+      Misc.validate_solution p s;
+      Json_util.write_solution_if_best score p.problem_id s;
+      Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
+  | _ -> Lwt.return (Response.make ~status:`OK ~body:(Body.of_string "No problem") ())
+
 let _ =
   App.empty
   |> App.get "/" index_handler
   |> App.get "/elm.js" js_handler
   |> App.get "/problem/:id" problem_handler
   |> App.post "/place_randomly" place_randomly_handler
+  |> App.post "/swap" (optimiser_handler Improver.improve)
+  |> App.post "/lp" (optimiser_handler Lp_solver.lp_optimize_solution)
+  |> App.post "/init_sim" (init_solution_handler init_solution_sol_stage1)
+  |> App.post "/step_sim" (optimiser_handler simulate_step_sol_stage1)
+  |> App.post "/save" save_handler
   |> App.run_command
