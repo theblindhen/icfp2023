@@ -78,21 +78,16 @@ let solution_of_lp_solution (problem : problem) (positions : position list)
          { id = musician; pos = p; instrument = musician_instruments.(musician) })
   |> Array.of_list
 
-let () =
-  let problem_id = 44 in
-  match Json_util.get_problem problem_id with
-  | None -> print_endline "Problem not found"
-  | Some problem ->
-      let positions = Random_solver.random_placements problem in
-      let vars = lp_vars problem positions in
-      let lp_problem = lp_of_problem problem positions vars in
-      if Lp.validate lp_problem then
-        match Lp_glpk.solve lp_problem with
-        | Ok (obj, xs) ->
-            let solution = solution_of_lp_solution problem positions vars (obj, xs) in
-            validate_solution problem solution;
-            let score = Score.score_solution problem solution in
-            printf "Recomputed score: %f\n" score;
-            Json_util.write_solution_if_best problem_id problem solution
-        | Error msg -> Printf.printf "Error in running LP solver: %s\n" msg
-      else print_endline "Oops, my problem is broken."
+let lp_assign_positions (problem : problem) (positions : position list) =
+  let vars = lp_vars problem positions in
+  let lp_problem = lp_of_problem problem positions vars in
+  if Lp.validate lp_problem then
+    match Lp_glpk.solve lp_problem with
+    | Ok (obj, xs) -> solution_of_lp_solution problem positions vars (obj, xs)
+    | Error msg -> failwith (sprintf "Error in running LP solver: %s\n" msg)
+  else failwith "Oops, LP problem is broken."
+
+(** Completely disregards the placement in the given solution and reassigns all
+  placements *)
+let lp_optimize_solution (problem : problem) (solution : solution) =
+  lp_assign_positions problem (solution |> List.of_array |> List.map ~f:(fun { pos; _ } -> pos))

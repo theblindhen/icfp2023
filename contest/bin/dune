@@ -2,7 +2,9 @@
  (public_name main)
  (name main)
  (modules main)
- (libraries contest))
+ (preprocess
+  (pps ppx_jane))
+ (libraries contest core_unix.command_unix))
 
 (executable
  (public_name gui)
