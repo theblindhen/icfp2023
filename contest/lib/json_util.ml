@@ -29,8 +29,7 @@ let best_solution_score problem_id =
 
 (** Write the solution to the "../problems/solutions-%d" directory. Only write a
  * new file if the new score is better than all the previous ones. *)
-let write_solution_if_best (problem_id : int) problem (solution : Types.solution) : unit =
-  let score : float = Score.score_solution problem solution in
+let write_solution_if_best (score : float) (problem_id : int) (solution : Types.solution) : unit =
   let best_previous_score = best_solution_score problem_id in
   if Float.(score > best_previous_score) then (
     let solution_json =
