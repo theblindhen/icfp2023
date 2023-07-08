@@ -15,11 +15,3 @@
  (name stats)
  (modules stats)
  (libraries contest))
-
-(executable
- (public_name lp_test)
- (preprocess
-  (pps ppx_jane))
- (name lp_test)
- (modules lp_test)
- (libraries contest lp lp-glpk))

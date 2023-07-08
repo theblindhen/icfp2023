@@ -1,5 +1,4 @@
 open Core
-open Contest
 open Types
 
 let num_instruments (problem : problem) =
