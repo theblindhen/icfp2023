@@ -10,9 +10,15 @@ type stats = {
   musicians_count : int;
   attendees_count : int;
   instrument_count : int;
+  instrument_count_per_instrument : int array;
 }
 
 let problem_stats problem =
+  let instrument_count =
+    match List.max_elt problem.musicians ~compare:Int.compare with
+    | None -> 0
+    | Some x -> x + 1
+  in
   {
     room_dim =
       sprintf "%d x %d" (int_of_float problem.room_width) (int_of_float problem.room_height);
@@ -20,10 +26,11 @@ let problem_stats problem =
       sprintf "%d x %d" (int_of_float problem.stage_width) (int_of_float problem.stage_height);
     musicians_count = List.length problem.musicians;
     attendees_count = List.length problem.attendees;
-    instrument_count =
-      (match List.max_elt problem.musicians ~compare:Int.compare with
-      | None -> 0
-      | Some x -> x + 1);
+    instrument_count;
+    instrument_count_per_instrument =
+      List.fold problem.musicians ~init:(Array.create ~len:instrument_count 0) ~f:(fun acc i ->
+          acc.(i) <- acc.(i) + 1;
+          acc);
   }
 
 let stats_to_string (problem_stats : stats) =
@@ -36,8 +43,13 @@ let stats_to_string (problem_stats : stats) =
   ^ "musicians: "
   ^ string_of_int problem_stats.musicians_count
   ^ "\n"
-  ^ "instruments: "
+  ^ "instruments total: "
   ^ string_of_int problem_stats.instrument_count
+  ^ "\n"
+  ^ String.concat
+      (List.map (List.init problem_stats.instrument_count ~f:Fn.id) ~f:(fun i ->
+           sprintf "  instrument %d: %d\n" i problem_stats.instrument_count_per_instrument.(i)))
+  ^ "\n"
   ^ "\n"
   ^ "attendees: "
   ^ string_of_int problem_stats.attendees_count
