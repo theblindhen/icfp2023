@@ -34,7 +34,13 @@ let point_rotator (theta : float) =
 let angle_of (p1 : point) (p2 : point) =
   let vx, vy = (p2.x -. p1.x, p2.y -. p1.y) in
   let res = atan2 vy vx in
-  res
+  if res = pi then -.pi else res
+
+(** Normalize an angle to be between -pi and pi. *)
+let angle_norm angle =
+  let open Float in
+  let angle = mod_float angle (2.0 *. pi) in
+  if angle >= pi then angle -. (2.0 *. pi) else angle
 
 (** Returns a function that computes whether a point is within a given distance of a line segment.
   * 
@@ -81,7 +87,9 @@ let precompute_hearable ~(attendees : Types.position array) ~(musicians : Types.
               let opposite = block_radius in
               let hypotenuse = distance base_musician musician in
               let delta_angle = asin (opposite /. hypotenuse) in
-              Some (angle_to_center -. delta_angle, angle_to_center +. delta_angle))
+              Some
+                ( angle_norm (angle_to_center -. delta_angle),
+                  angle_norm (angle_to_center +. delta_angle) ))
       in
       let block_events =
         Array.concat_map musician_start_stop_angles ~f:(fun (start, stop) ->
@@ -101,22 +109,20 @@ let precompute_hearable ~(attendees : Types.position array) ~(musicians : Types.
             | `stop, `stop -> 0
             | `stop, _ -> 1
           else angle_cmp);
-      (* Our starting angle is always 0, and then we sweep around counter-clockwise. *)
-      (* Compute the number of blockades at angle 0 so we have something to start with.  *)
-      let blockades_at_0 : int =
+      (* Our starting angle is always -pi, and then we sweep around counter-clockwise. *)
+      (* Compute the number of blockades at angle -pi so we have something to start with.  *)
+      let blockades_at_west : int =
         Array.count musician_start_stop_angles ~f:(fun (start, stop) ->
             (* A musician is blocking at angle 0 if their start angle is in the
              * bottom half of the circle while their stop angle is in the top half. *)
-            (* We don't include the case of `start = 0.0` in this count since
-             * those will be encountered when we traverse in sorted order below. *)
-            Float.(start > pi && stop < pi))
+            Float.(stop < start))
       in
       (* Sweep around the list of events counter-clockwise, appending to the
        * list of attendees who can hear this musician and updating the current
        * number of blockades. *)
       let attendees_hearable, _ =
         let open Int in
-        Array.fold events ~init:([], blockades_at_0)
+        Array.fold events ~init:([], blockades_at_west)
           ~f:(fun (attendees_hearable, blockades) (_angle, event_type) ->
             match event_type with
             | `start -> (attendees_hearable, blockades + 1)
@@ -131,6 +137,22 @@ let precompute_hearable ~(attendees : Types.position array) ~(musicians : Types.
 (* TESTS *)
 
 let to_point (x, y) : point = { x; y }
+
+let%test_unit "angle_norm" =
+  [%test_eq: float] (angle_norm 0.) 0.;
+  [%test_eq: float] (angle_norm pi) (-.pi);
+  [%test_eq: float] (angle_norm (2. *. pi)) 0.;
+  [%test_eq: float] (angle_norm (3. *. pi)) (-.pi);
+  [%test_eq: float] (angle_norm (-.pi)) (-.pi);
+  [%test_eq: float] (angle_norm (-2. *. pi)) 0.;
+  [%test_eq: float] (angle_norm (-3. *. pi)) (-.pi);
+  [%test_eq: float] (angle_norm (pi /. 2.)) (pi /. 2.);
+  [%test_eq: float] (angle_norm ((pi /. 2.) +. (2. *. pi))) (pi /. 2.);
+  [%test_eq: float] (angle_norm ((pi /. 2.) +. (3. *. pi))) (-.pi /. 2.);
+  [%test_eq: float] (angle_norm (-.pi /. 2.)) (-.pi /. 2.);
+  [%test_eq: float] (angle_norm ((-.pi /. 2.) +. (2. *. pi))) (-.pi /. 2.);
+  [%test_eq: float] (angle_norm ((-.pi /. 2.) +. (3. *. pi))) (pi /. 2.);
+  ()
 
 let%test_unit "precompute_hearable 1" =
   let attendees =
@@ -178,8 +200,9 @@ let%test_unit "angle_of" =
   [%test_eq: bool] (angle_of { x = 0.; y = 0. } { x = 10.; y = 0. } |> is 0.) true;
   [%test_eq: bool] (angle_of { x = 0.; y = 0. } { x = 10.; y = 0. } |> is 0.) true;
   [%test_eq: bool] (angle_of { x = 0.; y = 0. } { x = 0.; y = 10. } |> is (pi / 2.)) true;
-  [%test_eq: bool] (angle_of { x = 10.; y = 0. } { x = 0.; y = 0. } |> is pi) true;
+  [%test_eq: bool] (angle_of { x = 10.; y = 0. } { x = 0.; y = 0. } |> is (-.pi)) true;
   [%test_eq: bool] (angle_of { x = 0.; y = 10. } { x = 0.; y = 0. } |> is (-.pi / 2.)) true;
+  [%test_eq: bool] (angle_of { x = 0.; y = 0. } { x = -10.; y = -10. } |> is (-.pi *. 3. / 4.)) true;
   ()
 
 let test_rotations distance p1 p2 inside outside =
