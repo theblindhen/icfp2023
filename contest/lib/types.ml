@@ -37,24 +37,6 @@ type instrument = int [@@deriving sexp]
 type musician = { id : int; pos : position; instrument : instrument } [@@deriving sexp]
 type solution = musician array [@@deriving sexp]
 
-let validate_solution (p : problem) (s : solution) =
-  let musician_ids = Array.map s ~f:(fun m -> m.id) in
-  (* Musician 0 is the first used *)
-  let min_musician = Array.min_elt musician_ids ~compare:Int.compare |> Option.value_exn in
-  assert (min_musician = 0);
-  (* Musician max is the number of musician *)
-  let max_musician = Array.max_elt musician_ids ~compare:Int.compare |> Option.value_exn in
-  assert (max_musician = Array.length musician_ids - 1);
-  (* All musician ids are distinct *)
-  assert (Array.length musician_ids = Array.length (Set.to_array (Int.Set.of_array musician_ids)));
-  (* Musicians' instruments correspond to those in the problem *)
-  List.iteri p.musicians ~f:(fun m_id inst ->
-      match Array.find s ~f:(fun m' -> m'.id = m_id) with
-      | None -> assert false
-      | Some m' -> assert (m'.instrument = inst))
-(* TODO: Musicians are within the stage, including stage margin *)
-(* TODO: Musicians are appropriately spaced from each other *)
-
 let json_solution_of_solution (solution : solution) : Json_j.json_solution =
   {
     placements =

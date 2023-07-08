@@ -1,11 +1,50 @@
+open Core
 open Types
 
-let distance_squared (p1 : position) (p2 : position) : float =
-  ((p1.x -. p2.x) ** 2.0) +. ((p1.y -. p2.y) ** 2.0)
-
-let distance (p1 : position) (p2 : position) : float = sqrt (distance_squared p1 p2)
+let validate_solution (p : problem) (s : solution) =
+  let musician_ids = Array.map s ~f:(fun m -> m.id) in
+  (* Musician 0 is the first used *)
+  let () =
+    let min_musician = Array.min_elt musician_ids ~compare:Int.compare |> Option.value_exn in
+    assert (min_musician = 0)
+  in
+  (* Musician max is the number of musician *)
+  let () =
+    let max_musician = Array.max_elt musician_ids ~compare:Int.compare |> Option.value_exn in
+    assert (max_musician = List.length p.musicians - 1)
+  in
+  (* All musician ids are distinct *)
+  assert (Array.length musician_ids = Array.length (Set.to_array (Int.Set.of_array musician_ids)));
+  (* Musicians' instruments correspond to those in the problem *)
+  List.iteri p.musicians ~f:(fun m_id inst ->
+      match Array.find s ~f:(fun m' -> m'.id = m_id) with
+      | None -> assert false
+      | Some m' -> assert (m'.instrument = inst));
+  (* Musicians are within the stage, including stage margin *)
+  let () =
+    let musician_radius = 10. in
+    let within_stage (p : problem) (m : musician) =
+      let open Float in
+      let { x; y } = m.pos in
+      let { x = sx; y = sy } = p.stage_bottom_left in
+      x >= sx +. musician_radius
+      && x <= sx +. p.stage_width -. musician_radius
+      && y >= sy +. musician_radius
+      && y <= sy +. p.stage_height -. musician_radius
+    in
+    Array.iter s ~f:(fun m -> assert (within_stage p m))
+  in
+  (* Musicians are not too close to each other *)
+  let () =
+    let musician_radius_sq = 100. in
+    Array.iter s ~f:(fun m ->
+        Array.iter s ~f:(fun m' ->
+            if m.id <> m'.id then
+              assert (Float.(Geometry.distance_squared m.pos m'.pos >= musician_radius_sq))))
+  in
+  ()
 
 let solution_of_positions (p : problem) (s : position list) : solution =
-  List.combine p.musicians s
-  |> List.mapi (fun i (instrument, pos) -> { id = i; pos; instrument })
-  |> Array.of_list
+  match List.zip p.musicians s with
+  | Ok l -> List.mapi l ~f:(fun i (instrument, pos) -> { id = i; pos; instrument }) |> Array.of_list
+  | Unequal_lengths -> failwith "solution_of_positions: unequal lengths"

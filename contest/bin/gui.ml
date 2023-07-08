@@ -128,7 +128,11 @@ let () =
   let random_solve () =
     match !cur_problem with
     | None -> eprintf "No problem loaded\n%!"
-    | Some problem -> cur_solution := Some (Random_solver.random_placement_solution problem)
+    | Some problem ->
+        cur_solution :=
+          Some
+            (Random_solver.random_placement_solution problem
+               (Edge_placer.place_edges problem [ South; North ]))
   in
 
   let solve_button =
