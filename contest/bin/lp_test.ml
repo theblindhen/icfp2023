@@ -58,16 +58,13 @@ let solution_of_lp_solution (problem : problem) (positions : position list)
   Array.iteri vars ~f:(fun p pvars ->
       Array.iteri pvars ~f:(fun i var ->
           let value = Lp.PMap.find var xs in
-          print_endline (Printf.sprintf "I_%d_%d: %.2f" p i value);
           if Float.( > ) value 0.0 then
-            if assignments.(p) = -1 then (
-              print_endline "\tAssigned";
-              assignments.(p) <- i)
+            if assignments.(p) = -1 then assignments.(p) <- i
             else failwith "Multiple instruments assigned to one position");
       if assignments.(p) = -1 then failwith ("No instrument assigned to position" ^ Int.to_string p));
   (* initialize a lookup of musicians yet to be assigned *)
   let musician_pool = Array.create ~len:(num_instruments problem) [] in
-  List.iter problem.musicians ~f:(fun m -> musician_pool.(m) <- m :: musician_pool.(m));
+  List.iteri problem.musicians ~f:(fun m inst -> musician_pool.(inst) <- m :: musician_pool.(inst));
   (* assign instruments to positions *)
   let musician_instruments = Array.of_list problem.musicians in
   let musician_for_posidx = Array.create ~len:(List.length positions) (-1) in
@@ -94,6 +91,7 @@ let () =
         match Lp_glpk.solve lp_problem with
         | Ok (obj, xs) ->
             let solution = solution_of_lp_solution problem positions vars (obj, xs) in
+            validate_solution problem solution;
             let score = Score.score_solution problem solution in
             printf "Recomputed score: %f\n" score;
             Json_util.write_solution_if_best problem_id problem solution
