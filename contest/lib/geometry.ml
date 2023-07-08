@@ -102,7 +102,9 @@ let precompute_hearable ~(attendees : Types.position array) ~(musicians : Types.
         Array.count musician_start_stop_angles ~f:(fun (start, stop) ->
             (* A musician is blocking at angle 0 if their start angle is in the
              * bottom half of the circle while their stop angle is in the top half. *)
-            Float.((start > pi || start = 0.) && stop < pi))
+            (* We don't include the case of `start = 0.0` in this count since
+             * those will be encountered when we traverse in sorted order below. *)
+            Float.(start > pi && stop < pi))
       in
       (* Sweep around the list of events counter-clockwise, appending to the
        * list of attendees who can hear this musician and updating the current
@@ -125,7 +127,7 @@ let precompute_hearable ~(attendees : Types.position array) ~(musicians : Types.
 
 let to_point (x, y) : point = { x; y }
 
-let%test_unit "precompute_hearable" =
+let%test_unit "precompute_hearable 1" =
   let attendees =
     Array.map ~f:to_point
       [|
@@ -158,6 +160,13 @@ let%test_unit "precompute_hearable" =
   let hearable = precompute_hearable ~attendees ~musicians ~block_radius in
   [%test_eq: int array array] hearable
     [| [| 2; 3; 4 |]; [| 0; 1; 2; 3 |]; [| 0; 1; 2; 3 |]; [| 0; 1; 2; 3 |] |]
+
+let%test_unit "precompute_hearable edge" =
+  let attendees = Array.map ~f:to_point [| (10., 0.); (0., 10.) |] in
+  let musicians = Array.map ~f:to_point [| (0., 0.); (2., 1.) |] in
+  let block_radius = 1. in
+  let hearable = precompute_hearable ~attendees ~musicians ~block_radius in
+  [%test_eq: int array array] hearable [| [| 1 |]; [| 0; 1 |] |]
 
 let%test_unit "angle_of" =
   let is (a : float) (b : float) = a < b +. 0.001 && a > b -. 0.001 in
