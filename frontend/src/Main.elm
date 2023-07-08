@@ -12,10 +12,16 @@ import Html.Attributes exposing (style)
 import Json.Decode exposing (..)
 import Html exposing (table)
 
+import List.Extra as Extra
+
 import Bootstrap.CDN as CDN
 import Bootstrap.Button as BButton
 import Bootstrap.Form.Input as BInput
 import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
+import Bootstrap.Utilities.Flex as Flex
+import Bootstrap.ButtonGroup as BGroup
 
 type alias Musician = Int
 
@@ -41,12 +47,16 @@ type alias Problem =
     , pillars: List Pillar
     }
 
+type alias Focus = Int
+
 type alias Model =
     { count : Float
     , error : Maybe String
     , problemId : String
     , problem : Maybe Problem
-    , solution : Maybe Solution }
+    , solution : Maybe Solution
+    , focus : Maybe Focus
+    }
 
 type alias Placement =
     { x : Float
@@ -62,6 +72,10 @@ type Msg
     | LoadProblem String
     | LoadedProblem (Result Http.Error String)
     | PlaceRandomly
+    | Swap
+    | LP
+    | Save
+    | FocusOnInstrument Int
     | SolutionReturned (Result Http.Error String)
 
 decodeMusicians : Decoder Musician
@@ -120,6 +134,14 @@ decodeSolution =
     map Solution
         (field "placements" (list decodePlacement))
 
+postExpectSolution : String -> Cmd Msg
+postExpectSolution url =
+    Http.post
+        { body = Http.emptyBody
+        , url = url
+        , expect = Http.expectString SolutionReturned
+        }
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model = case msg of
     Frame _ -> ( { model | count = model.count + 1 }, Cmd.none )
@@ -136,13 +158,11 @@ update msg model = case msg of
             Err err -> { model | error = Just ("Failed to decode problem: " ++ errorToString err) }
         , Cmd.none )
     LoadedProblem (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
-    PlaceRandomly -> ( model, Cmd.batch [
-        Http.post 
-            { body = Http.emptyBody
-            , url = "http://localhost:3000/place_randomly"
-            , expect = Http.expectString SolutionReturned
-            }
-        ] )
+    PlaceRandomly -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/place_randomly" ] )
+    Swap -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/swap" ] )
+    LP -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/lp" ] )
+    Save -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/save" ] )
+    FocusOnInstrument i -> ( { model | focus = Just i }, Cmd.none )
     SolutionReturned (Ok res) -> (
         case decodeString decodeSolution res of
             Ok solution -> { model | solution = Just solution }
@@ -153,10 +173,10 @@ update msg model = case msg of
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing }, Cmd.none )
+        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing }, Cmd.none )
         , view = view
         , update = update
-        , subscriptions = \model -> onAnimationFrameDelta Frame
+        , subscriptions = \model -> Sub.none
         }
 
 viewLoadProblem : Model -> Html Msg
@@ -171,36 +191,69 @@ viewLoadProblem m =
                 BButton.button [ BButton.onClick (LoadProblem m.problemId), BButton.primary ] [ text "Load problem" ]
             ]
         ]
-   
+
+nextFocus : Maybe Focus -> Int -> Msg
+nextFocus mFocus i =
+    case mFocus of
+        Nothing -> FocusOnInstrument 0
+        Just focus -> FocusOnInstrument (focus + i)
+
+numberOfInstruments : Problem -> Int
+numberOfInstruments p =
+    case List.maximum p.musicians of
+        Nothing -> 0
+        Just i -> i
+
+instrumentDescription : Model -> Problem -> String
+instrumentDescription m p =
+    case m.focus of
+        Nothing -> "No instrument in focus"
+        Just i -> "Focusing on instrument: " ++ (String.fromInt i)
+
 viewProblem : Model -> Problem -> Html Msg
 viewProblem m p =
-    div [
-        style "margin" "20px"
-    ] [
-        div [ style "display" "flex"
-            , style "height" "auto"
-            , style "align-items" "center" ] 
-            [ text "Attendes: "
-            , text (String.fromInt (List.length p.attendees))
-            , text "; musicians: "
-            , text (String.fromInt (List.length p.musicians)) ],
-        div
-            [ style "display" "flex"
-            , style "justify-content" "center"
-            , style "align-items" "center"
-            ]
-            [ 
-            Canvas.toHtml
-                ( 1000, 1000 )
-                [ ]
-                [ clearScreen
-                , renderProblem p m.solution
+    let instruments = numberOfInstruments p in
+        div [
+            style "margin" "20px"
+        ] [
+            div [ style "display" "flex"
+                , style "height" "auto"
+                , style "align-items" "center" ] 
+                [ text "Attendes: "
+                , text (String.fromInt (List.length p.attendees))
+                , text "; musicians: "
+                , text (String.fromInt (List.length p.musicians)) ],
+            div
+                [ style "display" "flex"
+                , style "justify-content" "center"
+                , style "align-items" "center"
                 ]
-            ],
-        div [ ] [
-            BButton.button [ BButton.onClick (PlaceRandomly), BButton.primary ] [ text "Random solve" ]
+                [ 
+                Canvas.toHtml
+                    ( 1001, 1001 )
+                    [ ]
+                    [ clearScreen
+                    , renderProblem p m.solution m.focus
+                    ]
+                ],
+            div [ ] 
+                [ 
+                    BButton.button [ BButton.onClick (PlaceRandomly), BButton.primary ] [ text "Random solve" ],
+                    BButton.button [ BButton.onClick (Swap), BButton.primary ] [ text "Swap" ],
+                    BButton.button [ BButton.onClick (LP), BButton.primary ] [ text "LP" ],
+                    BButton.button 
+                        ((if m.focus == Nothing || m.focus == Just 0 then [BButton.disabled True] else []) ++ 
+                            [ BButton.onClick (nextFocus m.focus (-1)), BButton.primary ]) [ text "Previous Instrument" ],
+                    BButton.button 
+                        ((if m.focus == Just instruments then [BButton.disabled True] else []) ++
+                            [ BButton.onClick (nextFocus m.focus 1), BButton.primary ]) [ text "Next Instrument" ],
+                    BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ]
+                ],
+            div [ ]
+                [ 
+                    text (instrumentDescription m p)
+                ]
         ]
-    ]
 
 view : Model -> Html Msg
 view m =
@@ -215,28 +268,45 @@ view m =
 clearScreen =
     shapes [ fill Color.white ] [ rect ( 0, 0 ) 1000 1000 ]
 
-renderProblem : Problem -> Maybe Solution -> Canvas.Renderable
-renderProblem p s =
-    let scale = 1000 / (max p.roomHeight p.roomWidth) in
-    group []
-        [ shapes
-            [ stroke Color.black ]
-            [ rect (0, 0) (p.roomWidth * scale) (p.roomHeight * scale) ]
-        , shapes
-            [ fill Color.gray ]
-            [ rect (Tuple.first p.stageBottomLeft * scale, Tuple.second p.stageBottomLeft * scale) (p.stageWidth * scale) (p.stageHeight * scale)] 
-        , shapes
-            [ stroke Color.blue ]
-            (List.map (\a -> circle (a.x * scale, a.y * scale) (3.0 * scale)) p.attendees)
-        , shapes
-            [ fill Color.gray ]
-            (List.map (\pillar -> circle (Tuple.first pillar.center * scale, Tuple.second pillar.center * scale) (pillar.radius * scale)) p.pillars)
-        , shapes
-            [ stroke Color.red ]
-            (case s of
+renderProblem : Problem -> Maybe Solution -> Maybe Focus -> Canvas.Renderable
+renderProblem p s f =
+    let 
+        scale = 1000 / (max p.roomHeight p.roomWidth)
+
+        musicians = 
+            case s of
                 Nothing -> []
-                Just solution -> 
-                    (List.map (\placement -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) solution.placements)
-            )
-        ]
+                Just solution -> Extra.zip solution.placements p.musicians
+
+        unfocusedMusicians =
+            case f of
+                Nothing -> musicians
+                Just focus -> List.filter (\(_, musician) -> musician /= focus) musicians
+
+        focusedMusicians =
+            case f of
+                Nothing -> []
+                Just focus -> List.filter (\(_, musician) -> musician == focus) musicians
+
+    in
+        group []
+            [ shapes
+                [ stroke Color.black ]
+                [ rect (0, 0) (p.roomWidth * scale) (p.roomHeight * scale) ]
+            , shapes
+                [ fill Color.gray ]
+                [ rect (Tuple.first p.stageBottomLeft * scale, Tuple.second p.stageBottomLeft * scale) (p.stageWidth * scale) (p.stageHeight * scale)] 
+            , shapes
+                [ stroke Color.blue ]
+                (List.map (\a -> circle (a.x * scale, a.y * scale) (3.0 * scale)) p.attendees)
+            , shapes
+                [ fill Color.gray ]
+                (List.map (\pillar -> circle (Tuple.first pillar.center * scale, Tuple.second pillar.center * scale) (pillar.radius * scale)) p.pillars)
+            , shapes
+                [ stroke Color.red ]
+                (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) unfocusedMusicians)
+            , shapes
+                [ stroke Color.green ]
+                (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) focusedMusicians)
+            ]
 

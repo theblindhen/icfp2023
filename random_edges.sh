@@ -3,7 +3,7 @@
 
 directions=(north east west south)
 # Select a random number of edges
-how_many=$((1 + RANDOM % 4))
+how_many=$((RANDOM % 5))
 # Select a random subset of directions
 # Remove trailing , and newline
 shuf -e "${directions[@]}" | head -n $how_many | tr '\n' ',' | sed 's/,$//'
