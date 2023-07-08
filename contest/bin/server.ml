@@ -20,6 +20,8 @@ let problem_handler req =
   let id = Router.param req "id" in
   let problem = In_channel.read_all (sprintf "../problems/problem-%s.json" id) in
   current_problem := Json_util.get_problem (int_of_string id);
+  current_solution := None;
+  current_round := 0;
   Lwt.return (Response.make ~status:`OK ~body:(Body.of_string problem) ())
 
 let init_solution_handler f _ =
