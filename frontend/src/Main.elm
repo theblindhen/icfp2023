@@ -34,13 +34,24 @@ type alias Model =
     { count : Float
     , error : Maybe String
     , problemId : String
-    , problem : Maybe Problem }
+    , problem : Maybe Problem
+    , solution : Maybe Solution }
+
+type alias Placement =
+    { x : Float
+    , y : Float
+    }
+
+type alias Solution =
+    { placements : List Placement }
 
 type Msg
     = Frame Float
     | ProblemFieldUpdated String
     | LoadProblem String
     | LoadedProblem (Result Http.Error String)
+    | PlaceRandomly
+    | SolutionReturned (Result Http.Error String)
 
 decodeMusicians : Decoder Musician
 decodeMusicians =
@@ -72,6 +83,17 @@ decodeProblem =
         (field "musicians" (list decodeMusicians))
         (field "attendees" (list decodeAttendee))
 
+decodePlacement : Decoder Placement
+decodePlacement =
+    map2 Placement
+        (field "x" float)
+        (field "y" float)
+
+decodeSolution : Decoder Solution
+decodeSolution =
+    map Solution
+        (field "placements" (list decodePlacement))
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model = case msg of
     Frame _ -> ( { model | count = model.count + 1 }, Cmd.none )
@@ -87,12 +109,25 @@ update msg model = case msg of
             Ok problem -> { model | problem = Just problem }
             Err err -> { model | error = Just ("Failed to decode problem: " ++ errorToString err) }
         , Cmd.none )
-    LoadedProblem (Err _) -> ( model, Cmd.none )
+    LoadedProblem (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
+    PlaceRandomly -> ( model, Cmd.batch [
+        Http.post 
+            { body = Http.emptyBody
+            , url = "http://localhost:3000/place_randomly"
+            , expect = Http.expectString SolutionReturned
+            }
+        ] )
+    SolutionReturned (Ok res) -> (
+        case decodeString decodeSolution res of
+            Ok solution -> { model | solution = Just solution }
+            Err err -> { model | error = Just ("Failed to decode solution: " ++ errorToString err) }
+        , Cmd.none )
+    SolutionReturned (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
 
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing }, Cmd.none )
+        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing }, Cmd.none )
         , view = view
         , update = update
         , subscriptions = \model -> onAnimationFrameDelta Frame
@@ -108,19 +143,31 @@ viewLoadProblem m =
 
 viewProblem : Model -> Problem -> Html Msg
 viewProblem m p =
-    div
-        [ style "display" "flex"
-        , style "justify-content" "center"
-        , style "align-items" "center"
-        ]
-        [ 
-        Canvas.toHtml
-            ( 1000, 1000 )
-            [ ]
-            [ clearScreen
-            , renderProblem p
+    div [] [
+        div [ style "display" "flex"
+            , style "height" "auto"
+            , style "align-items" "center" ] 
+            [ text "Attendes: "
+            , text (String.fromInt (List.length p.attendees))
+            , text "; musicians: "
+            , text (String.fromInt (List.length p.musicians)) ],
+        div
+            [ style "display" "flex"
+            , style "justify-content" "center"
+            , style "align-items" "center"
             ]
-        ]   
+            [ 
+            Canvas.toHtml
+                ( 1000, 1000 )
+                [ ]
+                [ clearScreen
+                , renderProblem p m.solution
+                ]
+            ],
+        div [ ] [
+            button [ onClick (PlaceRandomly) ] [ text "Random solve" ]
+        ]
+    ]
 
 view : Model -> Html Msg
 view m =
@@ -132,16 +179,12 @@ view m =
         Just err ->
             div [] [ text err ]
 
-
-
-
 clearScreen =
     shapes [ fill Color.white ] [ rect ( 0, 0 ) 1000 1000 ]
 
-renderProblem : Problem -> Canvas.Renderable
-renderProblem p =
+renderProblem : Problem -> Maybe Solution -> Canvas.Renderable
+renderProblem p s =
     let scale = 1000 / (max p.roomHeight p.roomWidth) in
-    let _ = Debug.log "Problem" (p.roomHeight, p.roomWidth, scale) in
     group []
         [ shapes
             [ stroke Color.black ]
@@ -152,5 +195,12 @@ renderProblem p =
         , shapes
             [ stroke Color.blue ]
             (List.map (\a -> circle (a.x * scale, a.y * scale) (3.0 * scale)) p.attendees)
+        , shapes
+            [ stroke Color.red ]
+            (case s of
+                Nothing -> []
+                Just solution -> 
+                    (List.map (\placement -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) solution.placements)
+            )
         ]
 
