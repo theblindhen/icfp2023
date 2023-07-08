@@ -20,7 +20,6 @@ for p in {1..55}; do
     # If BEST is better than BEST_SUBMITTED then print
     if [ "$BEST" -gt "$BEST_SUBMITTED" ]; then
       IMPROVEMENT=$(($BEST - $BEST_SUBMITTED));
-      if [ 
       echo "$p: improved by $IMPROVEMENT $NEW_SOLUTION"
     fi;
     popd
