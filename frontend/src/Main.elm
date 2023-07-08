@@ -197,42 +197,63 @@ nextFocus mFocus i =
     case mFocus of
         Nothing -> FocusOnInstrument 0
         Just focus -> FocusOnInstrument (focus + i)
-   
+
+numberOfInstruments : Problem -> Int
+numberOfInstruments p =
+    case List.maximum p.musicians of
+        Nothing -> 0
+        Just i -> i
+
+instrumentDescription : Model -> Problem -> String
+instrumentDescription m p =
+    case m.focus of
+        Nothing -> "No instrument in focus"
+        Just i -> "Focusing on instrument: " ++ (String.fromInt i)
+
 viewProblem : Model -> Problem -> Html Msg
 viewProblem m p =
-    div [
-        style "margin" "20px"
-    ] [
-        div [ style "display" "flex"
-            , style "height" "auto"
-            , style "align-items" "center" ] 
-            [ text "Attendes: "
-            , text (String.fromInt (List.length p.attendees))
-            , text "; musicians: "
-            , text (String.fromInt (List.length p.musicians)) ],
-        div
-            [ style "display" "flex"
-            , style "justify-content" "center"
-            , style "align-items" "center"
-            ]
-            [ 
-            Canvas.toHtml
-                ( 1001, 1001 )
-                [ ]
-                [ clearScreen
-                , renderProblem p m.solution m.focus
+    let instruments = numberOfInstruments p in
+        div [
+            style "margin" "20px"
+        ] [
+            div [ style "display" "flex"
+                , style "height" "auto"
+                , style "align-items" "center" ] 
+                [ text "Attendes: "
+                , text (String.fromInt (List.length p.attendees))
+                , text "; musicians: "
+                , text (String.fromInt (List.length p.musicians)) ],
+            div
+                [ style "display" "flex"
+                , style "justify-content" "center"
+                , style "align-items" "center"
                 ]
-            ],
-        div [ ] 
-            [ 
-                BButton.button [ BButton.onClick (PlaceRandomly), BButton.primary ] [ text "Random solve" ],
-                BButton.button [ BButton.onClick (Swap), BButton.primary ] [ text "Swap" ],
-                BButton.button [ BButton.onClick (LP), BButton.primary ] [ text "LP" ],
-                BButton.button [ BButton.onClick (nextFocus m.focus 1), BButton.primary ] [ text "Next Instrument" ],
-                BButton.button [ BButton.onClick (nextFocus m.focus (-1)), BButton.primary ] [ text "Previous Instrument" ],
-                BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ]
-            ]
-    ]
+                [ 
+                Canvas.toHtml
+                    ( 1001, 1001 )
+                    [ ]
+                    [ clearScreen
+                    , renderProblem p m.solution m.focus
+                    ]
+                ],
+            div [ ] 
+                [ 
+                    BButton.button [ BButton.onClick (PlaceRandomly), BButton.primary ] [ text "Random solve" ],
+                    BButton.button [ BButton.onClick (Swap), BButton.primary ] [ text "Swap" ],
+                    BButton.button [ BButton.onClick (LP), BButton.primary ] [ text "LP" ],
+                    BButton.button 
+                        ((if m.focus == Nothing || m.focus == Just 0 then [BButton.disabled True] else []) ++ 
+                            [ BButton.onClick (nextFocus m.focus (-1)), BButton.primary ]) [ text "Previous Instrument" ],
+                    BButton.button 
+                        ((if m.focus == Just instruments then [BButton.disabled True] else []) ++
+                            [ BButton.onClick (nextFocus m.focus 1), BButton.primary ]) [ text "Next Instrument" ],
+                    BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ]
+                ],
+            div [ ]
+                [ 
+                    text (instrumentDescription m p)
+                ]
+        ]
 
 view : Model -> Html Msg
 view m =
