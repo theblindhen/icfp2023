@@ -2,7 +2,7 @@ open Core
 
 let get_problem problem_id =
   match In_channel.read_all (sprintf "../problems/problem-%d.json" problem_id) with
-  | json -> Some (Types.problem_of_json_problem (Json_j.json_problem_of_string json))
+  | json -> Some (Types.problem_of_json_problem ~problem_id (Json_j.json_problem_of_string json))
   | exception _ -> None
 
 let make_submission (problem_id : int) (solution : Types.solution) : Json_j.json_submission_post =
