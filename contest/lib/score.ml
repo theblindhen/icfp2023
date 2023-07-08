@@ -36,33 +36,6 @@ let score_solution_wip_broken (p : problem) (s : solution) : float =
           ~musicians:(Array.map s ~f:(fun m -> m.pos))
           ~block_radius:5.0)
   in
-  (*
-  (* For debugging, count how many pairs can hear each other. *)
-  eprintf "  hearable pairs: %d\n" (Array.sum (module Int) hearable_sets ~f:Array.length);
-  eprintf "  not blocked pairs: %d\n"
-    (Array.sum
-       (module Int)
-       s
-       ~f:(fun m -> Array.count attendees ~f:(fun a -> not (is_blocked s a m.id m.pos))));
-  (* For debugging, determine if the same pairs can hear each other in the two
-   * variations of the calculation. *)
-  let hearable_matrix =
-    let num_attendees = List.length p.attendees in
-    Array.map hearable_sets ~f:(fun hearable ->
-        let tmp = Array.create ~len:num_attendees false in
-        Array.iteri hearable ~f:(fun a_id _ -> tmp.(a_id) <- true);
-        tmp)
-  in
-  let not_blocked_matrix =
-    Array.map s ~f:(fun m -> Array.map attendees ~f:(fun a -> not (is_blocked s a m.id m.pos)))
-  in
-  (* Print all the entries from hearable_matrix that aren't in
-   * not_blocked_matrix. *)
-  Array.iteri hearable_matrix ~f:(fun m_id attendee_matrix ->
-      Array.iteri attendee_matrix ~f:(fun a_id can_hear ->
-          if Bool.(not_blocked_matrix.(m_id).(a_id) <> can_hear) then
-            eprintf "  (m %d, a %d) %b %b\n" m_id a_id can_hear not_blocked_matrix.(m_id).(a_id)));
-   *)
   (* Sum over all musicians *)
   Array.fold2_exn s hearable_sets ~init:0.0 ~f:(fun sum m hearable ->
       (* Sum over all attendees that can hear this musician *)
