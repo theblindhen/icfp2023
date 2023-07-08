@@ -21,9 +21,11 @@ let place_edge (p : problem) (already_placed : position list) (e : edge) : posit
   let max_musicians = (p.musicians |> List.length) - (already_placed |> List.length) in
   match e with
   | North ->
+      printf "Placing north edge\n";
       place_row (p.stage_bottom_left.x +. 10.0) (min w max_musicians)
         (p.stage_bottom_left.y +. p.stage_height -. 10.0)
   | South ->
+      printf "Placing south edge\n";
       place_row (p.stage_bottom_left.x +. 10.0) (min w max_musicians) (p.stage_bottom_left.y +. 10.0)
 
 let place_edges (p : problem) (edges : edges) : position list =
