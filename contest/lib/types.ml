@@ -44,15 +44,25 @@ let validate_solution (p : problem) (s : solution) =
   assert (min_musician = 0);
   (* Musician max is the number of musician *)
   let max_musician = Array.max_elt musician_ids ~compare:Int.compare |> Option.value_exn in
-  assert (max_musician = Array.length musician_ids - 1);
+  assert (max_musician = List.length p.musicians - 1);
   (* All musician ids are distinct *)
   assert (Array.length musician_ids = Array.length (Set.to_array (Int.Set.of_array musician_ids)));
   (* Musicians' instruments correspond to those in the problem *)
   List.iteri p.musicians ~f:(fun m_id inst ->
       match Array.find s ~f:(fun m' -> m'.id = m_id) with
       | None -> assert false
-      | Some m' -> assert (m'.instrument = inst))
-(* TODO: Musicians are within the stage, including stage margin *)
+      | Some m' -> assert (m'.instrument = inst));
+  (* Musicians are within the stage, including stage margin *)
+  let within_stage (p : problem) (m : musician) =
+    let open Float in
+    let { x; y } = m.pos in
+    let { x = sx; y = sy } = p.stage_bottom_left in
+    x >= sx && x <= sx +. p.stage_width && y >= sy && y <= sy +. p.stage_height
+  in
+  Array.iter s ~f:(fun m -> assert (within_stage p m));
+  ()
+
+(* Musicians are not too close to each other *)
 (* TODO: Musicians are appropriately spaced from each other *)
 
 let json_solution_of_solution (solution : solution) : Json_j.json_solution =
