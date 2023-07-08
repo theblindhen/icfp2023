@@ -31,10 +31,22 @@ let place_randomly_handler _ =
       current_solution := Some solution;
       Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
 
+let swap_handler _ =
+  match (!current_problem, !current_solution) with
+  | Some p, Some s ->
+      let solution' = Improver.improve p s in
+      let solution_json =
+        solution' |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
+      in
+      current_solution := Some solution';
+      Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
+  | _ -> Lwt.return (Response.make ~status:`OK ~body:(Body.of_string "No problem") ())
+
 let _ =
   App.empty
   |> App.get "/" index_handler
   |> App.get "/elm.js" js_handler
   |> App.get "/problem/:id" problem_handler
   |> App.post "/place_randomly" place_randomly_handler
+  |> App.post "/swap" swap_handler
   |> App.run_command
