@@ -6,13 +6,27 @@ let random_solution (p : Types.problem) (already_placed : Types.position list) =
 
 type assignment = LP | Swap | Random [@@deriving sexp]
 
-type invocation = { problem_id : int; assignment : assignment; edges : Edge_placer.edges }
+type invocation = {
+  problem_id : int;
+  assignment : assignment;
+  edges : Edge_placer.edges;
+  scale_height : float;
+  scale_width : float;
+}
 [@@deriving sexp]
 
 let run_invocation inv =
   match Json_util.get_problem inv.problem_id with
   | None -> failwith "Failed to parse problem"
   | Some problem ->
+      printf "Scaling stage with factors %f %f\n%!" inv.scale_width inv.scale_height;
+      let problem =
+        {
+          problem with
+          stage_height = problem.stage_height *. inv.scale_height;
+          stage_width = problem.stage_width *. inv.scale_width;
+        }
+      in
       print_endline (List.length problem.musicians |> string_of_int);
       let edge = Edge_placer.place_edges problem inv.edges in
       let solution = random_solution problem edge in
@@ -46,11 +60,16 @@ let parse_edges_flag edges : Edge_placer.edges =
              | "west" -> Edge_placer.West
              | _ -> failwith "Invalid edge placement")
 
+let parse_scale scale_width : float = Option.value scale_width ~default:1.0
+
 let command =
   Command.basic ~summary:"Run our solver on a problem"
     (let%map_open.Command lp = flag "--lp" no_arg ~doc:"Use the LP solver after placement"
      and swapper = flag "--swap" no_arg ~doc:"Use swap optimization after placement"
      and edges = flag "--edges" (optional string) ~doc:"Edge placement"
+     and scale_width = flag "--scale-width" (optional float) ~doc:"Scale the width of the problem"
+     and scale_height =
+       flag "--scale-height" (optional float) ~doc:"Scale the height of the problem"
      and problem_id = anon ("problem_id" %: string) in
      fun () ->
        let problem_id = Int.of_string problem_id in
@@ -64,6 +83,13 @@ let command =
            Swap)
          else Random
        in
-       run_invocation { problem_id; assignment; edges = parse_edges_flag edges })
+       run_invocation
+         {
+           problem_id;
+           assignment;
+           edges = parse_edges_flag edges;
+           scale_height = parse_scale scale_height;
+           scale_width = parse_scale scale_width;
+         })
 
 let () = Command_unix.run command

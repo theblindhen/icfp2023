@@ -131,8 +131,9 @@ let () =
     | Some problem ->
         cur_solution :=
           Some
-            (Random_solver.random_placement_solution problem
-               (Edge_placer.place_edges problem [ South; North ]))
+            (Improver.improve problem
+               (Random_solver.random_placement_solution problem
+                  (Edge_placer.place_edges problem [ South; East ])))
   in
 
   let solve_button =
