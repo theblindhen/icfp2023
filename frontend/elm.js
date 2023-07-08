@@ -7083,6 +7083,16 @@ var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Disabled = function (a) {
 var $rundis$elm_bootstrap$Bootstrap$Button$disabled = function (disabled_) {
 	return $rundis$elm_bootstrap$Bootstrap$Internal$Button$Disabled(disabled_);
 };
+var $author$project$Main$instrumentDescription = F2(
+	function (m, p) {
+		var _v0 = m.focus;
+		if (_v0.$ === 'Nothing') {
+			return 'No instrument in focus';
+		} else {
+			var i = _v0.a;
+			return 'Focusing on instrument: ' + $elm$core$String$fromInt(i);
+		}
+	});
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -7098,6 +7108,25 @@ var $author$project$Main$nextFocus = F2(
 			return $author$project$Main$FocusOnInstrument(focus + i);
 		}
 	});
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Main$numberOfInstruments = function (p) {
+	var _v0 = $elm$core$List$maximum(p.musicians);
+	if (_v0.$ === 'Nothing') {
+		return 0;
+	} else {
+		var i = _v0.a;
+		return i;
+	}
+};
 var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $avh4$elm_color$Color$blue = A4($avh4$elm_color$Color$RgbaSpace, 52 / 255, 101 / 255, 164 / 255, 1.0);
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Circle = F2(
@@ -8114,6 +8143,7 @@ var $joakin$elm_canvas$Canvas$toHtml = F3(
 	});
 var $author$project$Main$viewProblem = F2(
 	function (m, p) {
+		var instruments = $author$project$Main$numberOfInstruments(p);
 		return A2(
 			$elm$html$Html$div,
 			_List_fromArray(
@@ -8202,7 +8232,9 @@ var $author$project$Main$viewProblem = F2(
 							A2(
 							$rundis$elm_bootstrap$Bootstrap$Button$button,
 							_Utils_ap(
-								_Utils_eq(m.focus, $elm$core$Maybe$Nothing) ? _List_fromArray(
+								(_Utils_eq(m.focus, $elm$core$Maybe$Nothing) || _Utils_eq(
+									m.focus,
+									$elm$core$Maybe$Just(0))) ? _List_fromArray(
 									[
 										$rundis$elm_bootstrap$Bootstrap$Button$disabled(true)
 									]) : _List_Nil,
@@ -8218,12 +8250,19 @@ var $author$project$Main$viewProblem = F2(
 								])),
 							A2(
 							$rundis$elm_bootstrap$Bootstrap$Button$button,
-							_List_fromArray(
-								[
-									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
-									A2($author$project$Main$nextFocus, m.focus, 1)),
-									$rundis$elm_bootstrap$Bootstrap$Button$primary
-								]),
+							_Utils_ap(
+								_Utils_eq(
+									m.focus,
+									$elm$core$Maybe$Just(instruments)) ? _List_fromArray(
+									[
+										$rundis$elm_bootstrap$Bootstrap$Button$disabled(true)
+									]) : _List_Nil,
+								_List_fromArray(
+									[
+										$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+										A2($author$project$Main$nextFocus, m.focus, 1)),
+										$rundis$elm_bootstrap$Bootstrap$Button$primary
+									])),
 							_List_fromArray(
 								[
 									$elm$html$Html$text('Next Instrument')
@@ -8239,6 +8278,14 @@ var $author$project$Main$viewProblem = F2(
 								[
 									$elm$html$Html$text('Save')
 								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							A2($author$project$Main$instrumentDescription, m, p))
 						]))
 				]));
 	});
