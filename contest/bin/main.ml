@@ -33,20 +33,25 @@ let run_invocation inv =
       (* write solution_json to file *)
       print_endline "Done"
 
+let parse_edges_flag edges : Edge_placer.edges =
+  match edges with
+  | None -> []
+  | Some e ->
+      String.split_on_chars e ~on:[ ',' ]
+      |> List.map ~f:(fun edge_str ->
+             match edge_str with
+             | "north" -> Edge_placer.North
+             | "south" -> Edge_placer.South
+             | _ -> failwith "Invalid edge placement")
+
 let command =
   Command.basic ~summary:"Run our solver on a problem"
     (let%map_open.Command lp = flag "--lp" no_arg ~doc:"Use the LP solver after placement"
      and swapper = flag "--swap" no_arg ~doc:"Use swap optimization after placement"
-     and edge = flag "--edge" (optional string) ~doc:"Edge placement"
+     and edges = flag "--edges" (optional string) ~doc:"Edge placement"
      and problem_id = anon ("problem_id" %: string) in
      fun () ->
        let problem_id = Int.of_string problem_id in
-       let edges =
-         match edge with
-         | Some "north" -> [ Edge_placer.North ]
-         | Some "south" -> [ Edge_placer.South ]
-         | _ -> []
-       in
        let assignment =
          if lp && swapper then failwith "Can't use both LP and swap"
          else if lp then (
@@ -57,6 +62,6 @@ let command =
            Swap)
          else Random
        in
-       run_invocation { problem_id; assignment; edges })
+       run_invocation { problem_id; assignment; edges = parse_edges_flag edges })
 
 let () = Command_unix.run command
