@@ -4,6 +4,8 @@ open Contest.Types
 
 let problem_count = 90
 
+type pillar_radii_stats = { min : float; max : float; uniq : int }
+
 type stats = {
   room_dim : string;
   stage_dim : string;
@@ -11,6 +13,7 @@ type stats = {
   attendees_count : int;
   instrument_count : int; (* instrument_count_per_instrument : int array; *)
   pillar_count : int;
+  pillar_radii_stats : pillar_radii_stats option;
 }
 
 let problem_stats problem =
@@ -32,6 +35,14 @@ let problem_stats problem =
            acc.(i) <- acc.(i) + 1;
            acc); *)
     pillar_count = List.length problem.pillars;
+    pillar_radii_stats =
+      (if List.is_empty problem.pillars then None
+       else
+         let radii = problem.pillars |> List.map ~f:(fun p -> p.radius) in
+         let min = List.min_elt radii ~compare:Float.compare |> Option.value_exn in
+         let max = List.max_elt radii ~compare:Float.compare |> Option.value_exn in
+         let uniq = radii |> Set.of_list (module Float) |> Set.length in
+         Some { min; max; uniq });
   }
 
 let solution_stats (problem_id : int) total_score =
@@ -42,25 +53,25 @@ let solution_stats (problem_id : int) total_score =
 let stats_to_string (problem_stats : stats) =
   "room: "
   ^ problem_stats.room_dim
-  ^ "\n"
-  ^ "stage: "
+  ^ "\n stage: "
   ^ problem_stats.stage_dim
-  ^ "\n"
-  ^ "musicians: "
+  ^ "\n musicians: "
   ^ string_of_int problem_stats.musicians_count
-  ^ "\n"
-  ^ "instruments total: "
+  ^ "\n instruments total: "
   ^ string_of_int problem_stats.instrument_count
   (* ^ "\n"
      ^ String.concat
          (List.map (List.init problem_stats.instrument_count ~f:Fn.id) ~f:(fun i ->
               sprintf "  instrument %d: %d\n" i problem_stats.instrument_count_per_instrument.(i))) *)
-  ^ "\n"
-  ^ "attendees: "
+  ^ "\n attendees: "
   ^ string_of_int problem_stats.attendees_count
-  ^ "\n"
-  ^ "pillars: "
+  ^ "\n pillars: "
   ^ string_of_int problem_stats.pillar_count
+  ^
+  if Option.is_none problem_stats.pillar_radii_stats then ""
+  else
+    let stats = Option.value_exn problem_stats.pillar_radii_stats in
+    sprintf "\n    %d radii between %2.2f and %2.2f" stats.uniq stats.min stats.max
 
 let () =
   let total_score = ref 0. in
