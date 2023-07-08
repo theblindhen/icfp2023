@@ -148,6 +148,20 @@ let () =
       "Random solve"
   in
 
+  let score_and_save () =
+    match (!cur_problem, !cur_solution) with
+    | Some problem, Some solution -> (
+        match Misc.validate_solution problem solution with
+        | exception _ -> eprintf "Error validating solution\n%!"
+        | () ->
+            eprintf "Scoring solution\n%!";
+            let score = Score.score_solution problem solution in
+            Json_util.write_solution_if_best score problem.problem_id solution)
+    | _, _ -> eprintf "No solution to score\n%!"
+  in
+
+  let score_button = W.button ~action:(fun _ -> score_and_save ()) "Score and save" in
+
   let connections =
     [
       W.connect_main problem_widget problem_widget
@@ -160,7 +174,7 @@ let () =
   let a_layout = L.resident a_widget in
   L.tower
     [
-      L.flat_of_w [ problem_widget; solve_button ];
+      L.flat_of_w [ problem_widget; solve_button; score_button ];
       L.flat_of_w [ instrument_widget; instrument_prev; instrument_next; instrument_clear ];
       a_layout;
     ]
