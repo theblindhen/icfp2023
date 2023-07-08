@@ -1,16 +1,17 @@
 open Core
-open Types
 
-let num_instruments (problem : problem) =
+let num_instruments (problem : Types.problem) =
   1 + (List.max_elt problem.musicians ~compare:Int.compare |> Option.value_exn)
 
-let lp_vars (problem : problem) (positions : position list) =
+(* Create the variables we'll need, returning [musician_idx][instrument] *)
+let lp_vars (problem : Types.problem) (positions : Types.position list) =
   let num_positions = List.length positions in
   let num_instruments = num_instruments problem in
   Array.init num_positions ~f:(fun m ->
       Array.init num_instruments ~f:(fun i -> Lp.var (Printf.sprintf "I_%d_%d" m i)))
 
-let lp_of_problem (problem : problem) (positions : position list) (vars : Lp.Poly.t array array) =
+let lp_of_problem (problem : Types.problem) (positions : Types.position list)
+    (vars : Lp.Poly.t array array) =
   let open Lp in
   let positions_arr = Array.of_list positions in
   let num_instruments = num_instruments problem in
@@ -49,8 +50,8 @@ let lp_of_problem (problem : problem) (positions : position list) (vars : Lp.Pol
   in
   make objective (constraints_one_instrument @ constraints_total_instruments)
 
-let solution_of_lp_solution (problem : problem) (positions : position list)
-    (vars : Lp.Poly.t array array) (obj, xs) : solution =
+let solution_of_lp_solution (problem : Types.problem) (positions : Types.position list)
+    (vars : Lp.Poly.t array array) (obj, xs) : Types.solution =
   Printf.printf "Objective: %.2f\n" obj;
   (* extract for each pos_idx the instrument it is assigned *)
   let assignments = Array.create ~len:(List.length positions) (-1) in
@@ -75,10 +76,10 @@ let solution_of_lp_solution (problem : problem) (positions : position list)
   positions
   |> List.mapi ~f:(fun idx p ->
          let musician = musician_for_posidx.(idx) in
-         { id = musician; pos = p; instrument = musician_instruments.(musician) })
+         Types.{ id = musician; pos = p; instrument = musician_instruments.(musician) })
   |> Array.of_list
 
-let lp_assign_positions (problem : problem) (positions : position list) =
+let lp_assign_positions (problem : Types.problem) (positions : Types.position list) =
   let vars = lp_vars problem positions in
   let lp_problem = lp_of_problem problem positions vars in
   if Lp.validate lp_problem then
@@ -89,5 +90,5 @@ let lp_assign_positions (problem : problem) (positions : position list) =
 
 (** Completely disregards the placement in the given solution and reassigns all
   placements *)
-let lp_optimize_solution (problem : problem) (solution : solution) =
+let lp_optimize_solution (problem : Types.problem) (solution : Types.solution) =
   lp_assign_positions problem (solution |> List.of_array |> List.map ~f:(fun { pos; _ } -> pos))
