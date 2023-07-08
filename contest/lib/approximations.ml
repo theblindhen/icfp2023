@@ -31,5 +31,5 @@ let max_score_problem (p : problem) : float =
   List.fold in_groups ~init:0.0 ~f:(fun acc inl ->
       let q = max_q inl in
       let base_score = max_score_instrument_without_q p (List.hd_exn inl) in
-      let score = base_score *. q in
+      let score = if p.problem_id > 55 then base_score *. q else base_score in
       acc +. (score *. float (List.length inl)))

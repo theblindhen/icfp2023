@@ -33,7 +33,7 @@ let run_invocation inv =
       Misc.validate_solution problem solution;
       print_endline "Scoring solution...";
       let score = Score.score_solution problem solution in
-      printf "Random solution score: %f\n%!" score;
+      printf "Random solution score: %s\n" (Misc.string_of_score score);
       let optimized_solution =
         match inv.assignment with
         | Random -> solution
@@ -42,7 +42,8 @@ let run_invocation inv =
       in
       Misc.validate_solution problem optimized_solution;
       let optimised_score = Score.score_solution problem optimized_solution in
-      printf "Improved Problem %d with score: %f\n%!" inv.problem_id optimised_score;
+      printf "Improved Problem %d with score: %s\n%!" inv.problem_id
+        (Misc.string_of_score optimised_score);
       Json_util.write_solution_if_best optimised_score inv.problem_id optimized_solution;
       (* write solution_json to file *)
       print_endline "Done"
@@ -50,6 +51,7 @@ let run_invocation inv =
 let parse_edges_flag edges : Edge_placer.edges =
   match edges with
   | None -> []
+  | Some "" -> []
   | Some e ->
       String.split_on_chars e ~on:[ ',' ]
       |> List.map ~f:(fun edge_str ->
