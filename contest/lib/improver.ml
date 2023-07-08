@@ -14,14 +14,10 @@ let score_cache (p : problem) (s : solution) : (position * instrument, float) Ha
   let cache = Hashtbl.Poly.create () in
   let instrument_count = instrument_count p in
   Array.iteri s ~f:(fun i m ->
-      let constants = List.map p.attendees ~f:(fun a -> (score_I_partial s a m.id m.pos, a)) in
       printf "computing cache for %dnth position\n%!" i;
       for i = 0 to instrument_count - 1 do
-        let score =
-          List.map constants ~f:(fun (c, a) -> Float.round_up (c *. a.tastes.(i)))
-          |> List.sum (module Float) ~f:Fn.id
-        in
-        Hashtbl.Poly.add_exn cache ~key:(m.pos, i) ~data:score
+        Hashtbl.Poly.add_exn cache ~key:(m.pos, i)
+          ~data:(score_musician p s { m with instrument = i })
       done);
   cache
 
@@ -32,17 +28,23 @@ let get_score cache scores pos_of_i instrument_of_j =
 let improve (p : problem) (s : solution) : solution =
   let cache = score_cache p s in
   let scores = scores_of_musicians p s in
-  for i = 0 to Array.length scores - 1 do
-    for j = i + 1 to Array.length scores - 1 do
-      let score_i = get_score cache scores i i in
-      let score_j = get_score cache scores j j in
-      let score_i' = get_score cache scores i j in
-      let score_j' = get_score cache scores j i in
-      if Float.(score_i' + score_j' > score_i + score_j) then (
-        let musician_i = scores.(i).musician in
-        let musician_j = scores.(j).musician in
-        scores.(i) <- { score = score_i'; musician = { musician_j with pos = musician_i.pos } };
-        scores.(j) <- { score = score_j'; musician = { musician_i with pos = musician_j.pos } })
+  let iter = ref true in
+  while !iter do
+    iter := false;
+    for i = 0 to Array.length scores - 1 do
+      for j = i + 1 to Array.length scores - 1 do
+        let score_i = get_score cache scores i i in
+        let score_j = get_score cache scores j j in
+        let score_i' = get_score cache scores i j in
+        let score_j' = get_score cache scores j i in
+        if Float.(score_i' + score_j' > score_i + score_j) then (
+          Core.printf "Swap %d %d\n%!" i j;
+          iter := true;
+          let musician_i = scores.(i).musician in
+          let musician_j = scores.(j).musician in
+          scores.(i) <- { score = score_i'; musician = { musician_j with pos = musician_i.pos } };
+          scores.(j) <- { score = score_j'; musician = { musician_i with pos = musician_j.pos } })
+      done
     done
   done;
   printf "Score should be: %f\n%!" (Array.sum (module Float) scores ~f:(fun s -> s.score));
