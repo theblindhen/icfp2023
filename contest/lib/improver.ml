@@ -14,7 +14,7 @@ let score_cache (p : problem) (s : solution) : (position * instrument, float) Ha
   let cache = Hashtbl.Poly.create () in
   let instrument_count = instrument_count p in
   Array.iteri s ~f:(fun i m ->
-      let constants = List.map p.attendees ~f:(fun a -> (score_I_partial s a m.id m.pos, a)) in
+      let constants = List.map p.attendees ~f:(fun a -> (score_I_partial p s a m.id m.pos, a)) in
       printf "computing cache for %dnth position\n%!" i;
       for i = 0 to instrument_count - 1 do
         let score =

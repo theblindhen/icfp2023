@@ -47,12 +47,12 @@ let angle_norm angle =
   * WARNING: This method has inaccurate behaviour around the endpoints of the line
   * segments, due to efficiency. When all the given points are assumed to be at
   * least distance `distance` away from the endpoints, the behaviour is correct. *)
-let within_distance (distance : float) ((p1, p2) : segment) =
+let within_distance ((p1, p2) : segment) =
   let rotator = point_rotator (-.angle_of p1 p2) in
   let delta : point = { x = -.p1.x; y = -.p1.y } in
   let transformer p = p |> translate delta |> rotator in
   let t_p2_x, _t_p2_y = transformer p2 in
-  let f (p : point) =
+  let f (distance : float) (p : point) =
     let tx, ty = transformer p in
     tx >= 0. && tx <= t_p2_x && ty >= -.distance && ty <= distance
   in
@@ -210,8 +210,8 @@ let test_rotations distance p1 p2 inside outside =
     let inside = List.map inside ~f:(hat_iter ~count:rot) in
     let outside = List.map outside ~f:(hat_iter ~count:rot) in
     let p1, p2 = (hat_iter ~count:rot p1, hat_iter ~count:rot p2) in
-    List.iter inside ~f:(fun p -> [%test_eq: bool] (within_distance distance (p1, p2) p) true);
-    List.iter outside ~f:(fun p -> [%test_eq: bool] (within_distance distance (p1, p2) p) false)
+    List.iter inside ~f:(fun p -> [%test_eq: bool] (within_distance (p1, p2) distance p) true);
+    List.iter outside ~f:(fun p -> [%test_eq: bool] (within_distance (p1, p2) distance p) false)
   done
 
 let%test_unit "within_distance straight" =
