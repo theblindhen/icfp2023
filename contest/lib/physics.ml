@@ -24,9 +24,16 @@ let force_over_attendees (p : Types.problem) (i : placed_instrument) : force =
 (* Cull a force push to be within the bounds of the stage *)
 let safe_push (p : Types.problem) (pos : Types.position) (f : force) : Types.position =
   let open Float in
-  (* TODO: Stage bottom left *)
-  let new_x = max (p.stage_width - 10.) (min 10. (pos.x + f.x)) in
-  let new_y = max (p.stage_height - 10.) (min 10. (pos.y + f.y)) in
+  let new_x =
+    min
+      (p.stage_bottom_left.x + p.stage_width - 10.)
+      (max (p.stage_bottom_left.x + 10.) (pos.x + f.x))
+  in
+  let new_y =
+    min
+      (p.stage_bottom_left.y + p.stage_height - 10.)
+      (max (p.stage_bottom_left.y + 10.) (pos.y + f.y))
+  in
   { x = new_x; y = new_y }
 
 let simulate_step (p : Types.problem) ~(att_heat : float) (placements : placed_instrument array) :
