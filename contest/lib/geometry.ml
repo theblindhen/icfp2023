@@ -1,7 +1,7 @@
 open Core
 open Float
 
-type point = Types.position
+type point = Types.position [@@deriving sexp]
 (** a point in 2D space *)
 
 type segment = point * point
@@ -10,6 +10,10 @@ type segment = point * point
 type line = float * float * float [@@deriving sexp]
 (** A line in 2D space.
   * the line ax + by + c = 0 *)
+
+type rectangle = point * float * float [@@deriving sexp]
+(** A line in 2D space.
+    * the rectangle with lower left corner (x,y) width w and height h *)
 
 let distance_squared (p1 : point) (p2 : point) : float =
   ((p1.x -. p2.x) ** 2.0) +. ((p1.y -. p2.y) ** 2.0)
@@ -20,6 +24,12 @@ let point_to_line_squared ({ x; y } : point) ((a, b, c) : line) : float =
   let numerator = (a *. x) +. (b *. y) +. c in
   let denominator = (a *. a) +. (b *. b) in
   numerator *. numerator /. denominator
+
+let point_to_rect_squared ({ x; y } : point) (({ x = x_r; y = y_r }, w_r, h_r) : rectangle) : float
+    =
+  let dx = max (x_r - x) (max 0.0 (x - x_r - w_r)) in
+  let dy = max (y_r - y) (max 0.0 (y - y_r - h_r)) in
+  (dx ** 2.0) + (dy ** 2.0)
 
 let translate (delta : point) (p : point) : point = { x = p.x +. delta.x; y = p.y +. delta.y }
 
@@ -47,12 +57,12 @@ let angle_norm angle =
   * WARNING: This method has inaccurate behaviour around the endpoints of the line
   * segments, due to efficiency. When all the given points are assumed to be at
   * least distance `distance` away from the endpoints, the behaviour is correct. *)
-let within_distance (distance : float) ((p1, p2) : segment) =
+let within_distance ((p1, p2) : segment) =
   let rotator = point_rotator (-.angle_of p1 p2) in
   let delta : point = { x = -.p1.x; y = -.p1.y } in
   let transformer p = p |> translate delta |> rotator in
   let t_p2_x, _t_p2_y = transformer p2 in
-  let f (p : point) =
+  let f (distance : float) (p : point) =
     let tx, ty = transformer p in
     tx >= 0. && tx <= t_p2_x && ty >= -.distance && ty <= distance
   in
@@ -227,8 +237,8 @@ let test_rotations distance p1 p2 inside outside =
     let inside = List.map inside ~f:(hat_iter ~count:rot) in
     let outside = List.map outside ~f:(hat_iter ~count:rot) in
     let p1, p2 = (hat_iter ~count:rot p1, hat_iter ~count:rot p2) in
-    List.iter inside ~f:(fun p -> [%test_eq: bool] (within_distance distance (p1, p2) p) true);
-    List.iter outside ~f:(fun p -> [%test_eq: bool] (within_distance distance (p1, p2) p) false)
+    List.iter inside ~f:(fun p -> [%test_eq: bool] (within_distance (p1, p2) distance p) true);
+    List.iter outside ~f:(fun p -> [%test_eq: bool] (within_distance (p1, p2) distance p) false)
   done
 
 let%test_unit "within_distance straight" =
@@ -246,3 +256,31 @@ let%test_unit "within_distance diag1" =
   let inside = List.map ~f:to_point [ (2.9, 1.); (4.9, 5.); (7., 9.2); (11., 17.3) ] in
   let outside = List.map ~f:to_point [ (3.1, 1.); (5.1, 5.); (7., 8.9); (11., 17.) ] in
   test_rotations 2.2 p1 p2 inside outside
+
+let%test_unit "point_to_rect" =
+  let is (a : float) (b : float) = a < b +. 0.001 && a > b -. 0.001 in
+  [%test_eq: bool]
+    (point_to_rect_squared { x = 0.; y = 0. } ({ x = 10.; y = 10. }, 10., 10.) |> is 200.)
+    true;
+  [%test_eq: bool]
+    (point_to_rect_squared { x = 30.; y = 0. } ({ x = 10.; y = 10. }, 10., 10.) |> is 200.)
+    true;
+  [%test_eq: bool]
+    (point_to_rect_squared { x = 0.; y = 30. } ({ x = 10.; y = 10. }, 10., 10.) |> is 200.)
+    true;
+  [%test_eq: bool]
+    (point_to_rect_squared { x = 30.; y = 30. } ({ x = 10.; y = 10. }, 10., 10.) |> is 200.)
+    true;
+  [%test_eq: bool]
+    (point_to_rect_squared { x = 15.; y = 30. } ({ x = 10.; y = 10. }, 10., 10.) |> is 100.)
+    true;
+  [%test_eq: bool]
+    (point_to_rect_squared { x = 15.; y = 0. } ({ x = 10.; y = 10. }, 10., 10.) |> is 100.)
+    true;
+  [%test_eq: bool]
+    (point_to_rect_squared { x = 0.; y = 15. } ({ x = 10.; y = 10. }, 10., 10.) |> is 100.)
+    true;
+  [%test_eq: bool]
+    (point_to_rect_squared { x = 30.; y = 15. } ({ x = 10.; y = 10. }, 10., 10.) |> is 100.)
+    true;
+  ()

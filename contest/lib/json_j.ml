@@ -36,6 +36,11 @@ type json_solution = Json_t.json_solution = {
   placements: json_placement list
 }
 
+type json_pillar = Json_t.json_pillar = {
+  center: (float * float);
+  radius: float
+}
+
 type json_attendee = Json_t.json_attendee = {
   x: float;
   y: float;
@@ -49,7 +54,8 @@ type json_problem = Json_t.json_problem = {
   stage_height: float;
   stage_bottom_left: (float * float);
   musicians: int list;
-  attendees: json_attendee list
+  attendees: json_attendee list;
+  pillars: json_pillar list option
 }
 
 let write_json_submission_post : _ -> json_submission_post -> _ = (
@@ -1418,6 +1424,264 @@ let read_json_solution = (
 )
 let json_solution_of_string s =
   read_json_solution (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let write_json_pillar : _ -> json_pillar -> _ = (
+  fun ob (x : json_pillar) ->
+    Buffer.add_char ob '{';
+    let is_first = ref true in
+    if !is_first then
+      is_first := false
+    else
+      Buffer.add_char ob ',';
+      Buffer.add_string ob "\"center\":";
+    (
+      fun ob x ->
+        Buffer.add_char ob '(';
+        (let x, _ = x in
+        (
+          Yojson.Safe.write_float
+        ) ob x
+        );
+        Buffer.add_char ob ',';
+        (let _, x = x in
+        (
+          Yojson.Safe.write_float
+        ) ob x
+        );
+        Buffer.add_char ob ')';
+    )
+      ob x.center;
+    if !is_first then
+      is_first := false
+    else
+      Buffer.add_char ob ',';
+      Buffer.add_string ob "\"radius\":";
+    (
+      Yojson.Safe.write_float
+    )
+      ob x.radius;
+    Buffer.add_char ob '}';
+)
+let string_of_json_pillar ?(len = 1024) x =
+  let ob = Buffer.create len in
+  write_json_pillar ob x;
+  Buffer.contents ob
+let read_json_pillar = (
+  fun p lb ->
+    Yojson.Safe.read_space p lb;
+    Yojson.Safe.read_lcurl p lb;
+    let field_center = ref (None) in
+    let field_radius = ref (None) in
+    try
+      Yojson.Safe.read_space p lb;
+      Yojson.Safe.read_object_end lb;
+      Yojson.Safe.read_space p lb;
+      let f =
+        fun s pos len ->
+          if pos < 0 || len < 0 || pos + len > String.length s then
+            invalid_arg (Printf.sprintf "out-of-bounds substring position or length: string = %S, requested position = %i, requested length = %i" s pos len);
+          if len = 6 then (
+            match String.unsafe_get s pos with
+              | 'c' -> (
+                  if String.unsafe_get s (pos+1) = 'e' && String.unsafe_get s (pos+2) = 'n' && String.unsafe_get s (pos+3) = 't' && String.unsafe_get s (pos+4) = 'e' && String.unsafe_get s (pos+5) = 'r' then (
+                    0
+                  )
+                  else (
+                    -1
+                  )
+                )
+              | 'r' -> (
+                  if String.unsafe_get s (pos+1) = 'a' && String.unsafe_get s (pos+2) = 'd' && String.unsafe_get s (pos+3) = 'i' && String.unsafe_get s (pos+4) = 'u' && String.unsafe_get s (pos+5) = 's' then (
+                    1
+                  )
+                  else (
+                    -1
+                  )
+                )
+              | _ -> (
+                  -1
+                )
+          )
+          else (
+            -1
+          )
+      in
+      let i = Yojson.Safe.map_ident p f lb in
+      Atdgen_runtime.Oj_run.read_until_field_value p lb;
+      (
+        match i with
+          | 0 ->
+            field_center := (
+              Some (
+                (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Atdgen_runtime.Oj_run.read_number
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            Atdgen_runtime.Oj_run.read_number
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_space p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1)
+                    with Yojson.End_of_tuple ->
+                      Atdgen_runtime.Oj_run.missing_tuple_fields p !len [ 0; 1 ]);
+                ) p lb
+              )
+            );
+          | 1 ->
+            field_radius := (
+              Some (
+                (
+                  Atdgen_runtime.Oj_run.read_number
+                ) p lb
+              )
+            );
+          | _ -> (
+              Yojson.Safe.skip_json p lb
+            )
+      );
+      while true do
+        Yojson.Safe.read_space p lb;
+        Yojson.Safe.read_object_sep p lb;
+        Yojson.Safe.read_space p lb;
+        let f =
+          fun s pos len ->
+            if pos < 0 || len < 0 || pos + len > String.length s then
+              invalid_arg (Printf.sprintf "out-of-bounds substring position or length: string = %S, requested position = %i, requested length = %i" s pos len);
+            if len = 6 then (
+              match String.unsafe_get s pos with
+                | 'c' -> (
+                    if String.unsafe_get s (pos+1) = 'e' && String.unsafe_get s (pos+2) = 'n' && String.unsafe_get s (pos+3) = 't' && String.unsafe_get s (pos+4) = 'e' && String.unsafe_get s (pos+5) = 'r' then (
+                      0
+                    )
+                    else (
+                      -1
+                    )
+                  )
+                | 'r' -> (
+                    if String.unsafe_get s (pos+1) = 'a' && String.unsafe_get s (pos+2) = 'd' && String.unsafe_get s (pos+3) = 'i' && String.unsafe_get s (pos+4) = 'u' && String.unsafe_get s (pos+5) = 's' then (
+                      1
+                    )
+                    else (
+                      -1
+                    )
+                  )
+                | _ -> (
+                    -1
+                  )
+            )
+            else (
+              -1
+            )
+        in
+        let i = Yojson.Safe.map_ident p f lb in
+        Atdgen_runtime.Oj_run.read_until_field_value p lb;
+        (
+          match i with
+            | 0 ->
+              field_center := (
+                Some (
+                  (
+                    fun p lb ->
+                      Yojson.Safe.read_space p lb;
+                      let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                      let len = ref 0 in
+                      let end_of_tuple = ref false in
+                      (try
+                        let x0 =
+                          let x =
+                            (
+                              Atdgen_runtime.Oj_run.read_number
+                            ) p lb
+                          in
+                          incr len;
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          x
+                        in
+                        let x1 =
+                          let x =
+                            (
+                              Atdgen_runtime.Oj_run.read_number
+                            ) p lb
+                          in
+                          incr len;
+                          (try
+                            Yojson.Safe.read_space p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          with Yojson.End_of_tuple -> end_of_tuple := true);
+                          x
+                        in
+                        if not !end_of_tuple then (
+                          try
+                            while true do
+                              Yojson.Safe.skip_json p lb;
+                              Yojson.Safe.read_space p lb;
+                              Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                            done
+                          with Yojson.End_of_tuple -> ()
+                        );
+                        (x0, x1)
+                      with Yojson.End_of_tuple ->
+                        Atdgen_runtime.Oj_run.missing_tuple_fields p !len [ 0; 1 ]);
+                  ) p lb
+                )
+              );
+            | 1 ->
+              field_radius := (
+                Some (
+                  (
+                    Atdgen_runtime.Oj_run.read_number
+                  ) p lb
+                )
+              );
+            | _ -> (
+                Yojson.Safe.skip_json p lb
+              )
+        );
+      done;
+      assert false;
+    with Yojson.End_of_object -> (
+        (
+          {
+            center = (match !field_center with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "center");
+            radius = (match !field_radius with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "radius");
+          }
+         : json_pillar)
+      )
+)
+let json_pillar_of_string s =
+  read_json_pillar (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 let write__float_list = (
   Atdgen_runtime.Oj_run.write_list (
     Yojson.Safe.write_float
@@ -1622,6 +1886,79 @@ let read_json_attendee = (
 )
 let json_attendee_of_string s =
   read_json_attendee (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let write__json_pillar_list = (
+  Atdgen_runtime.Oj_run.write_list (
+    write_json_pillar
+  )
+)
+let string_of__json_pillar_list ?(len = 1024) x =
+  let ob = Buffer.create len in
+  write__json_pillar_list ob x;
+  Buffer.contents ob
+let read__json_pillar_list = (
+  Atdgen_runtime.Oj_run.read_list (
+    read_json_pillar
+  )
+)
+let _json_pillar_list_of_string s =
+  read__json_pillar_list (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let write__json_pillar_list_option = (
+  Atdgen_runtime.Oj_run.write_option (
+    write__json_pillar_list
+  )
+)
+let string_of__json_pillar_list_option ?(len = 1024) x =
+  let ob = Buffer.create len in
+  write__json_pillar_list_option ob x;
+  Buffer.contents ob
+let read__json_pillar_list_option = (
+  fun p lb ->
+    Yojson.Safe.read_space p lb;
+    match Yojson.Safe.start_any_variant p lb with
+      | `Edgy_bracket -> (
+          match Yojson.Safe.read_ident p lb with
+            | "None" ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_gt p lb;
+              (None : _ option)
+            | "Some" ->
+              Atdgen_runtime.Oj_run.read_until_field_value p lb;
+              let x = (
+                  read__json_pillar_list
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_gt p lb;
+              (Some x : _ option)
+            | x ->
+              Atdgen_runtime.Oj_run.invalid_variant_tag p x
+        )
+      | `Double_quote -> (
+          match Yojson.Safe.finish_string p lb with
+            | "None" ->
+              (None : _ option)
+            | x ->
+              Atdgen_runtime.Oj_run.invalid_variant_tag p x
+        )
+      | `Square_bracket -> (
+          match Atdgen_runtime.Oj_run.read_string p lb with
+            | "Some" ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_comma p lb;
+              Yojson.Safe.read_space p lb;
+              let x = (
+                  read__json_pillar_list
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_rbr p lb;
+              (Some x : _ option)
+            | x ->
+              Atdgen_runtime.Oj_run.invalid_variant_tag p x
+        )
+)
+let _json_pillar_list_option_of_string s =
+  read__json_pillar_list_option (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 let write__json_attendee_list = (
   Atdgen_runtime.Oj_run.write_list (
     write_json_attendee
@@ -1734,6 +2071,17 @@ let write_json_problem : _ -> json_problem -> _ = (
       write__json_attendee_list
     )
       ob x.attendees;
+    (match x.pillars with None -> () | Some x ->
+      if !is_first then
+        is_first := false
+      else
+        Buffer.add_char ob ',';
+        Buffer.add_string ob "\"pillars\":";
+      (
+        write__json_pillar_list
+      )
+        ob x;
+    );
     Buffer.add_char ob '}';
 )
 let string_of_json_problem ?(len = 1024) x =
@@ -1751,6 +2099,7 @@ let read_json_problem = (
     let field_stage_bottom_left = ref (None) in
     let field_musicians = ref (None) in
     let field_attendees = ref (None) in
+    let field_pillars = ref (None) in
     try
       Yojson.Safe.read_space p lb;
       Yojson.Safe.read_object_end lb;
@@ -1760,6 +2109,14 @@ let read_json_problem = (
           if pos < 0 || len < 0 || pos + len > String.length s then
             invalid_arg (Printf.sprintf "out-of-bounds substring position or length: string = %S, requested position = %i, requested length = %i" s pos len);
           match len with
+            | 7 -> (
+                if String.unsafe_get s pos = 'p' && String.unsafe_get s (pos+1) = 'i' && String.unsafe_get s (pos+2) = 'l' && String.unsafe_get s (pos+3) = 'l' && String.unsafe_get s (pos+4) = 'a' && String.unsafe_get s (pos+5) = 'r' && String.unsafe_get s (pos+6) = 's' then (
+                  7
+                )
+                else (
+                  -1
+                )
+              )
             | 9 -> (
                 match String.unsafe_get s pos with
                   | 'a' -> (
@@ -1933,6 +2290,16 @@ let read_json_problem = (
                 ) p lb
               )
             );
+          | 7 ->
+            if not (Yojson.Safe.read_null_if_possible p lb) then (
+              field_pillars := (
+                Some (
+                  (
+                    read__json_pillar_list
+                  ) p lb
+                )
+              );
+            )
           | _ -> (
               Yojson.Safe.skip_json p lb
             )
@@ -1946,6 +2313,14 @@ let read_json_problem = (
             if pos < 0 || len < 0 || pos + len > String.length s then
               invalid_arg (Printf.sprintf "out-of-bounds substring position or length: string = %S, requested position = %i, requested length = %i" s pos len);
             match len with
+              | 7 -> (
+                  if String.unsafe_get s pos = 'p' && String.unsafe_get s (pos+1) = 'i' && String.unsafe_get s (pos+2) = 'l' && String.unsafe_get s (pos+3) = 'l' && String.unsafe_get s (pos+4) = 'a' && String.unsafe_get s (pos+5) = 'r' && String.unsafe_get s (pos+6) = 's' then (
+                    7
+                  )
+                  else (
+                    -1
+                  )
+                )
               | 9 -> (
                   match String.unsafe_get s pos with
                     | 'a' -> (
@@ -2119,6 +2494,16 @@ let read_json_problem = (
                   ) p lb
                 )
               );
+            | 7 ->
+              if not (Yojson.Safe.read_null_if_possible p lb) then (
+                field_pillars := (
+                  Some (
+                    (
+                      read__json_pillar_list
+                    ) p lb
+                  )
+                );
+              )
             | _ -> (
                 Yojson.Safe.skip_json p lb
               )
@@ -2135,6 +2520,7 @@ let read_json_problem = (
             stage_bottom_left = (match !field_stage_bottom_left with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "stage_bottom_left");
             musicians = (match !field_musicians with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "musicians");
             attendees = (match !field_attendees with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "attendees");
+            pillars = !field_pillars;
           }
          : json_problem)
       )
