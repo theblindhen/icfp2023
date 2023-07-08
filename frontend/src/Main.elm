@@ -72,6 +72,7 @@ type Msg
     | LoadedProblem (Result Http.Error String)
     | PlaceRandomly
     | Swap
+    | LP
     | FocusOnInstrument Int
     | SolutionReturned (Result Http.Error String)
 
@@ -161,6 +162,13 @@ update msg model = case msg of
             , expect = Http.expectString SolutionReturned
             }
         ])
+    LP -> ( model, Cmd.batch [
+        Http.post
+            { body = Http.emptyBody
+            , url = "http://localhost:3000/lp"
+            , expect = Http.expectString SolutionReturned
+            }
+        ])
     FocusOnInstrument i -> ( { model | focus = Just i }, Cmd.none )
     SolutionReturned (Ok res) -> (
         case decodeString decodeSolution res of
@@ -225,6 +233,7 @@ viewProblem m p =
         div [ ] 
             [ BButton.button [ BButton.onClick (PlaceRandomly), BButton.primary ] [ text "Random solve" ]
             , BButton.button [ BButton.onClick (Swap), BButton.primary ] [ text "Swap" ]
+            , BButton.button [ BButton.onClick (LP), BButton.primary ] [ text "LP" ]
             , BButton.button [ BButton.onClick (nextFocus m.focus 1), BButton.primary ] [ text "Next Instrument" ]
             , BButton.button [ BButton.onClick (nextFocus m.focus (-1)), BButton.primary ] [ text "Previous Instrument" ]
             ]

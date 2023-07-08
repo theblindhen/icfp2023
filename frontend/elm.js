@@ -6314,6 +6314,19 @@ var $author$project$Main$update = F2(
 									url: 'http://localhost:3000/swap'
 								})
 							])));
+			case 'LP':
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$elm$http$Http$post(
+								{
+									body: $elm$http$Http$emptyBody,
+									expect: $elm$http$Http$expectString($author$project$Main$SolutionReturned),
+									url: 'http://localhost:3000/lp'
+								})
+							])));
 			case 'FocusOnInstrument':
 				var i = msg.a;
 				return _Utils_Tuple2(
@@ -6896,6 +6909,7 @@ var $author$project$Main$viewLoadProblem = function (m) {
 					]))
 			]));
 };
+var $author$project$Main$LP = {$: 'LP'};
 var $author$project$Main$PlaceRandomly = {$: 'PlaceRandomly'};
 var $author$project$Main$Swap = {$: 'Swap'};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
@@ -8165,6 +8179,17 @@ var $author$project$Main$viewProblem = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$text('Swap')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$LP),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('LP')
 								])),
 							A2(
 							$rundis$elm_bootstrap$Bootstrap$Button$button,
