@@ -14,6 +14,7 @@ type stats = {
   instrument_count : int; (* instrument_count_per_instrument : int array; *)
   pillar_count : int;
   pillar_radii_stats : pillar_radii_stats option;
+  theoretical_max_score : float;
 }
 
 let problem_stats problem =
@@ -43,11 +44,12 @@ let problem_stats problem =
          let max = List.max_elt radii ~compare:Float.compare |> Option.value_exn in
          let uniq = radii |> Set.of_list (module Float) |> Set.length in
          Some { min; max; uniq });
+    theoretical_max_score = Approximations.max_score_problem problem;
   }
 
 let solution_stats (problem_id : int) total_score =
   let best_score = int_of_float @@ Json_util.best_solution_score problem_id in
-  Printf.printf "Best score: %d\n  %% of our score: %2.2f\n\n" best_score
+  Printf.printf "Best score: %s\n  %% of our score: %2.2f\n\n" (Int.to_string_hum best_score)
     (100. *. float_of_int best_score /. total_score)
 
 let stats_to_string (problem_stats : stats) =
@@ -67,11 +69,12 @@ let stats_to_string (problem_stats : stats) =
   ^ string_of_int problem_stats.attendees_count
   ^ "\n pillars: "
   ^ string_of_int problem_stats.pillar_count
-  ^
-  if Option.is_none problem_stats.pillar_radii_stats then ""
-  else
-    let stats = Option.value_exn problem_stats.pillar_radii_stats in
-    sprintf "\n    %d radii between %2.2f and %2.2f" stats.uniq stats.min stats.max
+  ^ (if Option.is_none problem_stats.pillar_radii_stats then ""
+     else
+       let stats = Option.value_exn problem_stats.pillar_radii_stats in
+       sprintf "\n    %d radii between %2.2f and %2.2f" stats.uniq stats.min stats.max)
+  ^ "\n theoretical max score: "
+  ^ Int.to_string_hum (int_of_float problem_stats.theoretical_max_score)
 
 let () =
   let total_score = ref 0. in
@@ -86,4 +89,4 @@ let () =
         print_endline (sprintf "Problem %02d:\n%s" i stats);
         solution_stats i !total_score
   done;
-  Printf.printf "\n\nTotal score: %d\n" (int_of_float !total_score)
+  Printf.printf "\n\nTotal score: %s\n" (Int.to_string_hum @@ int_of_float !total_score)
