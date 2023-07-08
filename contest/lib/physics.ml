@@ -61,10 +61,12 @@ let solution_of_placement_stage1 (placement : placed_instrument array) : Types.s
   |> Array.mapi ~f:(fun idx i : Types.musician ->
          { id = idx; instrument = i.instrument; pos = i.pos })
 
-let simulate_step_sol_stage1 (p : Types.problem) (solution : Types.solution) : Types.solution =
+let simulate_step_sol_stage1 (p : Types.problem) (solution : Types.solution) ~(round : int) :
+    Types.solution =
   (* Pretend we have a solution, but actually we're only placing the instruments
   *)
-  let att_heat = 0.001 in
+  (* let att_heat = 0.1 /. Float.int_pow (float_of_int round +. 10.) 2 in *)
+  let att_heat = 0.1 /. Float.int_pow (float_of_int round +. 10.) 1 in
   let placements = Array.map solution ~f:(fun m -> { instrument = m.instrument; pos = m.pos }) in
   simulate_step p ~att_heat placements;
   solution_of_placement_stage1 placements
