@@ -37,8 +37,8 @@ let run_invocation inv =
       let optimized_solution =
         match inv.assignment with
         | Random -> solution
-        | Swap -> Improver.improve problem solution
-        | LP -> Lp_solver.lp_optimize_solution problem solution
+        | Swap -> Improver.improve problem solution ~round:0
+        | LP -> Lp_solver.lp_optimize_solution problem solution ~round:0
       in
       Misc.validate_solution problem optimized_solution;
       let optimised_score = Score.score_solution problem optimized_solution in

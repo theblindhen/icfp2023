@@ -133,7 +133,7 @@ let () =
     | Some problem ->
         cur_solution :=
           Some
-            (Improver.improve problem
+            (Improver.improve problem ~round:0
                (Random_solver.random_placement_solution problem
                   (Edge_placer.place_edges problem [ South; East ])))
   in
