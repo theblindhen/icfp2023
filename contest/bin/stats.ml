@@ -18,11 +18,7 @@ type stats = {
 }
 
 let problem_stats problem =
-  let instrument_count =
-    match List.max_elt problem.musicians ~compare:Int.compare with
-    | None -> 0
-    | Some x -> x + 1
-  in
+  let instrument_count = Misc.instrument_count problem in
   {
     room_dim =
       sprintf "%d x %d" (int_of_float problem.room_width) (int_of_float problem.room_height);
