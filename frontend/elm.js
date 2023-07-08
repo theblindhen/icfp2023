@@ -4625,9 +4625,6 @@ var $elm$core$Set$toList = function (_v0) {
 	return $elm$core$Dict$keys(dict);
 };
 var $elm$core$Basics$GT = {$: 'GT'};
-var $author$project$Main$Frame = function (a) {
-	return {$: 'Frame', a: a};
-};
 var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
@@ -5339,145 +5336,10 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$element = _Browser_element;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $elm$browser$Browser$AnimationManager$Delta = function (a) {
-	return {$: 'Delta', a: a};
-};
-var $elm$browser$Browser$AnimationManager$State = F3(
-	function (subs, request, oldTime) {
-		return {oldTime: oldTime, request: request, subs: subs};
-	});
-var $elm$browser$Browser$AnimationManager$init = $elm$core$Task$succeed(
-	A3($elm$browser$Browser$AnimationManager$State, _List_Nil, $elm$core$Maybe$Nothing, 0));
-var $elm$core$Process$kill = _Scheduler_kill;
-var $elm$browser$Browser$AnimationManager$now = _Browser_now(_Utils_Tuple0);
-var $elm$browser$Browser$AnimationManager$rAF = _Browser_rAF(_Utils_Tuple0);
-var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
-var $elm$core$Process$spawn = _Scheduler_spawn;
-var $elm$browser$Browser$AnimationManager$onEffects = F3(
-	function (router, subs, _v0) {
-		var request = _v0.request;
-		var oldTime = _v0.oldTime;
-		var _v1 = _Utils_Tuple2(request, subs);
-		if (_v1.a.$ === 'Nothing') {
-			if (!_v1.b.b) {
-				var _v2 = _v1.a;
-				return $elm$browser$Browser$AnimationManager$init;
-			} else {
-				var _v4 = _v1.a;
-				return A2(
-					$elm$core$Task$andThen,
-					function (pid) {
-						return A2(
-							$elm$core$Task$andThen,
-							function (time) {
-								return $elm$core$Task$succeed(
-									A3(
-										$elm$browser$Browser$AnimationManager$State,
-										subs,
-										$elm$core$Maybe$Just(pid),
-										time));
-							},
-							$elm$browser$Browser$AnimationManager$now);
-					},
-					$elm$core$Process$spawn(
-						A2(
-							$elm$core$Task$andThen,
-							$elm$core$Platform$sendToSelf(router),
-							$elm$browser$Browser$AnimationManager$rAF)));
-			}
-		} else {
-			if (!_v1.b.b) {
-				var pid = _v1.a.a;
-				return A2(
-					$elm$core$Task$andThen,
-					function (_v3) {
-						return $elm$browser$Browser$AnimationManager$init;
-					},
-					$elm$core$Process$kill(pid));
-			} else {
-				return $elm$core$Task$succeed(
-					A3($elm$browser$Browser$AnimationManager$State, subs, request, oldTime));
-			}
-		}
-	});
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
-var $elm$browser$Browser$AnimationManager$onSelfMsg = F3(
-	function (router, newTime, _v0) {
-		var subs = _v0.subs;
-		var oldTime = _v0.oldTime;
-		var send = function (sub) {
-			if (sub.$ === 'Time') {
-				var tagger = sub.a;
-				return A2(
-					$elm$core$Platform$sendToApp,
-					router,
-					tagger(
-						$elm$time$Time$millisToPosix(newTime)));
-			} else {
-				var tagger = sub.a;
-				return A2(
-					$elm$core$Platform$sendToApp,
-					router,
-					tagger(newTime - oldTime));
-			}
-		};
-		return A2(
-			$elm$core$Task$andThen,
-			function (pid) {
-				return A2(
-					$elm$core$Task$andThen,
-					function (_v1) {
-						return $elm$core$Task$succeed(
-							A3(
-								$elm$browser$Browser$AnimationManager$State,
-								subs,
-								$elm$core$Maybe$Just(pid),
-								newTime));
-					},
-					$elm$core$Task$sequence(
-						A2($elm$core$List$map, send, subs)));
-			},
-			$elm$core$Process$spawn(
-				A2(
-					$elm$core$Task$andThen,
-					$elm$core$Platform$sendToSelf(router),
-					$elm$browser$Browser$AnimationManager$rAF)));
-	});
-var $elm$browser$Browser$AnimationManager$Time = function (a) {
-	return {$: 'Time', a: a};
-};
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
-var $elm$browser$Browser$AnimationManager$subMap = F2(
-	function (func, sub) {
-		if (sub.$ === 'Time') {
-			var tagger = sub.a;
-			return $elm$browser$Browser$AnimationManager$Time(
-				A2($elm$core$Basics$composeL, func, tagger));
-		} else {
-			var tagger = sub.a;
-			return $elm$browser$Browser$AnimationManager$Delta(
-				A2($elm$core$Basics$composeL, func, tagger));
-		}
-	});
-_Platform_effectManagers['Browser.AnimationManager'] = _Platform_createManager($elm$browser$Browser$AnimationManager$init, $elm$browser$Browser$AnimationManager$onEffects, $elm$browser$Browser$AnimationManager$onSelfMsg, 0, $elm$browser$Browser$AnimationManager$subMap);
-var $elm$browser$Browser$AnimationManager$subscription = _Platform_leaf('Browser.AnimationManager');
-var $elm$browser$Browser$AnimationManager$onAnimationFrameDelta = function (tagger) {
-	return $elm$browser$Browser$AnimationManager$subscription(
-		$elm$browser$Browser$AnimationManager$Delta(tagger));
-};
-var $elm$browser$Browser$Events$onAnimationFrameDelta = $elm$browser$Browser$AnimationManager$onAnimationFrameDelta;
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$LoadedProblem = function (a) {
 	return {$: 'LoadedProblem', a: a};
-};
-var $author$project$Main$SolutionReturned = function (a) {
-	return {$: 'SolutionReturned', a: a};
 };
 var $author$project$Main$Problem = F8(
 	function (roomWidth, roomHeight, stageWidth, stageHeight, stageBottomLeft, musicians, attendees, pillars) {
@@ -5606,6 +5468,7 @@ var $elm$core$Maybe$isJust = function (maybe) {
 		return false;
 	}
 };
+var $elm$core$Platform$sendToSelf = _Platform_sendToSelf;
 var $elm$core$Basics$compare = _Utils_compare;
 var $elm$core$Dict$get = F2(
 	function (targetKey, dict) {
@@ -6119,7 +5982,6 @@ var $elm$core$Dict$update = F3(
 			return A2($elm$core$Dict$remove, targetKey, dictionary);
 		}
 	});
-var $elm$http$Http$emptyBody = _Http_emptyBody;
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -6184,6 +6046,7 @@ var $elm$http$Http$expectString = function (toMsg) {
 		toMsg,
 		$elm$http$Http$resolve($elm$core$Result$Ok));
 };
+var $elm$http$Http$emptyBody = _Http_emptyBody;
 var $elm$http$Http$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -6193,6 +6056,8 @@ var $elm$http$Http$State = F2(
 	});
 var $elm$http$Http$init = $elm$core$Task$succeed(
 	A2($elm$http$Http$State, $elm$core$Dict$empty, _List_Nil));
+var $elm$core$Process$kill = _Scheduler_kill;
+var $elm$core$Process$spawn = _Scheduler_spawn;
 var $elm$http$Http$updateReqs = F3(
 	function (router, cmds, reqs) {
 		updateReqs:
@@ -6354,9 +6219,20 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
+var $author$project$Main$SolutionReturned = function (a) {
+	return {$: 'SolutionReturned', a: a};
+};
 var $elm$http$Http$post = function (r) {
 	return $elm$http$Http$request(
 		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
+};
+var $author$project$Main$postExpectSolution = function (url) {
+	return $elm$http$Http$post(
+		{
+			body: $elm$http$Http$emptyBody,
+			expect: $elm$http$Http$expectString($author$project$Main$SolutionReturned),
+			url: url
+		});
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -6426,13 +6302,41 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
-								$elm$http$Http$post(
-								{
-									body: $elm$http$Http$emptyBody,
-									expect: $elm$http$Http$expectString($author$project$Main$SolutionReturned),
-									url: 'http://localhost:3000/place_randomly'
-								})
+								$author$project$Main$postExpectSolution('http://localhost:3000/place_randomly')
 							])));
+			case 'Swap':
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$author$project$Main$postExpectSolution('http://localhost:3000/swap')
+							])));
+			case 'LP':
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$author$project$Main$postExpectSolution('http://localhost:3000/lp')
+							])));
+			case 'Save':
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$author$project$Main$postExpectSolution('http://localhost:3000/save')
+							])));
+			case 'FocusOnInstrument':
+				var i = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							focus: $elm$core$Maybe$Just(i)
+						}),
+					$elm$core$Platform$Cmd$none);
 			default:
 				if (msg.a.$ === 'Ok') {
 					var res = msg.a.a;
@@ -7006,7 +6910,10 @@ var $author$project$Main$viewLoadProblem = function (m) {
 					]))
 			]));
 };
+var $author$project$Main$LP = {$: 'LP'};
 var $author$project$Main$PlaceRandomly = {$: 'PlaceRandomly'};
+var $author$project$Main$Save = {$: 'Save'};
+var $author$project$Main$Swap = {$: 'Swap'};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
@@ -7170,6 +7077,21 @@ var $author$project$Main$clearScreen = A2(
 			1000,
 			1000)
 		]));
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Main$FocusOnInstrument = function (a) {
+	return {$: 'FocusOnInstrument', a: a};
+};
+var $author$project$Main$nextFocus = F2(
+	function (mFocus, i) {
+		if (mFocus.$ === 'Nothing') {
+			return $author$project$Main$FocusOnInstrument(0);
+		} else {
+			var focus = mFocus.a;
+			return $author$project$Main$FocusOnInstrument(focus + i);
+		}
+	});
 var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $avh4$elm_color$Color$blue = A4($avh4$elm_color$Color$RgbaSpace, 52 / 255, 101 / 255, 164 / 255, 1.0);
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Circle = F2(
@@ -7181,6 +7103,7 @@ var $joakin$elm_canvas$Canvas$circle = F2(
 		return A2($joakin$elm_canvas$Canvas$Internal$Canvas$Circle, pos, radius);
 	});
 var $avh4$elm_color$Color$gray = A4($avh4$elm_color$Color$RgbaSpace, 211 / 255, 215 / 255, 207 / 255, 1.0);
+var $avh4$elm_color$Color$green = A4($avh4$elm_color$Color$RgbaSpace, 115 / 255, 210 / 255, 22 / 255, 1.0);
 var $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableGroup = function (a) {
 	return {$: 'DrawableGroup', a: a};
 };
@@ -7196,14 +7119,56 @@ var $joakin$elm_canvas$Canvas$group = F2(
 					drawable: $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableGroup(entities)
 				}));
 	});
+var $elm$core$Basics$neq = _Utils_notEqual;
 var $avh4$elm_color$Color$red = A4($avh4$elm_color$Color$RgbaSpace, 204 / 255, 0 / 255, 0 / 255, 1.0);
 var $joakin$elm_canvas$Canvas$Settings$stroke = function (color) {
 	return $joakin$elm_canvas$Canvas$Internal$Canvas$SettingDrawOp(
 		$joakin$elm_canvas$Canvas$Internal$Canvas$Stroke(color));
 };
-var $author$project$Main$renderProblem = F2(
-	function (p, s) {
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $elm_community$list_extra$List$Extra$zip = $elm$core$List$map2($elm$core$Tuple$pair);
+var $author$project$Main$renderProblem = F3(
+	function (p, s, f) {
 		var scale = 1000 / A2($elm$core$Basics$max, p.roomHeight, p.roomWidth);
+		var musicians = function () {
+			if (s.$ === 'Nothing') {
+				return _List_Nil;
+			} else {
+				var solution = s.a;
+				return A2($elm_community$list_extra$List$Extra$zip, solution.placements, p.musicians);
+			}
+		}();
+		var unfocusedMusicians = function () {
+			if (f.$ === 'Nothing') {
+				return musicians;
+			} else {
+				var focus = f.a;
+				return A2(
+					$elm$core$List$filter,
+					function (_v5) {
+						var musician = _v5.b;
+						return !_Utils_eq(musician, focus);
+					},
+					musicians);
+			}
+		}();
+		var focusedMusicians = function () {
+			if (f.$ === 'Nothing') {
+				return _List_Nil;
+			} else {
+				var focus = f.a;
+				return A2(
+					$elm$core$List$filter,
+					function (_v3) {
+						var musician = _v3.b;
+						return _Utils_eq(musician, focus);
+					},
+					musicians);
+			}
+		}();
 		return A2(
 			$joakin$elm_canvas$Canvas$group,
 			_List_Nil,
@@ -7273,22 +7238,32 @@ var $author$project$Main$renderProblem = F2(
 						[
 							$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$red)
 						]),
-					function () {
-						if (s.$ === 'Nothing') {
-							return _List_Nil;
-						} else {
-							var solution = s.a;
+					A2(
+						$elm$core$List$map,
+						function (_v0) {
+							var placement = _v0.a;
 							return A2(
-								$elm$core$List$map,
-								function (placement) {
-									return A2(
-										$joakin$elm_canvas$Canvas$circle,
-										_Utils_Tuple2(placement.x * scale, placement.y * scale),
-										5.0 * scale);
-								},
-								solution.placements);
-						}
-					}())
+								$joakin$elm_canvas$Canvas$circle,
+								_Utils_Tuple2(placement.x * scale, placement.y * scale),
+								5.0 * scale);
+						},
+						unfocusedMusicians)),
+					A2(
+					$joakin$elm_canvas$Canvas$shapes,
+					_List_fromArray(
+						[
+							$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$green)
+						]),
+					A2(
+						$elm$core$List$map,
+						function (_v1) {
+							var placement = _v1.a;
+							return A2(
+								$joakin$elm_canvas$Canvas$circle,
+								_Utils_Tuple2(placement.x * scale, placement.y * scale),
+								5.0 * scale);
+						},
+						focusedMusicians))
 				]));
 	});
 var $elm$html$Html$canvas = _VirtualDom_node('canvas');
@@ -8172,12 +8147,12 @@ var $author$project$Main$viewProblem = F2(
 						[
 							A3(
 							$joakin$elm_canvas$Canvas$toHtml,
-							_Utils_Tuple2(1000, 1000),
+							_Utils_Tuple2(1001, 1001),
 							_List_Nil,
 							_List_fromArray(
 								[
 									$author$project$Main$clearScreen,
-									A2($author$project$Main$renderProblem, p, m.solution)
+									A3($author$project$Main$renderProblem, p, m.solution, m.focus)
 								]))
 						])),
 					A2(
@@ -8195,6 +8170,63 @@ var $author$project$Main$viewProblem = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$text('Random solve')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$Swap),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Swap')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$LP),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('LP')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+									A2($author$project$Main$nextFocus, m.focus, 1)),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Next Instrument')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+									A2($author$project$Main$nextFocus, m.focus, -1)),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Previous Instrument')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$Save),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Save')
 								]))
 						]))
 				]));
@@ -8224,11 +8256,11 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 	{
 		init: function (_v0) {
 			return _Utils_Tuple2(
-				{count: 0, error: $elm$core$Maybe$Nothing, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
+				{count: 0, error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
 				$elm$core$Platform$Cmd$none);
 		},
 		subscriptions: function (model) {
-			return $elm$browser$Browser$Events$onAnimationFrameDelta($author$project$Main$Frame);
+			return $elm$core$Platform$Sub$none;
 		},
 		update: $author$project$Main$update,
 		view: $author$project$Main$view
