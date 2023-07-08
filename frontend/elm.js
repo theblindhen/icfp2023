@@ -6310,7 +6310,7 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
-								$author$project$Main$postExpectSolution('http://localhost:3000/swap')
+								$author$project$Main$postExpectSolution('http://localhost:3000/swap/1')
 							])));
 			case 'LP':
 				return _Utils_Tuple2(
@@ -6318,7 +6318,7 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
-								$author$project$Main$postExpectSolution('http://localhost:3000/lp')
+								$author$project$Main$postExpectSolution('http://localhost:3000/lp/1')
 							])));
 			case 'InitSim':
 				return _Utils_Tuple2(
@@ -6329,12 +6329,14 @@ var $author$project$Main$update = F2(
 								$author$project$Main$postExpectSolution('http://localhost:3000/init_sim')
 							])));
 			case 'StepSim':
+				var i = msg.a;
 				return _Utils_Tuple2(
 					model,
 					$elm$core$Platform$Cmd$batch(
 						_List_fromArray(
 							[
-								$author$project$Main$postExpectSolution('http://localhost:3000/step_sim')
+								$author$project$Main$postExpectSolution(
+								'http://localhost:3000/step_sim/' + $elm$core$String$fromInt(i))
 							])));
 			case 'Save':
 				return _Utils_Tuple2(
@@ -6930,7 +6932,9 @@ var $author$project$Main$InitSim = {$: 'InitSim'};
 var $author$project$Main$LP = {$: 'LP'};
 var $author$project$Main$PlaceRandomly = {$: 'PlaceRandomly'};
 var $author$project$Main$Save = {$: 'Save'};
-var $author$project$Main$StepSim = {$: 'StepSim'};
+var $author$project$Main$StepSim = function (a) {
+	return {$: 'StepSim', a: a};
+};
 var $author$project$Main$Swap = {$: 'Swap'};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
 	return {$: 'Fill', a: a};
@@ -7101,6 +7105,75 @@ var $rundis$elm_bootstrap$Bootstrap$Internal$Button$Disabled = function (a) {
 var $rundis$elm_bootstrap$Bootstrap$Button$disabled = function (disabled_) {
 	return $rundis$elm_bootstrap$Bootstrap$Internal$Button$Disabled(disabled_);
 };
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm_community$list_extra$List$Extra$getAt = F2(
+	function (idx, xs) {
+		return (idx < 0) ? $elm$core$Maybe$Nothing : $elm$core$List$head(
+			A2($elm$core$List$drop, idx, xs));
+	});
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $elm$core$List$minimum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var $author$project$Main$instrumentDescription = F2(
 	function (m, p) {
 		var _v0 = m.focus;
@@ -7108,7 +7181,31 @@ var $author$project$Main$instrumentDescription = F2(
 			return 'No instrument in focus';
 		} else {
 			var i = _v0.a;
-			return 'Focusing on instrument: ' + $elm$core$String$fromInt(i);
+			var tastes = A2(
+				$elm$core$List$map,
+				function (a) {
+					return A2(
+						$elm$core$Maybe$withDefault,
+						0,
+						A2($elm_community$list_extra$List$Extra$getAt, i, a.tastes));
+				},
+				p.attendees);
+			var noMusicians = $elm$core$List$length(
+				A2(
+					$elm$core$List$filter,
+					function (musician) {
+						return _Utils_eq(musician, i);
+					},
+					p.musicians));
+			var min = A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				$elm$core$List$minimum(tastes));
+			var max = A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				$elm$core$List$maximum(tastes));
+			return 'Focusing on instrument: ' + ($elm$core$String$fromInt(i) + ('; min: ' + ($elm$core$String$fromFloat(min) + ('; max: ' + ($elm$core$String$fromFloat(max) + ('; number of musicians with instrument: ' + $elm$core$String$fromInt(noMusicians)))))));
 		}
 	});
 var $elm$core$Basics$negate = function (n) {
@@ -7126,16 +7223,6 @@ var $author$project$Main$nextFocus = F2(
 			return $author$project$Main$FocusOnInstrument(focus + i);
 		}
 	});
-var $elm$core$List$maximum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $author$project$Main$numberOfInstruments = function (p) {
 	var _v0 = $elm$core$List$maximum(p.musicians);
 	if (_v0.$ === 'Nothing') {
@@ -7403,7 +7490,6 @@ var $joakin$elm_canvas$Canvas$Internal$CustomElementJsonApi$field = F2(
 var $elm$core$String$concat = function (strings) {
 	return A2($elm$core$String$join, '', strings);
 };
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$core$Basics$round = _Basics_round;
 var $avh4$elm_color$Color$toCssString = function (_v0) {
 	var r = _v0.a;
@@ -8311,12 +8397,25 @@ var $author$project$Main$viewProblem = F2(
 							$rundis$elm_bootstrap$Bootstrap$Button$button,
 							_List_fromArray(
 								[
-									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$StepSim),
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+									$author$project$Main$StepSim(1)),
 									$rundis$elm_bootstrap$Bootstrap$Button$primary
 								]),
 							_List_fromArray(
 								[
 									$elm$html$Html$text('Step Sim')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+									$author$project$Main$StepSim(100)),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Step Sim 100')
 								]))
 						])),
 					A2(
