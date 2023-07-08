@@ -4625,6 +4625,7 @@ var $elm$core$Set$toList = function (_v0) {
 	return $elm$core$Dict$keys(dict);
 };
 var $elm$core$Basics$GT = {$: 'GT'};
+var $elm$core$Basics$False = {$: 'False'};
 var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
@@ -4647,7 +4648,6 @@ var $elm$core$Result$Ok = function (a) {
 var $elm$json$Json$Decode$OneOf = function (a) {
 	return {$: 'OneOf', a: a};
 };
-var $elm$core$Basics$False = {$: 'False'};
 var $elm$core$Basics$add = _Basics_add;
 var $elm$core$Maybe$Just = function (a) {
 	return {$: 'Just', a: a};
@@ -6355,30 +6355,45 @@ var $author$project$Main$update = F2(
 							focus: $elm$core$Maybe$Just(i)
 						}),
 					$elm$core$Platform$Cmd$none);
+			case 'Play':
+				var playing = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{playing: playing}),
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$author$project$Main$postExpectSolution('http://localhost:3000/step_sim/1')
+							])));
 			default:
 				if (msg.a.$ === 'Ok') {
 					var res = msg.a.a;
-					return _Utils_Tuple2(
-						function () {
-							var _v2 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeSolution, res);
-							if (_v2.$ === 'Ok') {
-								var solution = _v2.a;
-								return _Utils_update(
-									model,
-									{
-										solution: $elm$core$Maybe$Just(solution)
-									});
-							} else {
-								var err = _v2.a;
-								return _Utils_update(
-									model,
-									{
-										error: $elm$core$Maybe$Just(
-											'Failed to decode solution: ' + $elm$json$Json$Decode$errorToString(err))
-									});
-							}
-						}(),
-						$elm$core$Platform$Cmd$none);
+					var _v2 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeSolution, res);
+					if (_v2.$ === 'Ok') {
+						var solution = _v2.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									solution: $elm$core$Maybe$Just(solution)
+								}),
+							model.playing ? $elm$core$Platform$Cmd$batch(
+								_List_fromArray(
+									[
+										$author$project$Main$postExpectSolution('http://localhost:3000/step_sim/1')
+									])) : $elm$core$Platform$Cmd$none);
+					} else {
+						var err = _v2.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									error: $elm$core$Maybe$Just(
+										'Failed to decode solution: ' + $elm$json$Json$Decode$errorToString(err))
+								}),
+							$elm$core$Platform$Cmd$none);
+					}
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -6931,6 +6946,9 @@ var $author$project$Main$viewLoadProblem = function (m) {
 var $author$project$Main$InitSim = {$: 'InitSim'};
 var $author$project$Main$LP = {$: 'LP'};
 var $author$project$Main$PlaceRandomly = {$: 'PlaceRandomly'};
+var $author$project$Main$Play = function (a) {
+	return {$: 'Play', a: a};
+};
 var $author$project$Main$Save = {$: 'Save'};
 var $author$project$Main$StepSim = function (a) {
 	return {$: 'StepSim', a: a};
@@ -7223,6 +7241,7 @@ var $author$project$Main$nextFocus = F2(
 			return $author$project$Main$FocusOnInstrument(focus + i);
 		}
 	});
+var $elm$core$Basics$not = _Basics_not;
 var $author$project$Main$numberOfInstruments = function (p) {
 	var _v0 = $elm$core$List$maximum(p.musicians);
 	if (_v0.$ === 'Nothing') {
@@ -8416,6 +8435,18 @@ var $author$project$Main$viewProblem = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$text('Step Sim 100')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+									$author$project$Main$Play(!m.playing)),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Play')
 								]))
 						])),
 					A2(
@@ -8453,7 +8484,7 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 	{
 		init: function (_v0) {
 			return _Utils_Tuple2(
-				{count: 0, error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
+				{count: 0, error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, playing: false, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
 				$elm$core$Platform$Cmd$none);
 		},
 		subscriptions: function (model) {

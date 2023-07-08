@@ -5,6 +5,7 @@ open Physics
 
 let current_problem = ref None
 let current_solution = ref None
+let current_round = ref 0
 let read_file path = In_channel.create path |> In_channel.input_all |> String.strip
 
 let index_handler _ =
@@ -19,6 +20,8 @@ let problem_handler req =
   let id = Router.param req "id" in
   let problem = In_channel.read_all (sprintf "../problems/problem-%s.json" id) in
   current_problem := Json_util.get_problem (int_of_string id);
+  current_solution := None;
+  current_round := 0;
   Lwt.return (Response.make ~status:`OK ~body:(Body.of_string problem) ())
 
 let init_solution_handler f _ =
@@ -30,15 +33,23 @@ let init_solution_handler f _ =
         solution |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
       in
       current_solution := Some solution;
+      current_round := 0;
       Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
-
-let rec repeat f n a = if n = 0 then a else repeat f (n - 1) (f a)
 
 let optimiser_handler f req =
   let n = Router.param req "n" |> int_of_string in
   match (!current_problem, !current_solution) with
   | Some p, Some s ->
-      let solution' = repeat (f p) n s in
+      Printf.printf "Optimization round %d\n" !current_round;
+      let solution' =
+        let rec repeat fp n s =
+          if n = 0 then s
+          else (
+            current_round := !current_round + 1;
+            repeat fp (n - 1) (fp s ~round:!current_round))
+        in
+        repeat (f p) n s
+      in
       let solution_json =
         solution' |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
       in

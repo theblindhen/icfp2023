@@ -90,5 +90,6 @@ let lp_assign_positions (problem : Types.problem) (positions : Types.position li
 
 (** Completely disregards the placement in the given solution and reassigns all
   placements *)
-let lp_optimize_solution (problem : Types.problem) (solution : Types.solution) =
+let lp_optimize_solution (problem : Types.problem) (solution : Types.solution) ~(round : int) =
+  ignore round;
   lp_assign_positions problem (solution |> List.of_array |> List.map ~f:(fun { pos; _ } -> pos))

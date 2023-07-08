@@ -56,6 +56,7 @@ type alias Model =
     , problem : Maybe Problem
     , solution : Maybe Solution
     , focus : Maybe Focus
+    , playing : Bool
     }
 
 type alias Placement =
@@ -79,6 +80,7 @@ type Msg
     | Save
     | FocusOnInstrument Int
     | SolutionReturned (Result Http.Error String)
+    | Play Bool
 
 decodeMusicians : Decoder Musician
 decodeMusicians =
@@ -167,17 +169,18 @@ update msg model = case msg of
     StepSim i -> ( model, Cmd.batch [ postExpectSolution ("http://localhost:3000/step_sim/" ++ (String.fromInt i)) ] )
     Save -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/save" ] )
     FocusOnInstrument i -> ( { model | focus = Just i }, Cmd.none )
-    SolutionReturned (Ok res) -> (
+    SolutionReturned (Ok res) ->
         case decodeString decodeSolution res of
-            Ok solution -> { model | solution = Just solution }
-            Err err -> { model | error = Just ("Failed to decode solution: " ++ errorToString err) }
-        , Cmd.none )
+            Ok solution -> ({ model | solution = Just solution }, 
+                if model.playing then Cmd.batch [ postExpectSolution "http://localhost:3000/step_sim/1" ] else Cmd.none)
+            Err err -> ({ model | error = Just ("Failed to decode solution: " ++ errorToString err) }, Cmd.none )
+    Play playing -> ( { model | playing = playing }, Cmd.batch [ postExpectSolution "http://localhost:3000/step_sim/1" ] )
     SolutionReturned (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
 
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing }, Cmd.none )
+        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing, playing = False }, Cmd.none )
         , view = view
         , update = update
         , subscriptions = \model -> Sub.none
@@ -263,7 +266,8 @@ viewProblem m p =
                     BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ],
                     BButton.button [ BButton.onClick InitSim, BButton.primary ] [ text "Init Sim" ],
                     BButton.button [ BButton.onClick (StepSim 1), BButton.primary ] [ text "Step Sim" ],
-                    BButton.button [ BButton.onClick (StepSim 100), BButton.primary ] [ text "Step Sim 100" ]
+                    BButton.button [ BButton.onClick (StepSim 100), BButton.primary ] [ text "Step Sim 100" ],
+                    BButton.button [ BButton.onClick (Play (not m.playing)), BButton.primary ] [ text "Play" ]
                 ],
             div [ ]
                 [ 
