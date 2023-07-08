@@ -51,6 +51,7 @@ let run_invocation inv =
 let parse_edges_flag edges : Edge_placer.edges =
   match edges with
   | None -> []
+  | Some "" -> []
   | Some e ->
       String.split_on_chars e ~on:[ ',' ]
       |> List.map ~f:(fun edge_str ->
