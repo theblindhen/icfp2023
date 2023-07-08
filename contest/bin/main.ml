@@ -23,7 +23,7 @@ let run_invocation inv =
       in
       let optimised_score = Score.score_solution problem optimized_solution in
       printf "Improved score: %f\n%!" optimised_score;
-      Json_util.write_solution_if_best inv.problem_id problem optimized_solution;
+      Json_util.write_solution_if_best optimised_score inv.problem_id optimized_solution;
       (* write solution_json to file *)
       print_endline "Done"
 
