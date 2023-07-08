@@ -1,30 +1,38 @@
 open Core
 open Types
 
-let is_blocked (s : solution) (a : attendee) (self_id : int) (pos : position) : bool =
-  let within_distance = Geometry.within_distance 5.0 (a.pos, pos) in
+let is_blocked_by_musicians (s : solution) (a : attendee) (self_id : int) (pos : position) : bool =
+  let within_distance = Geometry.within_distance (a.pos, pos) 5.0 in
   Array.exists ~f:(fun candidate -> self_id <> candidate.id && within_distance candidate.pos) s
 
-let score_I (s : solution) (a : attendee) (m : musician) : float =
-  if is_blocked s a m.id m.pos then 0.0
+let is_blocked_by_pillars (p : problem) (a : attendee) (pos : position) : bool =
+  let within = Geometry.within_distance (a.pos, pos) in
+  List.exists ~f:(fun (pillar : pillar) -> within pillar.radius pillar.center) p.pillars
+
+let is_blocked (p : problem) (s : solution) (a : attendee) (self_id : int) (pos : position) : bool =
+  is_blocked_by_musicians s a self_id pos || is_blocked_by_pillars p a pos
+
+let score_I (p : problem) (s : solution) (a : attendee) (m : musician) : float =
+  if is_blocked p s a m.id m.pos then 0.0
   else
     let d_sq = Geometry.distance_squared a.pos m.pos in
     Float.round_up (1_000_000.0 *. a.tastes.(m.instrument) /. d_sq)
 
-let score_I_partial (s : solution) (a : attendee) (self_id : int) (pos : position) : float =
-  if is_blocked s a self_id pos then 0.0
+let score_I_partial (p : problem) (s : solution) (a : attendee) (self_id : int) (pos : position) :
+    float =
+  if is_blocked p s a self_id pos then 0.0
   else
     let d_sq = Geometry.distance_squared a.pos pos in
     1_000_000.0 /. d_sq
 
-let score_attendee (s : solution) (a : attendee) : float =
-  Array.sum (module Float) ~f:(score_I s a) s
+let score_attendee (p : problem) (s : solution) (a : attendee) : float =
+  Array.sum (module Float) ~f:(score_I p s a) s
 
 let score_musician (p : problem) (s : solution) (m : musician) : float =
-  List.sum (module Float) ~f:(fun attendee -> score_I s attendee m) p.attendees
+  List.sum (module Float) ~f:(fun attendee -> score_I p s attendee m) p.attendees
 
 let score_solution (p : problem) (s : solution) : float =
-  List.sum (module Float) ~f:(score_attendee s) p.attendees
+  List.sum (module Float) ~f:(score_attendee p s) p.attendees
 
 (* Alternative scoring function, using Geometry.precompute_hearable. *)
 let score_solution_wip_broken (p : problem) (s : solution) : float =
