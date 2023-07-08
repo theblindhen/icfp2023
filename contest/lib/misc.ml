@@ -58,3 +58,5 @@ let solution_of_positions (p : problem) (s : position list) : solution =
   match List.zip p.musicians s with
   | Ok l -> List.mapi l ~f:(fun i (instrument, pos) -> { id = i; pos; instrument }) |> Array.of_list
   | Unequal_lengths -> failwith "solution_of_positions: unequal lengths"
+
+let string_of_score (score : float) : string = Int.to_string_hum (Float.to_int score)
