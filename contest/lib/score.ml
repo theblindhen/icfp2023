@@ -46,5 +46,5 @@ let score_solution_wip_broken (p : problem) (s : solution) : float =
         ~f:(fun attendee_index ->
           printf "  %d hears someone\n" attendee_index;
           let a = attendees.(attendee_index) in
-          let d_sq = distance_squared a.pos m.pos in
+          let d_sq = Geometry.distance_squared a.pos m.pos in
           sum +. Float.round_up (1_000_000.0 *. a.tastes.(m.instrument) /. d_sq)))

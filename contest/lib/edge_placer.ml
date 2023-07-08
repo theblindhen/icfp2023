@@ -13,6 +13,21 @@ let place_row (x_start : float) (x_no : int) (y : float) : position list =
 let place_col (x : float) (y_start : float) (y_no : int) : position list =
   List.range 0 (y_no - 1) |> List.map ~f:(fun i -> { x; y = y_start +. (float_of_int i *. 10.0) })
 
+(* Place a grid of points *)
+let place_grid (x_start : float) (y_start : float) (x_no : int) (y_no : int) (max_placed : int) :
+    position list =
+  let _remaining_placed, placed =
+    List.fold
+      (List.range 0 (y_no - 1))
+      ~init:(max_placed, [])
+      ~f:(fun (remaining_placed, placed) i ->
+        if remaining_placed = 0 then (0, placed)
+        else
+          let row = place_row x_start x_no (y_start +. (float_of_int i *. 10.0)) in
+          (remaining_placed - List.length row, placed @ row))
+  in
+  placed
+
 type edge = North | South | East | West [@@deriving sexp]
 type edges = edge list [@@deriving sexp]
 
