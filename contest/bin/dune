@@ -17,3 +17,11 @@
  (name stats)
  (modules stats)
  (libraries contest))
+
+(executable
+ (public_name server)
+ (name server)
+ (modules server)
+ (preprocess
+  (pps ppx_jane))
+ (libraries contest core_unix.command_unix core opium))
