@@ -17,19 +17,22 @@ type invocation = {
 
 let run_newton (problem : Types.problem) =
   let placements = Physics.init_placements problem in
-  let rec loop iteration last_instability =
-    if iteration > 100 && (Float.(last_instability < 0.00000000001) || iteration > 5000) then
-      iteration
+  let rec stage1 iteration last_instability =
+    if iteration > 100 && (Float.(last_instability < 0.00001) || iteration > 200) then iteration
     else
       let att_heat = Physics.att_heat_from_iteration_stage1 problem iteration in
       (* Printf.printf "Iteration %d, heat %f\n%!" iteration att_heat; *)
       let last_instability = Physics.simulate_step_stage1 problem ~att_heat placements in
-      loop (iteration + 1) last_instability
+      stage1 (iteration + 1) last_instability
   in
-  let iterations = loop 0 Float.max_value in
+  let iterations = stage1 0 Float.max_value in
   Printf.printf "Problem %d converged in %d iterations." problem.problem_id iterations;
   Printf.printf " Score: %s \n%!"
     (Physics.placement_score_raw problem placements |> Misc.string_of_score);
+  Printf.printf " Going to Stage 2 %!";
+  let solution = Physics.instrument_placement_to_stage2 problem placements in
+  Printf.printf " - DONE%!";
+  Misc.validate_solution problem solution;
   ()
 
 let run_invocation inv =

@@ -127,12 +127,21 @@ let simulate_step_sol_stage1 (p : Types.problem) (solution : Types.solution) ~(r
 let init_solution_sol (p : Types.problem) : Types.solution =
   init_placements p |> solution_of_placement_stage1
 
+let instrument_placement_to_stage2 (p : Types.problem) (placements : placed_instrument array) :
+    Types.solution =
+  let placements = Array.map placements ~f:(fun i -> i.pos) in
+  Random_solver.random_solution_from_instrument_locii p placements
+
 let simulate_step_sol (p : Types.problem) (solution : Types.solution) ~(round : int) :
     Types.solution =
-  if round < 1000 then simulate_step_sol_stage1 p solution ~round
-  else if round = 1000 then
+  if round <= 200 then simulate_step_sol_stage1 p solution ~round
+  else if round = 201 then (
+    print_endline "Switching to stage 2";
     (* switch from stage 1 to stage 2: Expand instrument locii to musicians *)
-    let placements = Array.map solution ~f:(fun m -> m.pos) in
-    Random_solver.random_solution_from_instrument_locii p placements
+    let placements = Array.mapi solution ~f:(fun i m -> { pos = m.pos; instrument = i }) in
+    let solution = instrument_placement_to_stage2 p placements in
+    print_endline "Placement done!";
+    (* Misc.validate_solution p solution; *)
+    solution)
   else (* NOOP *)
     solution

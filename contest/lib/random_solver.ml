@@ -8,7 +8,7 @@ let random_placement (p : problem) : position =
 
 let random_placement_around_locus (p : problem) (locus : position) : position =
   let legal_rect = Misc.legal_musician_rect p in
-  let sample_scale = 5.0 in
+  let sample_scale = 2.5 in
   let rec loop () =
     let delta_x =
       sample_scale *. Statistics.sample_min_abs Statistics.poor_mans_gaussian (7.5 /. sample_scale)
@@ -16,9 +16,8 @@ let random_placement_around_locus (p : problem) (locus : position) : position =
     let delta_y =
       sample_scale *. Statistics.sample_min_abs Statistics.poor_mans_gaussian (7.5 /. sample_scale)
     in
-    if Geometry.within_rect legal_rect { x = locus.x +. delta_x; y = locus.y +. delta_y } then
-      { x = locus.x +. delta_x; y = locus.y +. delta_y }
-    else loop ()
+    let pos = { x = locus.x +. delta_x; y = locus.y +. delta_y } in
+    if Geometry.within_rect legal_rect pos then pos else loop ()
   in
   loop ()
 
@@ -28,15 +27,17 @@ let is_valid_placement (_ : problem) (placed : position list) (potential : posit
 let random_placements (p : problem) (placer : unit -> position) (count : int)
     (already_placed : position list) : position list =
   Random.self_init ();
-  let rec random (acc : position list) (count : int) (fuel : int) =
-    if count = 0 then acc
+  let rec random (already_placed : position list) (placement : position list) (count : int)
+      (fuel : int) =
+    if count = 0 then placement
     else
       let potential = placer () in
-      if is_valid_placement p acc potential then random (potential :: acc) (count - 1) fuel
+      if is_valid_placement p already_placed potential then
+        random (potential :: already_placed) (potential :: placement) (count - 1) fuel
       else if fuel = 0 then failwith "ran out of fuel"
-      else random acc count (fuel - 1)
+      else random already_placed placement count (fuel - 1)
   in
-  random already_placed count 10_000
+  random already_placed [] count 10_000
 
 let random_solution_from_instrument_locii (p : problem) (instruments : position array) : solution =
   let musicians =
@@ -52,10 +53,15 @@ let random_solution_from_instrument_locii (p : problem) (instruments : position 
          | hd :: tl ->
              musicians.(hd) <- { (musicians.(hd)) with pos = locus };
              let already_placed = musicians.(hd).pos :: already_placed in
-             random_placements
-               (p : problem)
-               (fun () -> random_placement_around_locus p locus)
-               (List.length tl) already_placed)
+             let tl_placements =
+               random_placements
+                 (p : problem)
+                 (fun () -> random_placement_around_locus p locus)
+                 (List.length tl) already_placed
+             in
+             List.iter2_exn tl_placements tl ~f:(fun pos musician ->
+                 musicians.(musician) <- { (musicians.(musician)) with pos });
+             tl_placements @ already_placed)
   |> ignore;
   musicians
 
