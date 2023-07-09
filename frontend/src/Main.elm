@@ -58,6 +58,7 @@ type alias Model =
     , focus : Maybe Focus
     , playing : Bool
     , loading : List String
+    , edge : String
     }
 
 type alias Placement =
@@ -71,8 +72,10 @@ type alias Solution =
 type Msg
     = Frame Float
     | ProblemFieldUpdated String
+    | EdgeFieldUpdated String
     | LoadProblem String
     | LoadedProblem (Result Http.Error String)
+    | Edge String
     | PlaceRandomly
     | Swap
     | LP
@@ -150,10 +153,19 @@ postExpectSolution url =
         , expect = Http.expectString SolutionReturned
         }
 
+postExpectSolutionWithBody : String -> Http.Body -> Cmd Msg
+postExpectSolutionWithBody url body =
+    Http.post
+        { body = body
+        , url = url
+        , expect = Http.expectString SolutionReturned
+        }
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model = case msg of
     Frame _ -> ( { model | count = model.count + 1 }, Cmd.none )
     ProblemFieldUpdated problemId -> ( { model | problemId = problemId }, Cmd.none )
+    EdgeFieldUpdated edge -> ( { model | edge = edge }, Cmd.none )
     LoadProblem problemId -> ( model, Cmd.batch [
         Http.get 
             { url = "http://localhost:3000/problem/" ++ problemId
@@ -166,6 +178,7 @@ update msg model = case msg of
             Err err -> { model | error = Just ("Failed to decode problem: " ++ errorToString err) }
         , Cmd.none )
     LoadedProblem (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
+    Edge edge -> ( model, Cmd.batch [ postExpectSolutionWithBody "http://localhost:3000/edge" (Http.stringBody "application/json" edge) ] )
     PlaceRandomly -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/place_randomly" ] )
     Swap -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/swap/1" ] )
     LP -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/lp/1" ] )
@@ -192,7 +205,7 @@ update msg model = case msg of
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing, playing = False, loading = [] }, Cmd.none )
+        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing, playing = False, loading = [], edge = "" }, Cmd.none )
         , view = view
         , update = update
         , subscriptions = \model -> Sub.none
@@ -281,6 +294,11 @@ viewProblem m p =
                     BButton.button [ BButton.onClick (StepSim 1), BButton.primary ] [ text "Step Sim" ],
                     BButton.button [ BButton.onClick (StepSim 100), BButton.primary ] [ text "Step Sim 100" ],
                     BButton.button [ BButton.onClick (Play (not m.playing)), BButton.primary ] [ text "Play" ]
+                ],
+            div [ ]
+                [
+                    BButton.button [ BButton.onClick (Edge m.edge), BButton.primary ] [ text "Place specified edges" ],
+                    BInput.text [ BInput.onInput EdgeFieldUpdated ]
                 ],
             div [ ]
                 [ 
