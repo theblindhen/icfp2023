@@ -65,20 +65,6 @@ let run_invocation inv =
       in
       print_endline "All done"
 
-let parse_edges_flag edges : Edge_placer.edges =
-  match edges with
-  | None -> []
-  | Some "" -> []
-  | Some e ->
-      String.split_on_chars e ~on:[ ',' ]
-      |> List.map ~f:(fun edge_str ->
-             match edge_str with
-             | "north" -> Edge_placer.North
-             | "south" -> Edge_placer.South
-             | "east" -> Edge_placer.East
-             | "west" -> Edge_placer.West
-             | _ -> failwith "Invalid edge placement")
-
 let parse_scale scale_width : float = Option.value scale_width ~default:1.0
 
 let parse_optimizer string : optimizer =
@@ -102,7 +88,7 @@ let command =
      fun () ->
        let problem_id = Int.of_string problem_id in
        let initialization =
-         match (loadBest, newton, parse_edges_flag edges) with
+         match (loadBest, newton, Edge_placer.parse_edges_flag edges) with
          | true, false, [] -> LoadBest
          | false, true, [] -> Newton
          | false, false, [] -> Random

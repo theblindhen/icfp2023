@@ -31,6 +31,20 @@ let place_grid (x_start : float) (y_start : float) (x_no : int) (y_no : int) (ma
 type edge = North | South | East | West [@@deriving sexp]
 type edges = edge list [@@deriving sexp]
 
+let parse_edges_flag edges : edges =
+  match edges with
+  | None -> []
+  | Some "" -> []
+  | Some e ->
+      String.split_on_chars e ~on:[ ',' ]
+      |> List.map ~f:(fun edge_str ->
+             match edge_str with
+             | "north" -> North
+             | "south" -> South
+             | "east" -> East
+             | "west" -> West
+             | _ -> failwith "Invalid edge placement")
+
 let place_edge (p : problem) (already_placed : position list) (e : edge) : position list =
   let w, h = grid_size p in
   let max_musicians = (p.musicians |> List.length) - (already_placed |> List.length) in
