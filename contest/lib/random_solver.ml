@@ -74,5 +74,5 @@ let random_solution_from_instrument_locii (p : problem) (instruments : position 
 
 let random_placement_solution (p : problem) (already_placed : position list) : solution =
   let count = List.length p.musicians - List.length already_placed in
-  random_placements p (fun () -> random_placement p) count already_placed
+  already_placed @ random_placements p (fun () -> random_placement p) count already_placed
   |> Misc.solution_of_positions p
