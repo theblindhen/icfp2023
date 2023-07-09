@@ -211,6 +211,13 @@ let newton_solver (problem : Types.problem) : Types.solution =
   let sol = solution_of_placements problem music_placements in
   sol
 
+let newton_optimizer (problem : Types.problem) (solution : Types.solution) ~(max_iterations : int) =
+  let placements = placements_of_solution solution in
+  let stay_stage _last_instability iteration = iteration < max_iterations in
+  Printf.printf "Newton boogie on Problem %d for %d iterations" problem.problem_id max_iterations;
+  newton_run_stage stay_stage step_stage2 problem placements 0 |> ignore;
+  solution_of_placements problem placements
+
 (* GUI Entry points *)
 let gui_init_solution (p : Types.problem) : Types.solution * string =
   (init_placements p |> solution_of_placements p, "stage1")
