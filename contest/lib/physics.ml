@@ -62,20 +62,27 @@ let safe_move (p : Types.problem) (pos : Types.position) (f : force) : Types.pos
   in
   (new_pos, from_points new_pos pos)
 
+let has_collision (placements : placed_instrument array) (idx : int) (pos : Types.position) =
+  Array.existsi placements ~f:(fun i p ->
+      idx <> i && Float.(Geometry.distance_squared p.pos pos < 100.))
+
 (* Simulate a step of the placement algorithm. Returns the maximum distance moved
    by any instrument. *)
-let simulate_step (p : Types.problem) ~(att_heat : float) (placements : placed_instrument array) :
+let simulate_step (p : Types.problem) ~(att_heat : float) ~(repel : bool)
+    (placements : placed_instrument array) :
     (* let simulate_step (p : Types.problem) ~(att_heat : float) (placements : placed_instrument array) : *)
     float =
   let forces = Array.map placements ~f:(fun i -> force_over_attendees p i) in
   let max_truncated_force =
-    Array.fold2_exn placements forces ~init:Float.min_value ~f:(fun max_move i f ->
-        (*TODO: Could this be a bit more efficient? *)
-        let desired_move = scale_to_len att_heat f in
-        let pos, _ = safe_move p i.pos desired_move in
-        let _, truncated_force = safe_move p i.pos f in
-        placements.(i.instrument) <- { instrument = i.instrument; pos };
-        Float.max max_move (length_sq truncated_force))
+    List.zip_exn (List.of_array placements) (List.of_array forces)
+    |> List.foldi ~init:Float.min_value ~f:(fun idx max_move (placed_i, f) ->
+           (*TODO: Could this be a bit more efficient? *)
+           let desired_move = scale_to_len att_heat f in
+           let pos, _ = safe_move p placed_i.pos desired_move in
+           let _, truncated_force = safe_move p placed_i.pos f in
+           if (not repel) || not (has_collision placements idx pos) then
+             placements.(idx) <- { instrument = placed_i.instrument; pos };
+           Float.max max_move (length_sq truncated_force))
   in
   max_truncated_force
 
@@ -116,7 +123,7 @@ let honeycomb_solution_from_instrument_locii (p : Types.problem)
   |> ignore;
   musicians
 
-let instrument_placement_to_stage2 ?(placer = `Honeycomb) (p : Types.problem)
+let instrument_placement_to_stage2 ?(placer = `Random) (p : Types.problem)
     (placements : placed_instrument array) : placed_instrument array =
   let placements = Array.map placements ~f:(fun i -> i.pos) in
   (match placer with
@@ -160,12 +167,12 @@ let stay_stage2 last_instability iteration =
 (* Take a single step in Newton Stage 1. Return the instability *)
 let step_stage1 problem placements iteration =
   let att_heat = att_heat_from_iteration_stage1 problem iteration in
-  simulate_step problem placements ~att_heat
+  simulate_step problem placements ~att_heat ~repel:false
 
 (* Take a single step in Newton Stage 2. Return the instability *)
 let step_stage2 problem placements iteration =
   let att_heat = att_heat_from_iteration_stage2 problem iteration in
-  simulate_step problem placements ~att_heat
+  simulate_step problem placements ~att_heat ~repel:true
 
 (* Run Newton Stage 1, updating the placements imperatively.
    Return the total number of iterations *)
@@ -215,12 +222,12 @@ let gui_newton_solver_step (problem : Types.problem) ((solution, state) : Types.
     else
       let music_placements = instrument_placement_to_stage2 problem placements in
       (solution_of_placement problem music_placements, "stage2")
-  else if Stdlib.(state = "stage2") then (* Stage 2 *)
-    (solution, "stage3")
-    (* let last_instability = step_stage2 problem placements iteration in
-       if stay_stage2 last_instability (iteration + 1) then
-         (solution_of_placement problem placements, "stage2")
-       else (solution_of_placement problem placements, "stage3") *)
+  else if Stdlib.(state = "stage2") then
+    (* Stage 2 *)
+    let last_instability = step_stage2 problem placements iteration in
+    if stay_stage2 last_instability (iteration + 1) then
+      (solution_of_placement problem placements, "stage2")
+    else (solution_of_placement problem placements, "stage3")
   else (
     print_endline "I'm done";
     (solution, "stage3"))

@@ -52,7 +52,6 @@ let improve (p : problem) (s : solution) ~(round : int) : solution =
         let score_i' = get_score cache scores i j in
         let score_j' = get_score cache scores j i in
         if Float.(score_i' + score_j' > score_i + score_j) then (
-          printf "swapping %d and %d\n%!" i j;
           iter := true;
           let musician_i = scores.(i).musician in
           let musician_j = scores.(j).musician in
