@@ -27,6 +27,11 @@ let best_solution_score problem_id =
       |> Array.max_elt ~compare:Float.compare
       |> Option.value ~default:0.
 
+let get_best_solution (problem : Types.problem) =
+  let best_score = best_solution_score problem.problem_id in
+  let best_solution_file = sprintf "%.0f.json" best_score in
+  get_solution problem best_solution_file
+
 (** Write the solution to the "../problems/solutions-%d" directory. Only write a
  * new file if the new score is better than all the previous ones. *)
 let write_solution_if_best (score : float) (problem : Types.problem) (solution : Types.solution) :

@@ -4,7 +4,7 @@ open Contest
 let random_solution (p : Types.problem) (already_placed : Types.position list) =
   Random_solver.random_placement_solution p already_placed
 
-type initialization = Random | Newton | Edge of Edge_placer.edges [@@deriving sexp]
+type initialization = Random | Newton | Edge of Edge_placer.edges | LoadBest [@@deriving sexp]
 type optimizer = LP | Swap [@@deriving sexp]
 
 type invocation = {
@@ -37,6 +37,10 @@ let run_invocation inv =
         | Edge edges ->
             let edge = Edge_placer.place_edges problem edges in
             random_solution problem edge
+        | LoadBest -> (
+            match Json_util.get_best_solution problem with
+            | None -> failwith "Failed to load best solution (no previous solution?)"
+            | Some solution -> solution)
       in
       Misc.validate_solution problem solution;
       print_endline "Scoring solution...";
@@ -75,6 +79,7 @@ let parse_scale scale_width : float = Option.value scale_width ~default:1.0
 let command =
   Command.basic ~summary:"Run our solver on a problem"
     (let%map_open.Command lp = flag "--lp" no_arg ~doc:"Use the LP solver after placement"
+     and loadBest = flag "--loadBest" no_arg ~doc:"Load the previous best solution"
      and swapper = flag "--swap" no_arg ~doc:"Use swap optimization after placement"
      and newton = flag "--newton" no_arg ~doc:"Use Newton initial placement"
      and edges = flag "--edges" (optional string) ~doc:"Edge placement initialization"
@@ -85,15 +90,22 @@ let command =
      fun () ->
        let problem_id = Int.of_string problem_id in
        let initialization =
-         let edges = parse_edges_flag edges in
-         let set_initialization = List.count [ Stdlib.(edges <> []); newton ] ~f:Fn.id in
-         assert (set_initialization <= 1);
-         if newton then Newton else if Stdlib.(edges <> edges) then Random else Edge edges
+         match (loadBest, newton, parse_edges_flag edges) with
+         | true, false, [] -> LoadBest
+         | false, true, [] -> Newton
+         | false, false, [] -> Random
+         | false, false, edges -> Edge edges
+         | _ ->
+             failwith
+               "Invalid initialization. You must specify at most one of --loadBest, --newton, or \
+                --edges"
        in
        let optimizer =
-         let set_optimizer = List.count [ lp; swapper ] ~f:Fn.id in
-         assert (set_optimizer <= 1);
-         if lp then Some LP else if swapper then Some Swap else None
+         match (lp, swapper) with
+         | false, false -> None
+         | true, false -> Some LP
+         | false, true -> Some Swap
+         | _ -> failwith "Invalid optimizer. You must specify at most one of --lp or --swapper"
        in
        print_endline
          ("Initializing with " ^ (sexp_of_initialization initialization |> Sexp.to_string_hum));
