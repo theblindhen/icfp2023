@@ -79,20 +79,6 @@ let simulate_step (p : Types.problem) ~(att_heat : float) (placements : placed_i
   in
   max_truncated_force
 
-let att_heat_from_iteration_stage1 (problem : Types.problem) (iteration : int) : float =
-  let iter_denom = Float.round_up (Float.of_int iteration /. 100.) in
-  let att_heat_force : force =
-    { x = problem.stage_width /. iter_denom; y = problem.stage_height /. iter_denom }
-  in
-  length att_heat_force /. 10.
-
-(* STAGE 1: Placing the instruments *)
-let simulate_step_stage1 (p : Types.problem) ~(att_heat : float)
-    (placements : placed_instrument array) : float =
-  simulate_step p ~att_heat placements
-
-(* TODO: let simulate_stage1 (p : Types.problem)  *)
-
 let init_placements (p : Types.problem) : placed_instrument array =
   (* Place instruments at center stage *)
   let center : Types.position =
@@ -105,42 +91,74 @@ let init_placements (p : Types.problem) : placed_instrument array =
   Array.init num_instruments ~f:(fun i -> { instrument = i; pos = center })
 
 let instrument_placement_to_stage2 (p : Types.problem) (placements : placed_instrument array) :
-    Types.solution =
+    placed_instrument array =
   let placements = Array.map placements ~f:(fun i -> i.pos) in
   Random_solver.random_solution_from_instrument_locii p placements
+  |> Array.mapi ~f:(fun i m -> { pos = m.pos; instrument = i })
 
-let stay_stage1 iteration last_instability =
-  (* The condition to stay at stage 1 *)
-  Float.(last_instability > 0.0001) || iteration < 500
-
-(* Main entry point *)
-let newton_solver (problem : Types.problem) : Types.solution =
-  let placements = init_placements problem in
-  let rec stage1 iteration last_instability =
-    if stay_stage1 iteration last_instability then iteration
-    else
-      let att_heat = att_heat_from_iteration_stage1 problem iteration in
-      (* Printf.printf "Iteration %d, heat %f\n%!" iteration att_heat; *)
-      let last_instability = simulate_step_stage1 problem ~att_heat placements in
-      stage1 (iteration + 1) last_instability
-  in
-  let iterations = stage1 0 Float.max_value in
-  Printf.printf "Problem %d converged in %d iterations." problem.problem_id iterations;
-  Printf.printf " Fake ideal score: %s \n%!"
-    (placement_score_raw problem placements |> Misc.string_of_score);
-  Printf.printf " Going to Stage 2 %!";
-  let solution = instrument_placement_to_stage2 problem placements in
-  Printf.printf " - DONE\n%!";
-  solution
-
-(* GUI Entry points *)
-let gui_solution_of_placement_stage1 (placements : placed_instrument array) : Types.solution =
+let solution_of_placement (placements : placed_instrument array) : Types.solution =
   placements
   |> Array.mapi ~f:(fun idx i : Types.musician ->
          { id = idx; instrument = i.instrument; pos = i.pos })
 
+let att_heat_from_iteration_stage1 (problem : Types.problem) (iteration : int) : float =
+  let iter_denom = Float.round_up (Float.of_int iteration /. 100.) in
+  let att_heat_force : force =
+    { x = problem.stage_width /. iter_denom; y = problem.stage_height /. iter_denom }
+  in
+  length att_heat_force /. 10.
+
+let att_heat_from_iteration_stage2 = att_heat_from_iteration_stage1
+
+let stay_stage1 last_instability iteration =
+  (* The condition to stay at stage 1 *)
+  iteration < 100 || (Float.(last_instability > 0.0001) && iteration < 500)
+
+let stay_stage2 last_instability iteration =
+  (* The condition to stay at stage 2 *)
+  iteration < 100 || (Float.(last_instability > 0.0001) && iteration < 1000)
+
+(* Take a single step in Newton Stage 1. Return the instability *)
+let step_stage1 problem placements iteration =
+  let att_heat = att_heat_from_iteration_stage1 problem iteration in
+  simulate_step problem placements ~att_heat
+
+(* Take a single step in Newton Stage 2. Return the instability *)
+let step_stage2 problem placements iteration =
+  let att_heat = att_heat_from_iteration_stage2 problem iteration in
+  simulate_step problem placements ~att_heat
+
+(* Run Newton Stage 1, updating the placements imperatively.
+   Return the total number of iterations *)
+let newton_run_stage stay_stage step problem placements : int -> int =
+  let rec loop (last_instability : float) (iteration : int) =
+    if stay_stage last_instability iteration then
+      let last_instability = step problem placements iteration in
+      loop last_instability (iteration + 1)
+    else iteration
+  in
+  let ret iteration = loop Float.max_value iteration in
+  ret
+
+(* Main entry point *)
+let newton_solver (problem : Types.problem) : Types.solution =
+  let inst_placements = init_placements problem in
+  let run_stage1 = newton_run_stage stay_stage1 step_stage1 in
+  let iterations = run_stage1 problem inst_placements 0 in
+  Printf.printf "Problem %d converged in %d iterations." problem.problem_id iterations;
+  Printf.printf " Fake ideal score: %s \n%!"
+    (placement_score_raw problem inst_placements |> Misc.string_of_score);
+  Printf.printf " Going to Stage 2 %!";
+  let run_stage2 = newton_run_stage stay_stage2 step_stage2 in
+  let music_placements = instrument_placement_to_stage2 problem inst_placements in
+  Printf.printf " - DONE\n%!";
+  let iterations = run_stage2 problem music_placements iterations in
+  Printf.printf "Stage 2 done by %d iterations.\n%!" iterations;
+  solution_of_placement music_placements
+
+(* GUI Entry points *)
 let gui_init_solution (p : Types.problem) : Types.solution =
-  init_placements p |> gui_solution_of_placement_stage1
+  init_placements p |> solution_of_placement
 
 let gui_newton_solver_step (problem : Types.problem) (solution : Types.solution) ~(round : int) :
     Types.solution =
@@ -148,11 +166,11 @@ let gui_newton_solver_step (problem : Types.problem) (solution : Types.solution)
   let placements = Array.mapi solution ~f:(fun i m -> { pos = m.pos; instrument = i }) in
   if Array.length solution < List.length problem.musicians then
     (* Stage 1 *)
-    let att_heat = att_heat_from_iteration_stage1 problem round in
-    let last_instability = simulate_step_stage1 problem ~att_heat placements in
-    if stay_stage1 (iteration + 1) last_instability then gui_solution_of_placement_stage1 placements
+    let last_instability = step_stage1 problem placements iteration in
+    if stay_stage1 last_instability (iteration + 1) then solution_of_placement placements
     else (
       print_endline "Stage 1 done!";
-      instrument_placement_to_stage2 problem placements)
+      let music_placement = instrument_placement_to_stage2 problem placements in
+      solution_of_placement music_placement)
   else (* Stage 2 *)
     solution

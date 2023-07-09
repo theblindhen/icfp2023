@@ -14,6 +14,7 @@ type stats = {
   instrument_count : int; (* instrument_count_per_instrument : int array; *)
   pillar_count : int;
   pillar_radii_stats : pillar_radii_stats option;
+  best_score : float;
   theoretical_max_score : float;
   newton_max_score : float;
 }
@@ -43,14 +44,10 @@ let problem_stats problem =
          Some { min; max; uniq });
     theoretical_max_score = Approximations.max_score_problem problem;
     newton_max_score = Approximations.newton_score_problem problem;
+    best_score = Json_util.best_solution_score problem.problem_id;
   }
 
-let solution_stats (problem_id : int) total_score =
-  let best_score = int_of_float @@ Json_util.best_solution_score problem_id in
-  Printf.printf "Best score: %s\n  %% of our score: %2.2f\n\n" (Int.to_string_hum best_score)
-    (100. *. float_of_int best_score /. total_score)
-
-let stats_to_string (problem_stats : stats) =
+let stats_to_string total_score (problem_stats : stats) =
   "room: "
   ^ problem_stats.room_dim
   ^ "\n stage: "
@@ -71,10 +68,17 @@ let stats_to_string (problem_stats : stats) =
      else
        let stats = Option.value_exn problem_stats.pillar_radii_stats in
        sprintf "\n    %d radii between %2.2f and %2.2f" stats.uniq stats.min stats.max)
-  ^ "\n theoretical max score: "
-  ^ Int.to_string_hum (int_of_float problem_stats.theoretical_max_score)
-  ^ "\n Newton max score: "
-  ^ Int.to_string_hum (int_of_float problem_stats.newton_max_score)
+  ^ "\n Our best score: "
+  ^ Misc.string_of_score problem_stats.best_score
+  ^ "\n  %% of total score: "
+  ^ sprintf "%2.2f%%" (100. *. problem_stats.best_score /. total_score)
+  ^ "\n  Theoretical max score: "
+  ^ Misc.string_of_score problem_stats.theoretical_max_score
+  ^ "\n  Newton-theoretical max score: "
+  ^ Misc.string_of_score problem_stats.newton_max_score
+  ^ "\n    %% our score / Newton max: "
+  ^ sprintf "%2.2f%%" (100. *. problem_stats.best_score /. problem_stats.newton_max_score)
+  ^ "\n"
 
 let () =
   let total_score = ref 0. in
@@ -85,8 +89,7 @@ let () =
     match Json_util.get_problem i with
     | None -> print_endline (sprintf "Problem %02d: not found" i)
     | Some problem ->
-        let stats = problem |> problem_stats |> stats_to_string in
-        print_endline (sprintf "Problem %02d:\n%s" i stats);
-        solution_stats i !total_score
+        let stats = problem |> problem_stats |> stats_to_string !total_score in
+        print_endline (sprintf "Problem %02d:\n%s" i stats)
   done;
   Printf.printf "\n\nTotal score: %s\n" (Int.to_string_hum @@ int_of_float !total_score)
