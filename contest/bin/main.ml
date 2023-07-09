@@ -5,12 +5,12 @@ let random_solution (p : Types.problem) (already_placed : Types.position list) =
   Random_solver.random_placement_solution p already_placed
 
 type initialization = Random | Newton | Edge of Edge_placer.edges | LoadBest [@@deriving sexp]
-type optimizer = LP | Swap [@@deriving sexp]
+type optimizer = LP | Swap | Newton [@@deriving sexp]
 
 type invocation = {
   problem_id : int;
   initialization : initialization;
-  optimizer : optimizer option;
+  optimizers : optimizer list;
   scale_height : float;
   scale_width : float;
 }
@@ -46,19 +46,24 @@ let run_invocation inv =
       print_endline "Scoring solution...";
       let score = Score.score_solution problem solution in
       printf "Initial solution score: %s\n" (Misc.string_of_score score);
-      let optimized_solution =
-        match inv.optimizer with
-        | None -> solution
-        | Some Swap -> Improver.improve problem solution ~round:0
-        | Some LP -> Lp_solver.lp_optimize_solution problem solution ~round:0
+      let _ =
+        inv.optimizers
+        |> List.fold ~init:solution ~f:(fun solution opt_flag ->
+               let optimizer =
+                 match opt_flag with
+                 | Swap -> Improver.improve problem ~round:0
+                 | LP -> Lp_solver.lp_optimize_solution problem ~round:0
+                 | Newton -> Physics.newton_optimizer problem ~max_iterations:1000
+               in
+               let solution = optimizer solution in
+               Misc.validate_solution problem solution;
+               let optimised_score = Score.score_solution problem solution in
+               printf "Optimized problem %d with score: %s\n%!" inv.problem_id
+                 (Misc.string_of_score optimised_score);
+               Json_util.write_solution_if_best optimised_score problem solution;
+               solution)
       in
-      Misc.validate_solution problem optimized_solution;
-      let optimised_score = Score.score_solution problem optimized_solution in
-      printf "Optimized problem %d with score: %s\n%!" inv.problem_id
-        (Misc.string_of_score optimised_score);
-      Json_util.write_solution_if_best optimised_score problem optimized_solution;
-      (* write solution_json to file *)
-      print_endline "Done"
+      print_endline "All done"
 
 let parse_edges_flag edges : Edge_placer.edges =
   match edges with
@@ -76,11 +81,18 @@ let parse_edges_flag edges : Edge_placer.edges =
 
 let parse_scale scale_width : float = Option.value scale_width ~default:1.0
 
+let parse_optimizer string : optimizer =
+  match string with
+  | "lp" -> LP
+  | "swap" -> Swap
+  | "newton" -> Newton
+  | _ -> failwith "Invalid optimizer"
+
 let command =
   Command.basic ~summary:"Run our solver on a problem"
-    (let%map_open.Command lp = flag "--lp" no_arg ~doc:"Use the LP solver after placement"
-     and loadBest = flag "--loadBest" no_arg ~doc:"Load the previous best solution"
-     and swapper = flag "--swap" no_arg ~doc:"Use swap optimization after placement"
+    (let%map_open.Command loadBest = flag "--loadBest" no_arg ~doc:"Load the previous best solution"
+     and opt =
+       flag "-o" (listed (Arg_type.create parse_optimizer)) ~doc:"Optimizers, comma-separated"
      and newton = flag "--newton" no_arg ~doc:"Use Newton initial placement"
      and edges = flag "--edges" (optional string) ~doc:"Edge placement initialization"
      and scale_width = flag "--scale-width" (optional float) ~doc:"Scale the width of the problem"
@@ -100,26 +112,22 @@ let command =
                "Invalid initialization. You must specify at most one of --loadBest, --newton, or \
                 --edges"
        in
-       let optimizer =
-         match (lp, swapper) with
-         | false, false -> None
-         | true, false -> Some LP
-         | false, true -> Some Swap
-         | _ -> failwith "Invalid optimizer. You must specify at most one of --lp or --swapper"
-       in
        print_endline
          ("Initializing with " ^ (sexp_of_initialization initialization |> Sexp.to_string_hum));
-       (match optimizer with
-       | None -> ()
-       | Some optimizer ->
-           print_endline ("Optimizing with " ^ (sexp_of_optimizer optimizer |> Sexp.to_string_hum)));
-       run_invocation
-         {
-           problem_id;
-           initialization;
-           optimizer;
-           scale_height = parse_scale scale_height;
-           scale_width = parse_scale scale_width;
-         })
+       match opt with
+       | [] -> ()
+       | _ ->
+           print_endline
+             ("Optimizing with "
+             ^ String.concat ~sep:" -> "
+                 (List.map opt ~f:(fun o -> sexp_of_optimizer o |> Sexp.to_string_hum)));
+           run_invocation
+             {
+               problem_id;
+               initialization;
+               optimizers = opt;
+               scale_height = parse_scale scale_height;
+               scale_width = parse_scale scale_width;
+             })
 
 let () = Command_unix.run command
