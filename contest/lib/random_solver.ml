@@ -23,9 +23,9 @@ let random_placement_around_locus (p : problem) (locus : position) : position =
 
 let is_valid_placement (p : problem) (placed : position list) (potential : position) : bool =
   let legal_rect = Misc.legal_musician_rect p in
-  placed
-  |> List.for_all ~f:(fun pos ->
-         Geometry.within_rect legal_rect pos && Float.(Geometry.distance pos potential >= 10.0))
+  (* printf "is_valid_placement: (%f, %f)\n%!" potential.x potential.y; *)
+  Geometry.within_rect legal_rect potential
+  && placed |> List.for_all ~f:(fun pos -> Float.(Geometry.distance pos potential >= 10.0))
 
 let random_placements (p : problem) (placer : unit -> position) (count : int)
     (already_placed : position list) : position list =

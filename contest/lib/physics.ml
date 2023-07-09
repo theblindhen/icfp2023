@@ -122,7 +122,7 @@ let instrument_placement_to_stage2 ?(placer = `Honeycomb) (p : Types.problem)
   (match placer with
   | `Random -> Random_solver.random_solution_from_instrument_locii p placements
   | `Honeycomb -> honeycomb_solution_from_instrument_locii p placements)
-  |> Array.mapi ~f:(fun i m -> { pos = m.pos; instrument = i })
+  |> Array.map ~f:(fun m -> { pos = m.pos; instrument = m.instrument })
 
 let solution_of_placement (placements : placed_instrument array) : Types.solution =
   placements

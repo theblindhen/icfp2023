@@ -164,6 +164,13 @@ let precompute_hearable ~(attendees : Types.position array) ~(musicians : Types.
   Timer.print_acc "sweep" sweep_time;
   result
 
+let comb_y = Float.sin (Float.pi /. 3.) *. 10.
+let epsilon = 0.0001
+
+(** Generate the positions of the honeycombs. *)
+
+(** Generate the positions of the honeycombs. *)
+
 let honey_comb_positions (init_pos : Types.position) =
   let rec snake (position : Types.position) (ring_number : int) (ring_count : int) (direction : int)
       () =
@@ -171,26 +178,31 @@ let honey_comb_positions (init_pos : Types.position) =
       let x = position.x in
       let y = position.y in
       match direction with
-      | 0 -> { x = x +. 10.0; y = y +. 0.0 }
-      | 1 -> { x = x +. 5.0; y = y +. 8.66 }
-      | 2 -> { x = x -. 5.0; y = y +. 8.66 }
-      | 3 -> { x = x -. 10.0; y = y +. 0.0 }
-      | 4 -> { x = x -. 5.0; y = y -. 8.66 }
-      | 5 -> { x = x +. 5.0; y = y -. 8.66 }
+      | 0 -> { x = x +. 10. +. epsilon; y }
+      | 1 -> { x = x +. 5. +. epsilon; y = y +. comb_y + epsilon }
+      | 2 -> { x = x -. 5. -. epsilon; y = y +. comb_y + epsilon }
+      | 3 -> { x = x -. 10. -. epsilon; y }
+      | 4 -> { x = x -. 5. -. epsilon; y = y -. comb_y -. epsilon }
+      | 5 -> { x = x +. 5. +. epsilon; y = y -. comb_y -. epsilon }
       | _ -> failwith "direction must be between 0 and 5"
     in
     let open Int in
     if ring_count >= (ring_number * 6) - 1 then
+      (* printf "ring: (%f, %f)\n%!" position.x position.y; *)
       Seq.Cons (position, snake (next_pos direction) Int.(ring_number + 1) 0 ((direction + 1) mod 6))
     else if ring_count % ring_number = ring_number - 1 then
+      (* printf "count: (%f, %f)\n%!" position.x position.y; *)
       Seq.Cons
         ( position,
           snake
             (next_pos ((direction + 1) mod 6))
             ring_number (ring_count + 1)
             ((direction + 1) mod 6) )
-    else Seq.Cons (position, snake (next_pos direction) ring_number (ring_count + 1) direction)
+    else
+      (* printf "else: (%f, %f)\n%!" position.x position.y; *)
+      Seq.Cons (position, snake (next_pos direction) ring_number (ring_count + 1) direction)
   in
+  (* printf "init_pos: (%f, %f)\n%!" init_pos.x init_pos.y; *)
   snake init_pos 0 0 0
 
 (* TESTS *)
