@@ -33,7 +33,8 @@ type json_submission_get = Json_t.json_submission_get = {
 type json_placement = Json_t.json_placement = { x: float; y: float }
 
 type json_solution = Json_t.json_solution = {
-  placements: json_placement list
+  placements: json_placement list;
+  volumes: float list option
 }
 
 type json_pillar = Json_t.json_pillar = {
@@ -1326,6 +1327,79 @@ let read__json_placement_list = (
 )
 let _json_placement_list_of_string s =
   read__json_placement_list (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let write__float_list = (
+  Atdgen_runtime.Oj_run.write_list (
+    Yojson.Safe.write_float
+  )
+)
+let string_of__float_list ?(len = 1024) x =
+  let ob = Buffer.create len in
+  write__float_list ob x;
+  Buffer.contents ob
+let read__float_list = (
+  Atdgen_runtime.Oj_run.read_list (
+    Atdgen_runtime.Oj_run.read_number
+  )
+)
+let _float_list_of_string s =
+  read__float_list (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let write__float_list_option = (
+  Atdgen_runtime.Oj_run.write_option (
+    write__float_list
+  )
+)
+let string_of__float_list_option ?(len = 1024) x =
+  let ob = Buffer.create len in
+  write__float_list_option ob x;
+  Buffer.contents ob
+let read__float_list_option = (
+  fun p lb ->
+    Yojson.Safe.read_space p lb;
+    match Yojson.Safe.start_any_variant p lb with
+      | `Edgy_bracket -> (
+          match Yojson.Safe.read_ident p lb with
+            | "None" ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_gt p lb;
+              (None : _ option)
+            | "Some" ->
+              Atdgen_runtime.Oj_run.read_until_field_value p lb;
+              let x = (
+                  read__float_list
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_gt p lb;
+              (Some x : _ option)
+            | x ->
+              Atdgen_runtime.Oj_run.invalid_variant_tag p x
+        )
+      | `Double_quote -> (
+          match Yojson.Safe.finish_string p lb with
+            | "None" ->
+              (None : _ option)
+            | x ->
+              Atdgen_runtime.Oj_run.invalid_variant_tag p x
+        )
+      | `Square_bracket -> (
+          match Atdgen_runtime.Oj_run.read_string p lb with
+            | "Some" ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_comma p lb;
+              Yojson.Safe.read_space p lb;
+              let x = (
+                  read__float_list
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_rbr p lb;
+              (Some x : _ option)
+            | x ->
+              Atdgen_runtime.Oj_run.invalid_variant_tag p x
+        )
+)
+let _float_list_option_of_string s =
+  read__float_list_option (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 let write_json_solution : _ -> json_solution -> _ = (
   fun ob (x : json_solution) ->
     Buffer.add_char ob '{';
@@ -1339,6 +1413,17 @@ let write_json_solution : _ -> json_solution -> _ = (
       write__json_placement_list
     )
       ob x.placements;
+    (match x.volumes with None -> () | Some x ->
+      if !is_first then
+        is_first := false
+      else
+        Buffer.add_char ob ',';
+        Buffer.add_string ob "\"volumes\":";
+      (
+        write__float_list
+      )
+        ob x;
+    );
     Buffer.add_char ob '}';
 )
 let string_of_json_solution ?(len = 1024) x =
@@ -1350,6 +1435,7 @@ let read_json_solution = (
     Yojson.Safe.read_space p lb;
     Yojson.Safe.read_lcurl p lb;
     let field_placements = ref (None) in
+    let field_volumes = ref (None) in
     try
       Yojson.Safe.read_space p lb;
       Yojson.Safe.read_object_end lb;
@@ -1358,12 +1444,26 @@ let read_json_solution = (
         fun s pos len ->
           if pos < 0 || len < 0 || pos + len > String.length s then
             invalid_arg (Printf.sprintf "out-of-bounds substring position or length: string = %S, requested position = %i, requested length = %i" s pos len);
-          if len = 10 && String.unsafe_get s pos = 'p' && String.unsafe_get s (pos+1) = 'l' && String.unsafe_get s (pos+2) = 'a' && String.unsafe_get s (pos+3) = 'c' && String.unsafe_get s (pos+4) = 'e' && String.unsafe_get s (pos+5) = 'm' && String.unsafe_get s (pos+6) = 'e' && String.unsafe_get s (pos+7) = 'n' && String.unsafe_get s (pos+8) = 't' && String.unsafe_get s (pos+9) = 's' then (
-            0
-          )
-          else (
-            -1
-          )
+          match len with
+            | 7 -> (
+                if String.unsafe_get s pos = 'v' && String.unsafe_get s (pos+1) = 'o' && String.unsafe_get s (pos+2) = 'l' && String.unsafe_get s (pos+3) = 'u' && String.unsafe_get s (pos+4) = 'm' && String.unsafe_get s (pos+5) = 'e' && String.unsafe_get s (pos+6) = 's' then (
+                  1
+                )
+                else (
+                  -1
+                )
+              )
+            | 10 -> (
+                if String.unsafe_get s pos = 'p' && String.unsafe_get s (pos+1) = 'l' && String.unsafe_get s (pos+2) = 'a' && String.unsafe_get s (pos+3) = 'c' && String.unsafe_get s (pos+4) = 'e' && String.unsafe_get s (pos+5) = 'm' && String.unsafe_get s (pos+6) = 'e' && String.unsafe_get s (pos+7) = 'n' && String.unsafe_get s (pos+8) = 't' && String.unsafe_get s (pos+9) = 's' then (
+                  0
+                )
+                else (
+                  -1
+                )
+              )
+            | _ -> (
+                -1
+              )
       in
       let i = Yojson.Safe.map_ident p f lb in
       Atdgen_runtime.Oj_run.read_until_field_value p lb;
@@ -1377,6 +1477,16 @@ let read_json_solution = (
                 ) p lb
               )
             );
+          | 1 ->
+            if not (Yojson.Safe.read_null_if_possible p lb) then (
+              field_volumes := (
+                Some (
+                  (
+                    read__float_list
+                  ) p lb
+                )
+              );
+            )
           | _ -> (
               Yojson.Safe.skip_json p lb
             )
@@ -1389,12 +1499,26 @@ let read_json_solution = (
           fun s pos len ->
             if pos < 0 || len < 0 || pos + len > String.length s then
               invalid_arg (Printf.sprintf "out-of-bounds substring position or length: string = %S, requested position = %i, requested length = %i" s pos len);
-            if len = 10 && String.unsafe_get s pos = 'p' && String.unsafe_get s (pos+1) = 'l' && String.unsafe_get s (pos+2) = 'a' && String.unsafe_get s (pos+3) = 'c' && String.unsafe_get s (pos+4) = 'e' && String.unsafe_get s (pos+5) = 'm' && String.unsafe_get s (pos+6) = 'e' && String.unsafe_get s (pos+7) = 'n' && String.unsafe_get s (pos+8) = 't' && String.unsafe_get s (pos+9) = 's' then (
-              0
-            )
-            else (
-              -1
-            )
+            match len with
+              | 7 -> (
+                  if String.unsafe_get s pos = 'v' && String.unsafe_get s (pos+1) = 'o' && String.unsafe_get s (pos+2) = 'l' && String.unsafe_get s (pos+3) = 'u' && String.unsafe_get s (pos+4) = 'm' && String.unsafe_get s (pos+5) = 'e' && String.unsafe_get s (pos+6) = 's' then (
+                    1
+                  )
+                  else (
+                    -1
+                  )
+                )
+              | 10 -> (
+                  if String.unsafe_get s pos = 'p' && String.unsafe_get s (pos+1) = 'l' && String.unsafe_get s (pos+2) = 'a' && String.unsafe_get s (pos+3) = 'c' && String.unsafe_get s (pos+4) = 'e' && String.unsafe_get s (pos+5) = 'm' && String.unsafe_get s (pos+6) = 'e' && String.unsafe_get s (pos+7) = 'n' && String.unsafe_get s (pos+8) = 't' && String.unsafe_get s (pos+9) = 's' then (
+                    0
+                  )
+                  else (
+                    -1
+                  )
+                )
+              | _ -> (
+                  -1
+                )
         in
         let i = Yojson.Safe.map_ident p f lb in
         Atdgen_runtime.Oj_run.read_until_field_value p lb;
@@ -1408,6 +1532,16 @@ let read_json_solution = (
                   ) p lb
                 )
               );
+            | 1 ->
+              if not (Yojson.Safe.read_null_if_possible p lb) then (
+                field_volumes := (
+                  Some (
+                    (
+                      read__float_list
+                    ) p lb
+                  )
+                );
+              )
             | _ -> (
                 Yojson.Safe.skip_json p lb
               )
@@ -1418,6 +1552,7 @@ let read_json_solution = (
         (
           {
             placements = (match !field_placements with Some x -> x | None -> Atdgen_runtime.Oj_run.missing_field p "placements");
+            volumes = !field_volumes;
           }
          : json_solution)
       )
@@ -1682,22 +1817,6 @@ let read_json_pillar = (
 )
 let json_pillar_of_string s =
   read_json_pillar (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
-let write__float_list = (
-  Atdgen_runtime.Oj_run.write_list (
-    Yojson.Safe.write_float
-  )
-)
-let string_of__float_list ?(len = 1024) x =
-  let ob = Buffer.create len in
-  write__float_list ob x;
-  Buffer.contents ob
-let read__float_list = (
-  Atdgen_runtime.Oj_run.read_list (
-    Atdgen_runtime.Oj_run.read_number
-  )
-)
-let _float_list_of_string s =
-  read__float_list (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 let write_json_attendee : _ -> json_attendee -> _ = (
   fun ob (x : json_attendee) ->
     Buffer.add_char ob '{';

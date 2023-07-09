@@ -12,13 +12,6 @@ let get_solution (problem : Types.problem) solution_file =
   | json -> Some (Types.solution_of_json_solution problem (Json_j.json_solution_of_string json))
   | exception _ -> None
 
-let make_submission (problem_id : int) (solution : Types.solution) : Json_j.json_submission_post =
-  let solution_json =
-    solution |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
-  in
-  let submission : Json_j.json_submission_post = { problem_id; contents = solution_json } in
-  submission
-
 (** The directory "../problems/solutions-$PROBLEM_ID" contains the solutions to
  * problem. The files are named "$SCORE.json" where $SCORE is the score of the
  * solution in the file. This function returns the score of the highest scoring
@@ -39,8 +32,9 @@ let best_solution_score problem_id =
 let write_solution_if_best (score : float) (problem_id : int) (solution : Types.solution) : unit =
   let best_previous_score = best_solution_score problem_id in
   if Float.(score > best_previous_score) then (
+    let volumes = List.init ~f:(fun _ -> 10.) (Array.length solution) in
     let solution_json =
-      solution |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
+      Types.json_solution_of_solution ~volumes solution |> Json_j.string_of_json_solution
     in
     (* Create the directory "../problems/solutions-%d" if it doesn't exist.
      * We're not using mkdir_p here because if there's some kind of problem with

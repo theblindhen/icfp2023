@@ -54,7 +54,8 @@ let solution_of_json_solution (p : problem) (json_solution : Json_j.json_solutio
          { pos = { x = json_placement.x; y = json_placement.y }; id = i; instrument })
   |> Array.of_list
 
-let json_solution_of_solution (solution : solution) : Json_j.json_solution =
+let json_solution_of_solution ?(volumes : float list option) (solution : solution) :
+    Json_j.json_solution =
   {
     placements =
       solution
@@ -62,4 +63,5 @@ let json_solution_of_solution (solution : solution) : Json_j.json_solution =
       |> List.sort ~compare:(fun m1 m2 -> Poly.compare m1.id m2.id)
       |> List.map ~f:(fun { pos = { x; y }; id = _; instrument = _ } : Json_j.json_placement ->
              { x; y });
+    volumes;
   }
