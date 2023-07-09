@@ -38,6 +38,30 @@ let random_placements (p : problem) (placer : unit -> position) (count : int)
   in
   random already_placed count 10_000
 
+let honey_comb_positions (init_pos : position) =
+  let rec snake (position : position) (ring_number : int) (ring_count : int) (direction : int) :
+      position Seq.t =
+    let next_pos direction =
+      let x = position.x in
+      let y = position.y in
+      match direction with
+      | 0 -> { x = x +. 10.0; y = y +. 0.0 }
+      | 1 -> { x = x +. 5.0; y = y +. 8.66 }
+      | 2 -> { x = x -. 5.0; y = y +. 8.66 }
+      | 3 -> { x = x -. 10.0; y = y +. 0.0 }
+      | 4 -> { x = x -. 5.0; y = y -. 8.66 }
+      | 5 -> { x = x +. 5.0; y = y -. 8.66 }
+      | _ -> failwith "direction must be between 0 and 5"
+    in
+    if ring_count >= (ring_number * 6) - 1 then
+      Seq.cons position (snake (next_pos direction) (ring_number + 1) 0 ((direction + 1) mod 6))
+    else if ring_count % ring_number = ring_number - 1 then
+      Seq.cons position
+        (snake (next_pos (direction + 1)) ring_number (ring_count + 1) ((direction + 1) mod 6))
+    else Seq.cons position (snake (next_pos direction) ring_number (ring_count + 1) direction)
+  in
+  snake init_pos 0 0 0
+
 let random_solution_from_instrument_locii (p : problem) (instruments : position array) : solution =
   let musicians =
     p.musicians
