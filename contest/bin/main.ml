@@ -51,7 +51,7 @@ let run_invocation inv =
         |> List.fold ~init:solution ~f:(fun solution opt_flag ->
                let optimizer =
                  match opt_flag with
-                 | Swap -> Improver.swapper_without_q problem ~round:0
+                 | Swap -> Improver.swapper problem ~round:0
                  | LP -> Lp_solver.lp_optimize_solution problem ~round:0
                  | Newton -> Physics.newton_optimizer problem ~max_iterations:1000
                in

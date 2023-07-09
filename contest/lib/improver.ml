@@ -35,11 +35,8 @@ let get_score cache scores pos_of_i instrument_of_j =
     (scores.(pos_of_i).musician.pos, scores.(instrument_of_j).musician.instrument)
 
 let swapper_without_q (p : problem) (s : solution) ~(round : int) : solution =
-  (* TODO The env is assumed constant during the swaps, but this violates the qfactor
-     computations.
-  *)
   ignore round;
-  if p.problem_id > 55 then failwith "Swap improver doesn't (yet) work for problems with q-factors";
+  if p.problem_id > 55 then failwith "This function doesn't work for problems with q-factors";
   let env = Score.get_scoring_env p s in
   let cache = score_cache env in
   let scores = scores_of_musicians env in
@@ -66,6 +63,7 @@ let swapper_without_q (p : problem) (s : solution) ~(round : int) : solution =
 
 let swapper_with_q (p : problem) (s : solution) ~(round : int) : solution =
   ignore round;
+  if p.problem_id <= 55 then failwith "This function only works for problems with q-factors";
   (* Sort s by id so there's no confusion. *)
   let s = Array.sorted_copy s ~compare:(fun a b -> Int.compare a.id b.id) in
   (* We introduce the concept of a _musician id_, which refers to the index into
@@ -136,3 +134,6 @@ let swapper_with_q (p : problem) (s : solution) ~(round : int) : solution =
     done
   done;
   Array.map s ~f:(fun m -> { m with pos = s.(scores.(m.id).position_idx).pos })
+
+let swapper (p : problem) (s : solution) ~(round : int) : solution =
+  (if p.problem_id <= 55 then swapper_without_q else swapper_with_q) p s ~round
