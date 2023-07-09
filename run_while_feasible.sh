@@ -9,7 +9,7 @@ while true; do
         fi
         edges="$(./../random_edges.sh)"
         echo "Trying $i with edges '$edges'"
-        if ! timeout $TIMEOUT $BIN $i --lp --edges "$edges"; then
+        if ! timeout $TIMEOUT $BIN $i --edges "$edges" -o swap; then
             echo "Bailed on $i"
             touch "../_bailed_$i"
         fi
