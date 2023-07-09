@@ -131,7 +131,7 @@ let instrument_placement_to_stage2 ?(placer = `Random) (p : Types.problem)
   | `Honeycomb -> honeycomb_solution_from_instrument_locii p placements)
   |> Array.map ~f:(fun m -> { pos = m.pos; instrument = m.instrument })
 
-let solution_of_placement (problem : Types.problem) (placements : placed_instrument array) :
+let solution_of_placements (problem : Types.problem) (placements : placed_instrument array) :
     Types.solution =
   let musicians : Types.solution =
     problem.musicians
@@ -146,6 +146,9 @@ let solution_of_placement (problem : Types.problem) (placements : placed_instrum
          musicians.(musician) <- { (musicians.(musician)) with pos };
          musician_pool.(instrument) <- List.tl_exn musician_pool.(instrument));
   musicians
+
+let placements_of_solution (solution : Types.solution) =
+  Array.map solution ~f:(fun m -> { pos = m.pos; instrument = m.instrument })
 
 let att_heat_from_iteration_stage1 (problem : Types.problem) (iteration : int) : float =
   let iter_denom = Float.round_up (Float.of_int iteration /. 100.) in
@@ -186,6 +189,14 @@ let newton_run_stage stay_stage step problem placements : int -> int =
   let ret iteration = loop Float.max_value iteration in
   ret
 
+(* Newton solver on all stages but Stage 1 *)
+let newton_solver' (problem : Types.problem) placements : int =
+  let run_stage2 = newton_run_stage stay_stage2 step_stage2 in
+  Printf.printf " - DONE\n%!";
+  let iterations = run_stage2 problem placements 0 in
+  Printf.printf "Stage 2 done by %d iterations.\n%!" iterations;
+  iterations
+
 (* Main entry point *)
 let newton_solver (problem : Types.problem) : Types.solution =
   let inst_placements = init_placements problem in
@@ -195,39 +206,34 @@ let newton_solver (problem : Types.problem) : Types.solution =
   Printf.printf " Fake ideal score: %s \n%!"
     (placement_score_raw problem inst_placements |> Misc.string_of_score);
   Printf.printf " Going to Stage 2 %!";
-  let run_stage2 = newton_run_stage stay_stage2 step_stage2 in
   let music_placements = instrument_placement_to_stage2 problem inst_placements in
-  Printf.printf " - DONE\n%!";
-  let iterations = run_stage2 problem music_placements iterations in
-  Printf.printf "Stage 2 done by %d iterations.\n%!" iterations;
-  let sol = solution_of_placement problem music_placements in
+  let _iterations_stage2 = newton_solver' problem music_placements in
+  let sol = solution_of_placements problem music_placements in
   sol
 
 (* GUI Entry points *)
 let gui_init_solution (p : Types.problem) : Types.solution * string =
-  (init_placements p |> solution_of_placement p, "stage1")
+  (init_placements p |> solution_of_placements p, "stage1")
 
-let placements_of_solution (solution : Types.solution) =
-  Array.map solution ~f:(fun m -> { pos = m.pos; instrument = m.instrument })
-
-let gui_newton_solver_step (problem : Types.problem) ((solution, state) : Types.solution * string)
+let gui_newton_solver_step (problem : Types.problem) ((solution, stage) : Types.solution * string)
     ~(round : int) : Types.solution * string =
   let iteration = round in
-  let placements = placements_of_solution solution in
-  if Stdlib.(state = "stage1") then
-    (* Stage 1 *)
-    let last_instability = step_stage1 problem placements iteration in
-    if stay_stage1 last_instability (iteration + 1) then
-      (solution_of_placement problem placements, "stage1")
-    else
-      let music_placements = instrument_placement_to_stage2 problem placements in
-      (solution_of_placement problem music_placements, "stage2")
-  else if Stdlib.(state = "stage2") then
-    (* Stage 2 *)
-    let last_instability = step_stage2 problem placements iteration in
-    if stay_stage2 last_instability (iteration + 1) then
-      (solution_of_placement problem placements, "stage2")
-    else (solution_of_placement problem placements, "stage3")
-  else (
-    print_endline "I'm done";
-    (solution, "stage3"))
+  let placements, stage =
+    let placements = placements_of_solution solution in
+    if Stdlib.(stage = "stage1") then
+      (* Stage 1 *)
+      let last_instability = step_stage1 problem placements iteration in
+      if stay_stage1 last_instability (iteration + 1) then (placements, "stage1")
+      else
+        let music_placements = instrument_placement_to_stage2 problem placements in
+        (music_placements, "stage2")
+    else if Stdlib.(stage = "stage2") then
+      (* Stage 2 *)
+      let last_instability = step_stage2 problem placements iteration in
+      if stay_stage2 last_instability (iteration + 1) then (placements, "stage2")
+      else (placements, "stage3")
+    else (
+      print_endline "I'm done";
+      (solution, "stage3"))
+  in
+  (solution_of_placements problem placements, stage)
