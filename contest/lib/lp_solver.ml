@@ -11,65 +11,66 @@ let lp_vars (problem : Types.problem) (prev_solution : Types.solution) =
       Array.init num_instruments ~f:(fun i -> Lp.var (Printf.sprintf "I_%d_%d" m i)))
 
 let lp_of_problem (problem : Types.problem) (prev_solution : Types.solution)
-    (fixed_musician_indexes : int list) (vars : Lp.Poly.t array array) =
+    (musician_is_fixed : bool array) (vars : Lp.Poly.t array array)
+    (assignment_scores : (Types.position * int, float) Hashtbl.t) =
   let open Lp in
   let num_instruments = num_instruments problem in
   let instrument_count =
-    Array.init num_instruments ~f:(fun i -> List.count problem.musicians ~f:(fun m -> m = i))
+    Array.init num_instruments ~f:(fun i ->
+        Array.counti prev_solution ~f:(fun musician_idx musician ->
+            musician.instrument = i && not musician_is_fixed.(musician_idx)))
   in
-  let assignment_scores = Improver.score_cache (Score.get_scoring_env problem prev_solution) in
   let objective =
     maximize
       (Array.foldi vars ~init:(c 0.0) ~f:(fun pos_idx obj_i pvars ->
-           Array.foldi pvars ~init:obj_i ~f:(fun instrument obj_i var ->
-               let score =
-                 Hashtbl.find_exn assignment_scores (prev_solution.(pos_idx).pos, instrument)
-               in
-               (c score *~ var) ++ obj_i)))
+           if musician_is_fixed.(pos_idx) then obj_i
+           else
+             Array.foldi pvars ~init:obj_i ~f:(fun instrument obj_i var ->
+                 let score =
+                   Hashtbl.find_exn assignment_scores (prev_solution.(pos_idx).pos, instrument)
+                 in
+                 (c score *~ var) ++ obj_i)))
   in
   let constraints_one_instrument =
     (* each position plays one instrument *)
     vars
     |> List.of_array
-    |> List.map ~f:(fun pvars ->
-           let sum = Array.fold pvars ~init:(c 0.0) ~f:(fun sum var -> sum ++ var) in
-           [ sum <~ c 1.0; sum >~ c 1.0 ])
+    |> List.mapi ~f:(fun pos_idx pvars ->
+           if musician_is_fixed.(pos_idx) then []
+           else
+             let sum = Array.fold pvars ~init:(c 0.0) ~f:(fun sum var -> var ++ sum) in
+             [ sum <~ c 1.0; sum >~ c 1.0 ])
     |> List.concat
   in
   let constraints_total_instruments =
     (* the number of each instrument is bounded *)
     instrument_count
     |> Array.mapi ~f:(fun instrument count ->
-           let instrument_vars = Array.map vars ~f:(fun pvars -> pvars.(instrument)) in
+           let instrument_vars =
+             Array.filter_mapi vars ~f:(fun pos_idx pvars ->
+                 if musician_is_fixed.(pos_idx) then None else Some pvars.(instrument))
+           in
            let instrument_sum =
-             Array.fold instrument_vars ~init:(c 0.0) ~f:(fun sum var -> sum ++ var)
+             Array.fold instrument_vars ~init:(c 0.0) ~f:(fun sum var -> var ++ sum)
            in
            instrument_sum <~ c (float_of_int count))
     |> List.of_array
   in
-  let constraints_fixed_instruments =
-    (* fixed musicians are assigned to the instrument from solution *)
-    List.concat_map fixed_musician_indexes ~f:(fun fixed_musician_idx ->
-        let instrument = prev_solution.(fixed_musician_idx).instrument in
-        [
-          vars.(fixed_musician_idx).(instrument) <~ c 1.0;
-          c 1.0 <~ vars.(fixed_musician_idx).(instrument);
-        ])
-  in
-  make objective
-    (constraints_one_instrument @ constraints_total_instruments @ constraints_fixed_instruments)
+  make objective (constraints_one_instrument @ constraints_total_instruments)
 
 let solution_of_lp_solution (problem : Types.problem) (prev_solution : Types.solution)
-    (vars : Lp.Poly.t array array) (obj, xs) : Types.solution =
+    (vars : Lp.Poly.t array array) (musician_is_fixed : bool array) (obj, xs) : Types.solution =
   Printf.printf "Objective: %.2f\n" obj;
   (* extract for each pos_idx the instrument it is assigned *)
   let assignments = Array.create ~len:(Array.length prev_solution) (-1) in
   Array.iteri vars ~f:(fun p pvars ->
-      Array.iteri pvars ~f:(fun i var ->
-          let value = Lp.PMap.find var xs in
-          if Float.( > ) value 0.0 then
-            if assignments.(p) = -1 then assignments.(p) <- i
-            else failwith "Multiple instruments assigned to one position");
+      if musician_is_fixed.(p) then assignments.(p) <- prev_solution.(p).instrument
+      else
+        Array.iteri pvars ~f:(fun i var ->
+            let value = Lp.PMap.find var xs in
+            if Float.( > ) value 0.0 then
+              if assignments.(p) = -1 then assignments.(p) <- i
+              else failwith "Multiple instruments assigned to one position");
       if assignments.(p) = -1 then failwith ("No instrument assigned to position" ^ Int.to_string p));
   (* initialize a lookup of musicians yet to be assigned *)
   let musician_pool = Array.create ~len:(num_instruments problem) [] in
@@ -87,14 +88,15 @@ let solution_of_lp_solution (problem : Types.problem) (prev_solution : Types.sol
          let musician = musician_for_posidx.(idx) in
          Types.{ id = musician; pos = p.pos; instrument = musician_instruments.(musician) })
 
-let lp_assign_positions (problem : Types.problem) (prev_solution : Types.solution) =
+let lp_assign_positions (problem : Types.problem) (prev_solution : Types.solution)
+    (assignment_scores : (Types.position * int, float) Hashtbl.t) (musician_is_fixed : bool array) =
   printf "Generating and validating LP problem.\n%!";
   let vars = lp_vars problem prev_solution in
-  let lp_problem = lp_of_problem problem prev_solution [] vars in
+  let lp_problem = lp_of_problem problem prev_solution musician_is_fixed vars assignment_scores in
   if Lp.validate lp_problem then (
     printf "LP problem is valid; starting solver.\n%!";
-    match Lp_glpk.solve lp_problem with
-    | Ok (obj, xs) -> solution_of_lp_solution problem prev_solution vars (obj, xs)
+    match Lp_glpk.Simplex.solve ~term_output:true lp_problem with
+    | Ok (obj, xs) -> solution_of_lp_solution problem prev_solution vars musician_is_fixed (obj, xs)
     | Error msg -> failwith (sprintf "Error in running LP solver: %s\n" msg))
   else failwith "Oops, LP problem is broken."
 
@@ -102,4 +104,27 @@ let lp_assign_positions (problem : Types.problem) (prev_solution : Types.solutio
   placements *)
 let lp_optimize_solution (problem : Types.problem) (prev_solution : Types.solution) ~(round : int) =
   ignore round;
-  lp_assign_positions problem prev_solution
+  let assignment_scores = Improver.score_cache (Score.get_scoring_env problem prev_solution) in
+  let no_positions = Array.length prev_solution in
+  let no_vars = no_positions * num_instruments problem in
+  if no_vars > 10_000 then (
+    let subset_factor = float_of_int no_vars /. 10_000.0 in
+    let num_fixed_positions =
+      int_of_float ((1.0 -. (1.0 /. subset_factor)) *. float_of_int no_positions)
+    in
+    let current_solution = ref prev_solution in
+    let random_position_indexes = Array.init no_positions ~f:(fun i -> i) in
+    let iterations = Float.(to_int (round_up (subset_factor * 2.0))) in
+    for i = 1 to iterations do
+      printf "%d/%d: Optimizing subset of %d positions\n%!" i iterations num_fixed_positions;
+      Array.permute random_position_indexes;
+      let fixed_musician_indexes =
+        Array.sub random_position_indexes ~pos:0 ~len:num_fixed_positions
+      in
+      let musician_is_fixed = Array.create ~len:(List.length problem.musicians) false in
+      Array.iter fixed_musician_indexes ~f:(fun idx -> musician_is_fixed.(idx) <- true);
+      current_solution :=
+        lp_assign_positions problem !current_solution assignment_scores musician_is_fixed
+    done;
+    !current_solution)
+  else lp_assign_positions problem prev_solution assignment_scores [||]
