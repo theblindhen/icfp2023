@@ -180,22 +180,17 @@ let honey_comb_positions (init_pos : Types.position) =
       | _ -> failwith "direction must be between 0 and 5"
     in
     let open Int in
-    if ring_count >= (ring_number * 6) - 1 then (
-      Printf.printf "ring \n%!";
-      Seq.Cons (position, snake (next_pos direction) Int.(ring_number + 1) 0 ((direction + 1) mod 6)))
-    else if ring_count % ring_number = ring_number - 1 then (
-      Printf.printf "rand \n%!";
+    if ring_count >= (ring_number * 6) - 1 then
+      Seq.Cons (position, snake (next_pos direction) Int.(ring_number + 1) 0 ((direction + 1) mod 6))
+    else if ring_count % ring_number = ring_number - 1 then
       Seq.Cons
         ( position,
           snake
             (next_pos ((direction + 1) mod 6))
             ring_number (ring_count + 1)
-            ((direction + 1) mod 6) ))
-    else (
-      Printf.printf "rind \n%!";
-      Seq.Cons (position, snake (next_pos direction) ring_number (ring_count + 1) direction))
+            ((direction + 1) mod 6) )
+    else Seq.Cons (position, snake (next_pos direction) ring_number (ring_count + 1) direction)
   in
-  Printf.printf "starting honeycomb";
   snake init_pos 0 0 0
 
 (* TESTS *)
