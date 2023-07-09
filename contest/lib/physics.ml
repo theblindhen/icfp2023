@@ -10,6 +10,11 @@ let from_points (a : Types.position) (b : Types.position) : force =
 let add (a : force) (b : force) : force = { x = a.x +. b.x; y = a.y +. b.y }
 let scale (c : float) (v : force) : force = { x = c *. v.x; y = c *. v.y }
 let length (v : force) : float = sqrt ((v.x *. v.x) +. (v.y *. v.y))
+
+let scale_to_len (l : float) (v : force) : force =
+  let lenv = length v in
+  if Float.(lenv = 0.) then { x = 0.; y = 0. } else scale (l /. lenv) v
+
 let length_sq (v : force) : float = (v.x *. v.x) +. (v.y *. v.y)
 let push (p : Types.position) (f : force) : Types.position = { x = p.x +. f.x; y = p.y +. f.y }
 
@@ -55,7 +60,7 @@ let simulate_step (p : Types.problem) ~(att_heat : float) (placements : placed_i
     unit =
   let forces = Array.map placements ~f:(fun i -> force_over_attendees p i) in
   Array.iter2_exn placements forces ~f:(fun i f ->
-      let desired_push = scale (att_heat /. length f) f in
+      let desired_push = scale_to_len att_heat f in
       (* let desired_push = scale att_heat f in *)
       placements.(i.instrument) <-
         { instrument = i.instrument; pos = safe_push p i.pos desired_push });
