@@ -57,6 +57,7 @@ type alias Model =
     , solution : Maybe Solution
     , focus : Maybe Focus
     , playing : Bool
+    , loading : List String
     }
 
 type alias Placement =
@@ -77,9 +78,12 @@ type Msg
     | LP
     | InitSim
     | StepSim Int
+    | Load
+    | LoadSolution String
     | Save
     | FocusOnInstrument Int
     | SolutionReturned (Result Http.Error String)
+    | FetchSolutions (Result Http.Error String)
     | Play Bool
 
 decodeMusicians : Decoder Musician
@@ -168,19 +172,27 @@ update msg model = case msg of
     InitSim -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/init_sim" ] )
     StepSim i -> ( model, Cmd.batch [ postExpectSolution ("http://localhost:3000/step_sim/" ++ (String.fromInt i)) ] )
     Save -> ( model, Cmd.batch [ postExpectSolution "http://localhost:3000/save" ] )
+    Load -> ( model, Cmd.batch [ Http.get 
+            { url = "http://localhost:3000/solutions/" ++ model.problemId
+            , expect = Http.expectString FetchSolutions
+            }])
+    LoadSolution s -> ( model, Cmd.batch [ postExpectSolution ("http://localhost:3000/solution/" ++ model.problemId ++ "/" ++ s) ])
     FocusOnInstrument i -> ( { model | focus = Just i }, Cmd.none )
     SolutionReturned (Ok res) ->
         case decodeString decodeSolution res of
-            Ok solution -> ({ model | solution = Just solution }, 
+            Ok solution -> ({ model | solution = Just solution, loading = [] }, 
                 if model.playing then Cmd.batch [ postExpectSolution "http://localhost:3000/step_sim/1" ] else Cmd.none)
             Err err -> ({ model | error = Just ("Failed to decode solution: " ++ errorToString err) }, Cmd.none )
+    SolutionReturned (Err err) -> ( { model | error = Just "Failed" }, Cmd.none )
+    FetchSolutions (Ok res) -> ( { model | loading = String.split "," res }, Cmd.none)
+    FetchSolutions (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
     Play playing -> ( { model | playing = playing }, Cmd.batch [ postExpectSolution "http://localhost:3000/step_sim/1" ] )
-    SolutionReturned (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
+
 
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing, playing = False }, Cmd.none )
+        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing, playing = False, loading = [] }, Cmd.none )
         , view = view
         , update = update
         , subscriptions = \model -> Sub.none
@@ -188,8 +200,8 @@ main =
 
 viewLoadProblem : Model -> Html Msg
 viewLoadProblem m =
-    Grid.container []         -- Responsive fixed width container
-        [ CDN.stylesheet      -- Inlined Bootstrap CSS for use with reactor
+    Grid.container []
+        [ CDN.stylesheet
         ,  div [
                 style "margin" "20px"
             ] [
@@ -263,6 +275,7 @@ viewProblem m p =
                     BButton.button 
                         ((if m.focus == Just instruments then [BButton.disabled True] else []) ++
                             [ BButton.onClick (nextFocus m.focus 1), BButton.primary ]) [ text "Next Instrument" ],
+                    BButton.button [ BButton.onClick Load, BButton.primary ] [ text "Load" ],
                     BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ],
                     BButton.button [ BButton.onClick InitSim, BButton.primary ] [ text "Init Sim" ],
                     BButton.button [ BButton.onClick (StepSim 1), BButton.primary ] [ text "Step Sim" ],
@@ -275,13 +288,22 @@ viewProblem m p =
                 ]
         ]
 
+viewLoadSolution : List String -> Html Msg
+viewLoadSolution loading =
+    div [ ] 
+        (List.map (\l -> BButton.button [ BButton.primary, BButton.onClick (LoadSolution l) ] [text l]) loading)
+        
+
 view : Model -> Html Msg
 view m =
     case m.error of
         Nothing ->
-            case m.problem of
-                Nothing -> viewLoadProblem m
-                Just problem -> viewProblem m problem
+            case m.loading of 
+                [] -> 
+                    case m.problem of
+                        Nothing -> viewLoadProblem m
+                        Just problem -> viewProblem m problem
+                _ -> viewLoadSolution m.loading
         Just err ->
             div [] [ text err ]
 

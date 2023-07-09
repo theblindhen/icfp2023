@@ -48,6 +48,12 @@ type instrument = int [@@deriving sexp]
 type musician = { id : int; pos : position; instrument : instrument } [@@deriving sexp]
 type solution = musician array [@@deriving sexp]
 
+let solution_of_json_solution (p : problem) (json_solution : Json_j.json_solution) : solution =
+  List.zip_exn p.musicians json_solution.placements
+  |> List.mapi ~f:(fun i (instrument, json_placement) ->
+         { pos = { x = json_placement.x; y = json_placement.y }; id = i; instrument })
+  |> Array.of_list
+
 let json_solution_of_solution (solution : solution) : Json_j.json_solution =
   {
     placements =

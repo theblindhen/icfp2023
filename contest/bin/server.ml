@@ -8,6 +8,18 @@ let current_solution = ref None
 let current_round = ref 0
 let read_file path = In_channel.create path |> In_channel.input_all |> String.strip
 
+let returnJson json_str =
+  Lwt.return
+    (Response.make ~status:`OK
+       ~headers:(Headers.of_list [ ("content-type", "application/json") ])
+       ~body:(Body.of_string json_str) ())
+
+let returnError msg =
+  Lwt.return
+    (Response.make ~status:`I_m_a_teapot
+       ~headers:(Headers.of_list [ ("content-type", "text/plain") ])
+       ~body:(Body.of_string msg) ())
+
 let index_handler _ =
   let index = read_file "../frontend/index.html" in
   Lwt.return (Response.make ~status:`OK ~body:(Body.of_string index) ())
@@ -22,11 +34,46 @@ let problem_handler req =
   current_problem := Json_util.get_problem (int_of_string id);
   current_solution := None;
   current_round := 0;
-  Lwt.return (Response.make ~status:`OK ~body:(Body.of_string problem) ())
+  returnJson problem
+
+let solutions_handler req =
+  let id = Router.param req "id" in
+  let solutions_dir = sprintf "../problems/solutions-%s" id in
+  printf "solutions dir: %s\n%!" solutions_dir;
+  match Sys_unix.is_directory solutions_dir with
+  | `Yes ->
+      let solution_files =
+        Sys_unix.ls_dir solutions_dir
+        |> List.filter ~f:(fun s -> String.is_suffix ~suffix:".json" s)
+        |> List.map ~f:(fun s -> String.chop_suffix_exn ~suffix:".json" s)
+      in
+      printf "solutions: %s\n%!" (String.concat ~sep:"," solution_files);
+      let result = String.concat ~sep:"," solution_files in
+      returnJson result
+  | _ -> returnError "No solutions found"
+
+let solution_handler req =
+  let id = Router.param req "id" in
+  let solution_file = Router.param req "name" ^ ".json" in
+  match !current_problem with
+  | None -> returnError "No problem selected; cannot load solution"
+  | Some problem ->
+      if int_of_string id = problem.problem_id then
+        match Json_util.get_solution problem solution_file with
+        | Some solution ->
+            current_solution := Some solution;
+            current_round := 0;
+            let solution_json =
+              solution |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
+            in
+            printf "solution loaded: %s\n%!" solution_json;
+            returnJson solution_json
+        | None -> returnError "Failed to load solution"
+      else returnError "Problem id mismatch"
 
 let init_solution_handler f _ =
   match !current_problem with
-  | None -> Lwt.return (Response.make ~status:`OK ~body:(Body.of_string "No problem") ())
+  | None -> returnError "No problem selected; cannot initialize solution"
   | Some p ->
       let solution = f p in
       let solution_json =
@@ -34,7 +81,7 @@ let init_solution_handler f _ =
       in
       current_solution := Some solution;
       current_round := 0;
-      Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
+      returnJson solution_json
 
 let optimiser_handler f req =
   let n = Router.param req "n" |> int_of_string in
@@ -54,8 +101,8 @@ let optimiser_handler f req =
         solution' |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
       in
       current_solution := Some solution';
-      Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
-  | _ -> Lwt.return (Response.make ~status:`OK ~body:(Body.of_string "No problem") ())
+      returnJson solution_json
+  | _ -> returnError "No problem or solution selected; cannot optimize solution"
 
 let save_handler _ =
   match (!current_problem, !current_solution) with
@@ -64,14 +111,16 @@ let save_handler _ =
       let score = Score.score_solution p s in
       Misc.validate_solution p s;
       Json_util.write_solution_if_best score p.problem_id s;
-      Lwt.return (Response.make ~status:`OK ~body:(Body.of_string solution_json) ())
-  | _ -> Lwt.return (Response.make ~status:`OK ~body:(Body.of_string "No problem") ())
+      returnJson solution_json
+  | _ -> returnError "No problem or solution selected; cannot save solution"
 
 let _ =
   App.empty
   |> App.get "/" index_handler
   |> App.get "/elm.js" js_handler
   |> App.get "/problem/:id" problem_handler
+  |> App.get "/solutions/:id" solutions_handler
+  |> App.post "/solution/:id/:name" solution_handler
   |> App.post "/place_randomly"
        (init_solution_handler (fun p -> Random_solver.random_placement_solution p []))
   |> App.post "/swap/:n" (optimiser_handler Improver.improve)

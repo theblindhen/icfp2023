@@ -80,87 +80,6 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
 console.warn('Compiled in DEV mode. Follow the advice at https://elm-lang.org/0.19.1/optimize for better performance and smaller assets.');
 
 
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
-
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
-
-
-var _List_cons = F2(_List_Cons);
-
-function _List_fromArray(arr)
-{
-	var out = _List_Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = _List_Cons(arr[i], out);
-	}
-	return out;
-}
-
-function _List_toArray(xs)
-{
-	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		out.push(xs.a);
-	}
-	return out;
-}
-
-var _List_map2 = F3(function(f, xs, ys)
-{
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
-	{
-		arr.push(A2(f, xs.a, ys.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map3 = F4(function(f, xs, ys, zs)
-{
-	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A3(f, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map4 = F5(function(f, ws, xs, ys, zs)
-{
-	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
-{
-	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_sortBy = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
-	}));
-});
-
-var _List_sortWith = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = A2(f, a, b);
-		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
-	}));
-});
-
-
-
 var _JsArray_empty = [];
 
 function _JsArray_singleton(value)
@@ -790,6 +709,87 @@ function _Utils_ap(xs, ys)
 	}
 	return root;
 }
+
+
+
+var _List_Nil_UNUSED = { $: 0 };
+var _List_Nil = { $: '[]' };
+
+function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
+	}));
+});
 
 
 
@@ -4545,9 +4545,7 @@ function _Http_track(router, xhr, tracker)
 			size: event.lengthComputable ? $elm$core$Maybe$Just(event.total) : $elm$core$Maybe$Nothing
 		}))));
 	});
-}var $elm$core$Basics$EQ = {$: 'EQ'};
-var $elm$core$Basics$LT = {$: 'LT'};
-var $elm$core$List$cons = _List_cons;
+}var $elm$core$List$cons = _List_cons;
 var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
 var $elm$core$Array$foldr = F3(
 	function (func, baseCase, _v0) {
@@ -4624,7 +4622,9 @@ var $elm$core$Set$toList = function (_v0) {
 	var dict = _v0.a;
 	return $elm$core$Dict$keys(dict);
 };
+var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
+var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$Basics$False = {$: 'False'};
 var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$Result$Err = function (a) {
@@ -5338,6 +5338,9 @@ var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Main$FetchSolutions = function (a) {
+	return {$: 'FetchSolutions', a: a};
+};
 var $author$project$Main$LoadedProblem = function (a) {
 	return {$: 'LoadedProblem', a: a};
 };
@@ -6219,6 +6222,7 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
+var $elm$core$Debug$log = _Debug_log;
 var $author$project$Main$SolutionReturned = function (a) {
 	return {$: 'SolutionReturned', a: a};
 };
@@ -6346,6 +6350,27 @@ var $author$project$Main$update = F2(
 							[
 								$author$project$Main$postExpectSolution('http://localhost:3000/save')
 							])));
+			case 'Load':
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$elm$http$Http$get(
+								{
+									expect: $elm$http$Http$expectString($author$project$Main$FetchSolutions),
+									url: 'http://localhost:3000/solutions/' + model.problemId
+								})
+							])));
+			case 'LoadSolution':
+				var s = msg.a;
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$author$project$Main$postExpectSolution('http://localhost:3000/solution/' + (model.problemId + ('/' + s)))
+							])));
 			case 'FocusOnInstrument':
 				var i = msg.a;
 				return _Utils_Tuple2(
@@ -6355,18 +6380,7 @@ var $author$project$Main$update = F2(
 							focus: $elm$core$Maybe$Just(i)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 'Play':
-				var playing = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{playing: playing}),
-					$elm$core$Platform$Cmd$batch(
-						_List_fromArray(
-							[
-								$author$project$Main$postExpectSolution('http://localhost:3000/step_sim/1')
-							])));
-			default:
+			case 'SolutionReturned':
 				if (msg.a.$ === 'Ok') {
 					var res = msg.a.a;
 					var _v2 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeSolution, res);
@@ -6376,6 +6390,7 @@ var $author$project$Main$update = F2(
 							_Utils_update(
 								model,
 								{
+									loading: _List_Nil,
 									solution: $elm$core$Maybe$Just(solution)
 								}),
 							model.playing ? $elm$core$Platform$Cmd$batch(
@@ -6395,6 +6410,8 @@ var $author$project$Main$update = F2(
 							$elm$core$Platform$Cmd$none);
 					}
 				} else {
+					var err = msg.a.a;
+					var _v3 = A2($elm$core$Debug$log, 'Error', err);
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -6403,6 +6420,36 @@ var $author$project$Main$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
+			case 'FetchSolutions':
+				if (msg.a.$ === 'Ok') {
+					var res = msg.a.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								loading: A2($elm$core$String$split, ',', res)
+							}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('Failed')
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			default:
+				var playing = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{playing: playing}),
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$author$project$Main$postExpectSolution('http://localhost:3000/step_sim/1')
+							])));
 		}
 	});
 var $elm$html$Html$div = _VirtualDom_node('div');
@@ -6943,8 +6990,34 @@ var $author$project$Main$viewLoadProblem = function (m) {
 					]))
 			]));
 };
+var $author$project$Main$LoadSolution = function (a) {
+	return {$: 'LoadSolution', a: a};
+};
+var $author$project$Main$viewLoadSolution = function (loading) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		A2(
+			$elm$core$List$map,
+			function (l) {
+				return A2(
+					$rundis$elm_bootstrap$Bootstrap$Button$button,
+					_List_fromArray(
+						[
+							$rundis$elm_bootstrap$Bootstrap$Button$primary,
+							$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+							$author$project$Main$LoadSolution(l))
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(l)
+						]));
+			},
+			loading));
+};
 var $author$project$Main$InitSim = {$: 'InitSim'};
 var $author$project$Main$LP = {$: 'LP'};
+var $author$project$Main$Load = {$: 'Load'};
 var $author$project$Main$PlaceRandomly = {$: 'PlaceRandomly'};
 var $author$project$Main$Play = function (a) {
 	return {$: 'Play', a: a};
@@ -8394,6 +8467,17 @@ var $author$project$Main$viewProblem = F2(
 							$rundis$elm_bootstrap$Bootstrap$Button$button,
 							_List_fromArray(
 								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$Load),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Load')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
 									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$Save),
 									$rundis$elm_bootstrap$Bootstrap$Button$primary
 								]),
@@ -8462,12 +8546,17 @@ var $author$project$Main$viewProblem = F2(
 var $author$project$Main$view = function (m) {
 	var _v0 = m.error;
 	if (_v0.$ === 'Nothing') {
-		var _v1 = m.problem;
-		if (_v1.$ === 'Nothing') {
-			return $author$project$Main$viewLoadProblem(m);
+		var _v1 = m.loading;
+		if (!_v1.b) {
+			var _v2 = m.problem;
+			if (_v2.$ === 'Nothing') {
+				return $author$project$Main$viewLoadProblem(m);
+			} else {
+				var problem = _v2.a;
+				return A2($author$project$Main$viewProblem, m, problem);
+			}
 		} else {
-			var problem = _v1.a;
-			return A2($author$project$Main$viewProblem, m, problem);
+			return $author$project$Main$viewLoadSolution(m.loading);
 		}
 	} else {
 		var err = _v0.a;
@@ -8484,7 +8573,7 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 	{
 		init: function (_v0) {
 			return _Utils_Tuple2(
-				{count: 0, error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, playing: false, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
+				{count: 0, error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, loading: _List_Nil, playing: false, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
 				$elm$core$Platform$Cmd$none);
 		},
 		subscriptions: function (model) {
