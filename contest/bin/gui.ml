@@ -154,7 +154,7 @@ let () =
         | () ->
             eprintf "Scoring solution\n%!";
             let score = Score.score_solution problem solution in
-            Json_util.write_solution_if_best score problem.problem_id solution)
+            Json_util.write_solution_if_best score problem solution)
     | _, _ -> eprintf "No solution to score\n%!"
   in
 
