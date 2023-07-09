@@ -27,17 +27,11 @@ let placement_score_raw (p : Types.problem) (placement : placed_instrument array
              a.tastes.(i.instrument) /. (d *. d)))
 
 let force_I (i : placed_instrument) (a : Types.attendee) : force =
-  (* Johan's algebra *)
   let d_sq = length_sq (from_points a.pos i.pos) in
   {
     x = -2. *. a.tastes.(i.instrument) /. (d_sq *. d_sq) *. (i.pos.x -. a.pos.x);
     y = -2. *. a.tastes.(i.instrument) /. (d_sq *. d_sq) *. (i.pos.y -. a.pos.y);
   }
-(* Just taking the score vectors *)
-(* let v : force = from_points a.pos i.pos in
-   let d = length v in
-   let c = Float.int_pow (a.tastes.(i.instrument) /. d) 3 in
-   scale c v *)
 
 let force_over_attendees (p : Types.problem) (i : placed_instrument) : force =
   List.fold p.attendees ~init:{ x = 0.; y = 0. } ~f:(fun acc a -> add acc (force_I i a))
@@ -83,11 +77,11 @@ let solution_of_placement_stage1 (placement : placed_instrument array) : Types.s
   |> Array.mapi ~f:(fun idx i : Types.musician ->
          { id = idx; instrument = i.instrument; pos = i.pos })
 
-let simulate_step_sol_stage1 (p : Types.problem) (solution : Types.solution) ~(round : int) :
+let simulate_step_sol_stage1 (p : Types.problem) (solution : Types.solution) ~(_round : int) :
     Types.solution =
   (* Pretend we have a solution, but actually we're only placing the instruments
   *)
-  let att_heat = 0.1 in
+  let att_heat = 0.01 in
   (* let att_heat = 0.1 /. Float.int_pow (float_of_int round +. 10.) 2 in *)
   (* let att_heat = 0.1 /. ((float_of_int round +. 10.) ** 1.75) in *)
   let placements = Array.map solution ~f:(fun m -> { instrument = m.instrument; pos = m.pos }) in

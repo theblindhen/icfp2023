@@ -5,8 +5,9 @@ room: 3649 x 4350
  instruments total: 132
  attendees: 1000
  pillars: 0
-Best score: 1408506431
-  % of our score: 17.15
+ theoretical max score: 229_068_612_564
+Best score: 1_408_506_431
+  % of our score: 13.43
 
 Problem 02:
 room: 8689 x 6523
@@ -15,8 +16,9 @@ room: 8689 x 6523
  instruments total: 438
  attendees: 1000
  pillars: 0
-Best score: 1422143386
-  % of our score: 17.31
+ theoretical max score: 133_707_593_745
+Best score: 1_422_143_386
+  % of our score: 13.56
 
 Problem 03:
 room: 2426 x 6421
@@ -25,8 +27,9 @@ room: 2426 x 6421
  instruments total: 101
  attendees: 1000
  pillars: 0
-Best score: 92231143
-  % of our score: 1.12
+ theoretical max score: 3_550_716_492
+Best score: 92_261_796
+  % of our score: 0.88
 
 Problem 04:
 room: 9340 x 2339
@@ -35,8 +38,9 @@ room: 9340 x 2339
  instruments total: 314
  attendees: 1000
  pillars: 0
-Best score: 40415671
-  % of our score: 0.49
+ theoretical max score: 1_972_048_654
+Best score: 40_415_671
+  % of our score: 0.39
 
 Problem 05:
 room: 7859 x 5821
@@ -45,8 +49,9 @@ room: 7859 x 5821
  instruments total: 700
  attendees: 1000
  pillars: 0
-Best score: 72943997
-  % of our score: 0.89
+ theoretical max score: 4_424_056_712
+Best score: 72_943_997
+  % of our score: 0.70
 
 Problem 06:
 room: 4677 x 8826
@@ -55,8 +60,9 @@ room: 4677 x 8826
  instruments total: 27
  attendees: 1000
  pillars: 0
-Best score: 109875133
-  % of our score: 1.34
+ theoretical max score: 3_508_627_467
+Best score: 109_875_133
+  % of our score: 1.05
 
 Problem 07:
 room: 6111 x 9953
@@ -65,8 +71,9 @@ room: 6111 x 9953
  instruments total: 2
  attendees: 1000
  pillars: 0
-Best score: 88596424
-  % of our score: 1.08
+ theoretical max score: 4_637_132_024
+Best score: 88_596_424
+  % of our score: 0.84
 
 Problem 08:
 room: 2166 x 5248
@@ -75,8 +82,9 @@ room: 2166 x 5248
  instruments total: 40
  attendees: 5000
  pillars: 0
-Best score: 1831553621
-  % of our score: 22.30
+ theoretical max score: 25_912_422_540
+Best score: 1_831_553_621
+  % of our score: 17.46
 
 Problem 09:
 room: 1000 x 1000
@@ -85,8 +93,9 @@ room: 1000 x 1000
  instruments total: 38
  attendees: 1000
  pillars: 0
-Best score: 87842100
-  % of our score: 1.07
+ theoretical max score: 680_159_350
+Best score: 87_842_100
+  % of our score: 0.84
 
 Problem 10:
 room: 1000 x 1000
@@ -95,6 +104,7 @@ room: 1000 x 1000
  instruments total: 4
  attendees: 1000
  pillars: 0
+ theoretical max score: 415_905_527
 Best score: 0
   % of our score: 0.00
 
@@ -105,8 +115,9 @@ room: 1000 x 1000
  instruments total: 115
  attendees: 1000
  pillars: 0
-Best score: 244315168
-  % of our score: 2.97
+ theoretical max score: 4_096_385_137
+Best score: 244_315_168
+  % of our score: 2.33
 
 Problem 12:
 room: 1000 x 1000
@@ -115,8 +126,9 @@ room: 1000 x 1000
  instruments total: 11
  attendees: 5000
  pillars: 0
-Best score: 843916989
-  % of our score: 10.27
+ theoretical max score: 7_026_138_212
+Best score: 843_916_989
+  % of our score: 8.05
 
 Problem 13:
 room: 1000 x 1000
@@ -125,6 +137,7 @@ room: 1000 x 1000
  instruments total: 22
  attendees: 1000
  pillars: 0
+ theoretical max score: 296_031_104
 Best score: 0
   % of our score: 0.00
 
@@ -135,6 +148,7 @@ room: 1000 x 1000
  instruments total: 15
  attendees: 1000
  pillars: 0
+ theoretical max score: 9_068_867
 Best score: 0
   % of our score: 0.00
 
@@ -145,8 +159,9 @@ room: 1000 x 1000
  instruments total: 9
  attendees: 1000
  pillars: 0
-Best score: 16768119
-  % of our score: 0.20
+ theoretical max score: 1_143_679_292
+Best score: 16_768_119
+  % of our score: 0.16
 
 Problem 16:
 room: 1000 x 1000
@@ -155,6 +170,7 @@ room: 1000 x 1000
  instruments total: 6
  attendees: 1000
  pillars: 0
+ theoretical max score: 162_996_283
 Best score: 0
   % of our score: 0.00
 
@@ -165,7 +181,8 @@ room: 1547 x 3049
  instruments total: 51
  attendees: 5000
  pillars: 0
-Best score: 407390
+ theoretical max score: 20_702_057
+Best score: 407_390
   % of our score: 0.00
 
 Problem 18:
@@ -175,8 +192,9 @@ room: 4444 x 5794
  instruments total: 563
  attendees: 5000
  pillars: 0
-Best score: 2363541
-  % of our score: 0.03
+ theoretical max score: 155_522_929
+Best score: 2_363_541
+  % of our score: 0.02
 
 Problem 19:
 room: 2954 x 7680
@@ -185,7 +203,8 @@ room: 2954 x 7680
  instruments total: 236
  attendees: 5000
  pillars: 0
-Best score: 221150
+ theoretical max score: 1_531_761
+Best score: 221_150
   % of our score: 0.00
 
 Problem 20:
@@ -195,7 +214,8 @@ room: 6073 x 3064
  instruments total: 452
  attendees: 500
  pillars: 0
-Best score: 161045
+ theoretical max score: 5_659_266
+Best score: 161_045
   % of our score: 0.00
 
 Problem 21:
@@ -205,7 +225,8 @@ room: 5853 x 8495
  instruments total: 46
  attendees: 1000
  pillars: 0
-Best score: 52191
+ theoretical max score: 209_932
+Best score: 52_191
   % of our score: 0.00
 
 Problem 22:
@@ -215,8 +236,9 @@ room: 1000 x 1000
  instruments total: 9
  attendees: 400
  pillars: 0
-Best score: 38411081
-  % of our score: 0.47
+ theoretical max score: 190_128_374
+Best score: 38_411_081
+  % of our score: 0.37
 
 Problem 23:
 room: 1000 x 1000
@@ -225,8 +247,9 @@ room: 1000 x 1000
  instruments total: 1
  attendees: 500
  pillars: 0
-Best score: 27865298
-  % of our score: 0.34
+ theoretical max score: 185_023_990
+Best score: 27_865_298
+  % of our score: 0.27
 
 Problem 24:
 room: 1000 x 1000
@@ -235,8 +258,9 @@ room: 1000 x 1000
  instruments total: 3
  attendees: 500
  pillars: 0
-Best score: 44279621
-  % of our score: 0.54
+ theoretical max score: 317_055_383
+Best score: 44_279_621
+  % of our score: 0.42
 
 Problem 25:
 room: 1000 x 1000
@@ -245,8 +269,9 @@ room: 1000 x 1000
  instruments total: 25
  attendees: 1500
  pillars: 0
-Best score: 188761481
-  % of our score: 2.30
+ theoretical max score: 1_524_479_818
+Best score: 188_761_481
+  % of our score: 1.80
 
 Problem 26:
 room: 1000 x 1000
@@ -255,8 +280,9 @@ room: 1000 x 1000
  instruments total: 10
  attendees: 1500
  pillars: 0
-Best score: 110759236
-  % of our score: 1.35
+ theoretical max score: 822_190_628
+Best score: 110_759_236
+  % of our score: 1.06
 
 Problem 27:
 room: 1000 x 1000
@@ -265,8 +291,9 @@ room: 1000 x 1000
  instruments total: 10
  attendees: 1000
  pillars: 0
-Best score: 93082339
-  % of our score: 1.13
+ theoretical max score: 613_900_040
+Best score: 93_082_339
+  % of our score: 0.89
 
 Problem 28:
 room: 1000 x 1000
@@ -275,8 +302,9 @@ room: 1000 x 1000
  instruments total: 6
  attendees: 1000
  pillars: 0
-Best score: 98792275
-  % of our score: 1.20
+ theoretical max score: 569_000_397
+Best score: 98_792_275
+  % of our score: 0.94
 
 Problem 29:
 room: 1000 x 1000
@@ -285,8 +313,9 @@ room: 1000 x 1000
  instruments total: 10
  attendees: 1000
  pillars: 0
-Best score: 269970218
-  % of our score: 3.29
+ theoretical max score: 2_486_545_972
+Best score: 270_094_687
+  % of our score: 2.57
 
 Problem 30:
 room: 1000 x 1000
@@ -295,8 +324,9 @@ room: 1000 x 1000
  instruments total: 3
  attendees: 1000
  pillars: 0
-Best score: 425097261
-  % of our score: 5.18
+ theoretical max score: 4_506_436_450
+Best score: 425_097_261
+  % of our score: 4.05
 
 Problem 31:
 room: 1462 x 9133
@@ -305,8 +335,9 @@ room: 1462 x 9133
  instruments total: 306
  attendees: 1000
  pillars: 0
-Best score: 141215164
-  % of our score: 1.72
+ theoretical max score: 5_033_744_659
+Best score: 141_215_164
+  % of our score: 1.35
 
 Problem 32:
 room: 3968 x 9921
@@ -315,8 +346,9 @@ room: 3968 x 9921
  instruments total: 642
  attendees: 1000
  pillars: 0
-Best score: 156570270
-  % of our score: 1.91
+ theoretical max score: 2_565_176_389
+Best score: 156_570_270
+  % of our score: 1.49
 
 Problem 33:
 room: 9963 x 9102
@@ -325,8 +357,9 @@ room: 9963 x 9102
  instruments total: 107
  attendees: 500
  pillars: 0
-Best score: 20881642
-  % of our score: 0.25
+ theoretical max score: 488_546_690
+Best score: 20_881_642
+  % of our score: 0.20
 
 Problem 34:
 room: 8882 x 5656
@@ -335,8 +368,9 @@ room: 8882 x 5656
  instruments total: 375
  attendees: 500
  pillars: 0
-Best score: 37299255
-  % of our score: 0.45
+ theoretical max score: 1_169_424_836
+Best score: 37_299_255
+  % of our score: 0.36
 
 Problem 35:
 room: 8085 x 3225
@@ -345,8 +379,9 @@ room: 8085 x 3225
  instruments total: 561
  attendees: 500
  pillars: 0
-Best score: 44193991
-  % of our score: 0.54
+ theoretical max score: 1_598_144_446
+Best score: 44_193_991
+  % of our score: 0.42
 
 Problem 36:
 room: 2159 x 1047
@@ -355,8 +390,9 @@ room: 2159 x 1047
  instruments total: 82
  attendees: 500
  pillars: 0
-Best score: 36263016
-  % of our score: 0.44
+ theoretical max score: 301_320_066
+Best score: 39_914_888
+  % of our score: 0.38
 
 Problem 37:
 room: 2372 x 1101
@@ -365,8 +401,9 @@ room: 2372 x 1101
  instruments total: 82
  attendees: 500
  pillars: 0
-Best score: 99792280
-  % of our score: 1.21
+ theoretical max score: 1_733_830_177
+Best score: 105_720_961
+  % of our score: 1.01
 
 Problem 38:
 room: 1369 x 2047
@@ -375,8 +412,9 @@ room: 1369 x 2047
  instruments total: 82
  attendees: 1000
  pillars: 0
-Best score: 8629475
-  % of our score: 0.11
+ theoretical max score: 201_752_668
+Best score: 9_215_775
+  % of our score: 0.09
 
 Problem 39:
 room: 4758 x 1374
@@ -385,7 +423,8 @@ room: 4758 x 1374
  instruments total: 21
  attendees: 1000
  pillars: 0
-Best score: 21281960
+ theoretical max score: 146_296_095
+Best score: 26_996_016
   % of our score: 0.26
 
 Problem 40:
@@ -395,8 +434,9 @@ room: 1000 x 1000
  instruments total: 2
  attendees: 1000
  pillars: 0
-Best score: 8088816
-  % of our score: 0.10
+ theoretical max score: 256_432_476
+Best score: 11_513_139
+  % of our score: 0.11
 
 Problem 41:
 room: 1000 x 1000
@@ -405,7 +445,8 @@ room: 1000 x 1000
  instruments total: 5
  attendees: 400
  pillars: 0
-Best score: 4836121
+ theoretical max score: 88_269_033
+Best score: 5_913_628
   % of our score: 0.06
 
 Problem 42:
@@ -415,8 +456,9 @@ room: 1000 x 1000
  instruments total: 2
  attendees: 100
  pillars: 0
-Best score: 6277998
-  % of our score: 0.08
+ theoretical max score: 18_991_752
+Best score: 6_483_522
+  % of our score: 0.06
 
 Problem 43:
 room: 1000 x 1000
@@ -425,7 +467,8 @@ room: 1000 x 1000
  instruments total: 2
  attendees: 100
  pillars: 0
-Best score: 846915
+ theoretical max score: 3_878_487
+Best score: 1_232_877
   % of our score: 0.01
 
 Problem 44:
@@ -435,8 +478,9 @@ room: 1000 x 1000
  instruments total: 6
  attendees: 400
  pillars: 0
-Best score: 18192894
-  % of our score: 0.22
+ theoretical max score: 224_283_518
+Best score: 26_062_393
+  % of our score: 0.25
 
 Problem 45:
 room: 1000 x 1000
@@ -445,8 +489,9 @@ room: 1000 x 1000
  instruments total: 5
  attendees: 400
  pillars: 0
-Best score: 9662018
-  % of our score: 0.12
+ theoretical max score: 90_536_022
+Best score: 10_660_042
+  % of our score: 0.10
 
 Problem 46:
 room: 9948 x 8811
@@ -455,7 +500,8 @@ room: 9948 x 8811
  instruments total: 3
  attendees: 300
  pillars: 0
-Best score: 624416
+ theoretical max score: 7_772_322
+Best score: 811_464
   % of our score: 0.01
 
 Problem 47:
@@ -465,7 +511,8 @@ room: 8531 x 3600
  instruments total: 7
  attendees: 200
  pillars: 0
-Best score: 1562111
+ theoretical max score: 3_773_322
+Best score: 1_603_816
   % of our score: 0.02
 
 Problem 48:
@@ -475,8 +522,9 @@ room: 5144 x 3291
  instruments total: 40
  attendees: 200
  pillars: 0
-Best score: 5327277
-  % of our score: 0.06
+ theoretical max score: 45_984_511
+Best score: 5_440_334
+  % of our score: 0.05
 
 Problem 49:
 room: 6863 x 7049
@@ -485,7 +533,8 @@ room: 6863 x 7049
  instruments total: 2
  attendees: 300
  pillars: 0
-Best score: 527984
+ theoretical max score: 13_364_448
+Best score: 943_270
   % of our score: 0.01
 
 Problem 50:
@@ -495,8 +544,9 @@ room: 4922 x 2260
  instruments total: 2
  attendees: 300
  pillars: 0
-Best score: 8184083
-  % of our score: 0.10
+ theoretical max score: 38_753_744
+Best score: 8_433_006
+  % of our score: 0.08
 
 Problem 51:
 room: 7948 x 3504
@@ -505,8 +555,9 @@ room: 7948 x 3504
  instruments total: 2
  attendees: 400
  pillars: 0
-Best score: 709793
-  % of our score: 0.01
+ theoretical max score: 6_678_956
+Best score: 2_165_437
+  % of our score: 0.02
 
 Problem 52:
 room: 7151 x 3876
@@ -515,7 +566,8 @@ room: 7151 x 3876
  instruments total: 34
  attendees: 400
  pillars: 0
-Best score: 3618950
+ theoretical max score: 21_548_381
+Best score: 4_249_016
   % of our score: 0.04
 
 Problem 53:
@@ -525,8 +577,9 @@ room: 7396 x 2367
  instruments total: 4
  attendees: 400
  pillars: 0
-Best score: 5678149
-  % of our score: 0.07
+ theoretical max score: 101_338_113
+Best score: 6_677_491
+  % of our score: 0.06
 
 Problem 54:
 room: 7314 x 6807
@@ -535,7 +588,8 @@ room: 7314 x 6807
  instruments total: 6
  attendees: 400
  pillars: 0
-Best score: 1725047
+ theoretical max score: 11_926_466
+Best score: 1_807_065
   % of our score: 0.02
 
 Problem 55:
@@ -545,7 +599,8 @@ room: 4200 x 6234
  instruments total: 3
  attendees: 300
  pillars: 0
-Best score: 459522
+ theoretical max score: 1_950_285
+Best score: 614_698
   % of our score: 0.01
 
 Problem 56:
@@ -556,8 +611,9 @@ room: 6168 x 1514
  attendees: 400
  pillars: 194
     71 radii between 5.00 and 84.00
-Best score: 11999380
-  % of our score: 0.15
+ theoretical max score: 1_038_681_005
+Best score: 78_611_453
+  % of our score: 0.75
 
 Problem 57:
 room: 3039 x 2499
@@ -567,8 +623,9 @@ room: 3039 x 2499
  attendees: 400
  pillars: 103
     58 radii between 5.00 and 83.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 1_790_282_924
+Best score: 116_040_654
+  % of our score: 1.11
 
 Problem 58:
 room: 3303 x 2620
@@ -578,8 +635,9 @@ room: 3303 x 2620
  attendees: 400
  pillars: 32
     24 radii between 8.00 and 76.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 1_161_203_159
+Best score: 39_437_364
+  % of our score: 0.38
 
 Problem 59:
 room: 6688 x 5054
@@ -589,8 +647,9 @@ room: 6688 x 5054
  attendees: 700
  pillars: 58
     45 radii between 5.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 272_413_047
+Best score: 23_836_345
+  % of our score: 0.23
 
 Problem 60:
 room: 8642 x 7123
@@ -600,8 +659,9 @@ room: 8642 x 7123
  attendees: 400
  pillars: 47
     38 radii between 9.00 and 82.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 19_625_362
+Best score: 2_809_353
+  % of our score: 0.03
 
 Problem 61:
 room: 5135 x 8578
@@ -611,8 +671,9 @@ room: 5135 x 8578
  attendees: 400
  pillars: 149
     67 radii between 5.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 2_287_817_040
+Best score: 45_452_797
+  % of our score: 0.43
 
 Problem 62:
 room: 8701 x 7942
@@ -622,8 +683,9 @@ room: 8701 x 7942
  attendees: 400
  pillars: 81
     49 radii between 5.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 1_997_658_546
+Best score: 34_609_541
+  % of our score: 0.33
 
 Problem 63:
 room: 9997 x 9776
@@ -633,8 +695,9 @@ room: 9997 x 9776
  attendees: 700
  pillars: 86
     50 radii between 6.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 16_980_141_455
+Best score: 86_830_658
+  % of our score: 0.83
 
 Problem 64:
 room: 5590 x 6364
@@ -644,8 +707,9 @@ room: 5590 x 6364
  attendees: 700
  pillars: 78
     52 radii between 5.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 4_314_971_826
+Best score: 104_678_520
+  % of our score: 1.00
 
 Problem 65:
 room: 4544 x 3526
@@ -655,8 +719,9 @@ room: 4544 x 3526
  attendees: 700
  pillars: 125
     63 radii between 5.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 933_508_361
+Best score: 52_501_288
+  % of our score: 0.50
 
 Problem 66:
 room: 7244 x 9899
@@ -666,8 +731,9 @@ room: 7244 x 9899
  attendees: 700
  pillars: 86
     57 radii between 5.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 2_561_024_488
+Best score: 60_733_878
+  % of our score: 0.58
 
 Problem 67:
 room: 6079 x 1663
@@ -677,8 +743,9 @@ room: 6079 x 1663
  attendees: 700
  pillars: 145
     71 radii between 5.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 14_300_760_234
+Best score: 235_551_140
+  % of our score: 2.25
 
 Problem 68:
 room: 3016 x 4070
@@ -688,8 +755,9 @@ room: 3016 x 4070
  attendees: 700
  pillars: 157
     68 radii between 5.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 16_131_792_613
+Best score: 169_552_926
+  % of our score: 1.62
 
 Problem 69:
 room: 9745 x 1634
@@ -699,8 +767,9 @@ room: 9745 x 1634
  attendees: 700
  pillars: 50
     1 radii between 18.00 and 18.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 9_010_116_058
+Best score: 156_220_318
+  % of our score: 1.49
 
 Problem 70:
 room: 8342 x 4137
@@ -710,8 +779,9 @@ room: 8342 x 4137
  attendees: 700
  pillars: 17
     1 radii between 10.00 and 10.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 1_041_155_537
+Best score: 27_851_273
+  % of our score: 0.27
 
 Problem 71:
 room: 1550 x 9992
@@ -721,8 +791,9 @@ room: 1550 x 9992
  attendees: 700
  pillars: 50
     1 radii between 18.00 and 18.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 6_100_647_007
+Best score: 132_502_896
+  % of our score: 1.26
 
 Problem 72:
 room: 6953 x 4553
@@ -732,8 +803,9 @@ room: 6953 x 4553
  attendees: 700
  pillars: 214
     1 radii between 18.00 and 18.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 7_508_362_753
+Best score: 92_083_482
+  % of our score: 0.88
 
 Problem 73:
 room: 9314 x 3954
@@ -743,8 +815,9 @@ room: 9314 x 3954
  attendees: 700
  pillars: 858
     1 radii between 18.00 and 18.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 1_008_037_736
+Best score: 27_752_402
+  % of our score: 0.26
 
 Problem 74:
 room: 8624 x 6031
@@ -754,8 +827,9 @@ room: 8624 x 6031
  attendees: 700
  pillars: 27
     1 radii between 10.00 and 10.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 3_644_588_455
+Best score: 58_636_046
+  % of our score: 0.56
 
 Problem 75:
 room: 9603 x 9226
@@ -765,8 +839,9 @@ room: 9603 x 9226
  attendees: 700
  pillars: 4
     1 radii between 10.00 and 10.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 69_620_661
+Best score: 12_037_726
+  % of our score: 0.11
 
 Problem 76:
 room: 4022 x 8752
@@ -776,8 +851,9 @@ room: 4022 x 8752
  attendees: 700
  pillars: 16
     1 radii between 10.00 and 10.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 1_559_461_717
+Best score: 71_074_729
+  % of our score: 0.68
 
 Problem 77:
 room: 6417 x 6984
@@ -787,8 +863,9 @@ room: 6417 x 6984
  attendees: 700
  pillars: 39
     1 radii between 5.00 and 5.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 1_011_341_910
+Best score: 60_922_615
+  % of our score: 0.58
 
 Problem 78:
 room: 3978 x 2318
@@ -798,8 +875,9 @@ room: 3978 x 2318
  attendees: 700
  pillars: 17
     1 radii between 5.00 and 5.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 2_254_081_742
+Best score: 94_283_688
+  % of our score: 0.90
 
 Problem 79:
 room: 6067 x 4027
@@ -809,8 +887,9 @@ room: 6067 x 4027
  attendees: 400
  pillars: 29
     23 radii between 9.00 and 104.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 1_530_458_357
+Best score: 18_388_438
+  % of our score: 0.18
 
 Problem 80:
 room: 1300 x 6058
@@ -820,8 +899,9 @@ room: 1300 x 6058
  attendees: 700
  pillars: 91
     56 radii between 6.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 1_502_076_608
+Best score: 102_607_957
+  % of our score: 0.98
 
 Problem 81:
 room: 6887 x 3930
@@ -831,8 +911,9 @@ room: 6887 x 3930
  attendees: 700
  pillars: 95
     61 radii between 9.00 and 103.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 306_590_423
+Best score: 26_875_343
+  % of our score: 0.26
 
 Problem 82:
 room: 4785 x 2577
@@ -842,8 +923,9 @@ room: 4785 x 2577
  attendees: 700
  pillars: 57
     44 radii between 6.00 and 101.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 103_558_323
+Best score: 22_627_793
+  % of our score: 0.22
 
 Problem 83:
 room: 1855 x 5516
@@ -853,8 +935,9 @@ room: 1855 x 5516
  attendees: 700
  pillars: 153
     77 radii between 5.00 and 104.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 548_178_299
+Best score: 49_609_097
+  % of our score: 0.47
 
 Problem 84:
 room: 4172 x 6853
@@ -864,8 +947,9 @@ room: 4172 x 6853
  attendees: 700
  pillars: 92
     60 radii between 8.00 and 104.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 1_185_204_462
+Best score: 43_530_948
+  % of our score: 0.42
 
 Problem 85:
 room: 4504 x 4115
@@ -875,8 +959,9 @@ room: 4504 x 4115
  attendees: 400
  pillars: 76
     52 radii between 5.00 and 83.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 779_387_419
+Best score: 28_670_318
+  % of our score: 0.27
 
 Problem 86:
 room: 7586 x 5764
@@ -886,8 +971,9 @@ room: 7586 x 5764
  attendees: 400
  pillars: 111
     63 radii between 5.00 and 83.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 787_408_013
+Best score: 18_820_977
+  % of our score: 0.18
 
 Problem 87:
 room: 9797 x 4805
@@ -897,8 +983,9 @@ room: 9797 x 4805
  attendees: 400
  pillars: 64
     43 radii between 6.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 303_942_583
+Best score: 16_031_656
+  % of our score: 0.15
 
 Problem 88:
 room: 1680 x 4552
@@ -908,8 +995,9 @@ room: 1680 x 4552
  attendees: 400
  pillars: 194
     75 radii between 6.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 6_250_174_862
+Best score: 73_192_732
+  % of our score: 0.70
 
 Problem 89:
 room: 8328 x 3370
@@ -919,8 +1007,9 @@ room: 8328 x 3370
  attendees: 400
  pillars: 174
     68 radii between 5.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 336_138_688
+Best score: 19_068_295
+  % of our score: 0.18
 
 Problem 90:
 room: 3196 x 8359
@@ -930,9 +1019,10 @@ room: 3196 x 8359
  attendees: 400
  pillars: 183
     75 radii between 5.00 and 84.00
-Best score: 0
-  % of our score: 0.00
+ theoretical max score: 4_656_447_349
+Best score: 49_608_028
+  % of our score: 0.47
 
 
 
-Total score: 8213780836
+Total score: 10_489_149_265
