@@ -8,12 +8,10 @@ let grid_size (p : problem) : int * int =
   else ((w -. 10.0) /. 10.0 |> int_of_float, (h -. 10.0) /. 10.0 |> int_of_float)
 
 let place_row (x_start : float) (x_no : int) (y : float) : position list =
-  List.range ~stop:`inclusive 0 (x_no - 1)
-  |> List.map ~f:(fun i -> { x = x_start +. (float_of_int i *. 10.0); y })
+  List.range 0 (x_no - 1) |> List.map ~f:(fun i -> { x = x_start +. (float_of_int i *. 10.0); y })
 
 let place_col (x : float) (y_start : float) (y_no : int) : position list =
-  List.range ~stop:`inclusive 0 (y_no - 1)
-  |> List.map ~f:(fun i -> { x; y = y_start +. (float_of_int i *. 10.0) })
+  List.range 0 (y_no - 1) |> List.map ~f:(fun i -> { x; y = y_start +. (float_of_int i *. 10.0) })
 
 (* Place a grid of points *)
 let place_grid (x_start : float) (y_start : float) (x_no : int) (y_no : int) (max_placed : int) :
@@ -130,8 +128,9 @@ let place_curvy_edge (p : problem) (already_placed : position list) (e : edge) :
           (min h max_musicians) West
   in
   (* Remove elements already in already_placed *)
-  let already_placed_set = already_placed |> Set.Poly.of_list in
-  let new_pos = List.filter new_pos ~f:(fun p -> not (Set.mem already_placed_set p)) in
+  let new_pos =
+    List.filter new_pos ~f:(fun pos -> not (Random_solver.is_valid_placement p already_placed pos))
+  in
   new_pos
 
 let place_curvy_edges (p : problem) (edges : edges) : position list =
