@@ -65,3 +65,14 @@ let instrument_count (p : problem) : int =
   match List.max_elt p.musicians ~compare:Int.compare with
   | None -> 0
   | Some x -> x + 1
+
+let legal_musician_rect (p : problem) : Geometry.rectangle =
+  ( { x = p.stage_bottom_left.x +. 10.0; y = p.stage_bottom_left.y +. 10. },
+    p.stage_width -. 20.,
+    p.stage_height -. 20. )
+
+let musician_group_by_instrument (problem : problem) : int list array =
+  let num_instruments = instrument_count problem in
+  let musician_pool = Array.create ~len:num_instruments [] in
+  List.iteri problem.musicians ~f:(fun m inst -> musician_pool.(inst) <- m :: musician_pool.(inst));
+  musician_pool

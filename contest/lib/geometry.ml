@@ -31,6 +31,10 @@ let point_to_rect_squared ({ x; y } : point) (({ x = x_r; y = y_r }, w_r, h_r) :
   let dy = max (y_r - y) (max 0.0 (y - y_r - h_r)) in
   (dx ** 2.0) + (dy ** 2.0)
 
+let within_rect (({ x = x_r; y = y_r }, w_r, h_r) : rectangle) (p : point) : bool =
+  let x, y = (p.x, p.y) in
+  x >= x_r && x <= x_r +. w_r && y >= y_r && y <= y_r +. h_r
+
 let translate (delta : point) (p : point) : point = { x = p.x +. delta.x; y = p.y +. delta.y }
 
 let point_rotator (theta : float) =

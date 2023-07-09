@@ -123,7 +123,7 @@ let _ =
        (init_solution_handler (fun p -> Random_solver.random_placement_solution p []))
   |> App.post "/swap/:n" (optimiser_handler Improver.improve)
   |> App.post "/lp/:n" (optimiser_handler Lp_solver.lp_optimize_solution)
-  |> App.post "/init_sim" (init_solution_handler init_solution_sol_stage1)
-  |> App.post "/step_sim/:n" (optimiser_handler simulate_step_sol_stage1)
+  |> App.post "/init_sim" (init_solution_handler init_solution_sol)
+  |> App.post "/step_sim/:n" (optimiser_handler simulate_step_sol)
   |> App.post "/save" save_handler
   |> App.run_command
