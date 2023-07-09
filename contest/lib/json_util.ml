@@ -29,10 +29,11 @@ let best_solution_score problem_id =
 
 (** Write the solution to the "../problems/solutions-%d" directory. Only write a
  * new file if the new score is better than all the previous ones. *)
-let write_solution_if_best (score : float) (problem_id : int) (solution : Types.solution) : unit =
-  let best_previous_score = best_solution_score problem_id in
+let write_solution_if_best (score : float) (problem : Types.problem) (solution : Types.solution) :
+    unit =
+  let best_previous_score = best_solution_score problem.problem_id in
   if Float.(score > best_previous_score) then (
-    let volumes = List.init ~f:(fun _ -> 10.) (Array.length solution) in
+    let volumes = Score.volumes_for_musicians problem solution in
     let solution_json =
       Types.json_solution_of_solution ~volumes solution |> Json_j.string_of_json_solution
     in
@@ -40,7 +41,7 @@ let write_solution_if_best (score : float) (problem_id : int) (solution : Types.
      * We're not using mkdir_p here because if there's some kind of problem with
      * our assumptions about directory layout we don't want files to be created
      * under the parent directory. *)
-    let dir_name = sprintf "../problems/solutions-%d" problem_id in
+    let dir_name = sprintf "../problems/solutions-%d" problem.problem_id in
     (match Sys_unix.is_directory dir_name with
     | `No -> Caml_unix.mkdir dir_name 0o777
     | _ -> ());

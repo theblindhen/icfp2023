@@ -107,7 +107,7 @@ let save_handler _ =
       let solution_json = s |> Types.json_solution_of_solution |> Json_j.string_of_json_solution in
       let score = Score.score_solution p s in
       Misc.validate_solution p s;
-      Json_util.write_solution_if_best score p.problem_id s;
+      Json_util.write_solution_if_best score p s;
       returnJson solution_json
   | _ -> returnError "No problem or solution selected; cannot save solution"
 

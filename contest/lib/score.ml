@@ -36,8 +36,7 @@ let score_I_partial (env : scoring_env) (a : attendee) (self_id : int) (pos : po
     1_000_000.0 /. d_sq
 
 let score_musician ?(negative : bool option) (env : scoring_env) (m : musician) : float =
-  (* TODO: Change negative to default false *)
-  let negative = Option.value negative ~default:true in
+  let negative = Option.value negative ~default:false in
   let raw_score =
     List.sum (module Float) ~f:(fun attendee -> score_I env attendee m) env.problem.attendees
   in
@@ -63,10 +62,17 @@ let compute_qfactors (p : problem) (s : solution) : float array =
 let get_scoring_env (p : problem) (s : solution) : scoring_env =
   { problem = p; solution = s; qfactors = compute_qfactors p s }
 
-let score_solution ?(volume : bool option) (p : problem) (s : solution) : float =
-  let volume = Option.value volume ~default:true in
+let score_solution (p : problem) (s : solution) : float =
+  (* Includes volume boost for positive. Negative musicians capped in score_musician  *)
   let raw_score = Array.sum (module Float) ~f:(score_musician (get_scoring_env p s)) s in
-  raw_score *. if volume then 10. else 1.
+  raw_score *. 10.
+
+let volumes_for_musicians (problem : problem) (solution : solution) : float list =
+  let env = get_scoring_env problem solution in
+  solution
+  |> Array.to_list
+  |> List.sort ~compare:(fun a b -> Int.compare a.id b.id)
+  |> List.map ~f:(fun m -> if Float.(score_musician ~negative:true env m < 0.) then 0. else 10.)
 
 (* Alternative scoring function, using Geometry.precompute_hearable. *)
 let score_solution_wip_broken (p : problem) (s : solution) : float =
