@@ -5,6 +5,13 @@ let get_problem problem_id =
   | json -> Some (Types.problem_of_json_problem ~problem_id (Json_j.json_problem_of_string json))
   | exception _ -> None
 
+let get_solution (problem : Types.problem) solution_file =
+  match
+    In_channel.read_all (sprintf "../problems/solutions-%d/%s" problem.problem_id solution_file)
+  with
+  | json -> Some (Types.solution_of_json_solution problem (Json_j.json_solution_of_string json))
+  | exception _ -> None
+
 let make_submission (problem_id : int) (solution : Types.solution) : Json_j.json_submission_post =
   let solution_json =
     solution |> Types.json_solution_of_solution |> Json_j.string_of_json_solution

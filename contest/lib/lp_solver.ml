@@ -3,7 +3,7 @@ open Core
 let num_instruments (problem : Types.problem) =
   1 + (List.max_elt problem.musicians ~compare:Int.compare |> Option.value_exn)
 
-(* Create the variables we'll need, returning [musician_idx][instrument] *)
+(* Create the variables we'll need, returning [position_idx][instrument] *)
 let lp_vars (problem : Types.problem) (positions : Types.position list) =
   let num_positions = List.length positions in
   let num_instruments = num_instruments problem in
@@ -43,9 +43,12 @@ let lp_of_problem (problem : Types.problem) (positions : Types.position list)
   let constraints_total_instruments =
     (* the number of each instrument is bounded *)
     instrument_count
-    |> Array.mapi ~f:(fun i count ->
-           let pvars = Array.map vars ~f:(fun pvars -> pvars.(i)) in
-           Array.fold pvars ~init:(c 0.0) ~f:(fun sum var -> sum ++ var) <~ c (float_of_int count))
+    |> Array.mapi ~f:(fun instrument count ->
+           let instrument_vars = Array.map vars ~f:(fun pvars -> pvars.(instrument)) in
+           let instrument_sum =
+             Array.fold instrument_vars ~init:(c 0.0) ~f:(fun sum var -> sum ++ var)
+           in
+           instrument_sum <~ c (float_of_int count))
     |> List.of_array
   in
   make objective (constraints_one_instrument @ constraints_total_instruments)
