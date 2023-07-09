@@ -35,7 +35,7 @@ let run_invocation inv =
         | Random -> random_solution problem []
         | Newton -> Physics.newton_solver problem
         | Edge edges ->
-            let edge = Edge_placer.place_edges problem edges in
+            let edge = Edge_placer.place_curvy_edges problem edges in
             random_solution problem edge
         | LoadBest -> (
             match Json_util.get_best_solution problem with
