@@ -40,7 +40,7 @@ let score_musician ?(negative : bool option) (env : scoring_env) (m : musician) 
   let raw_score =
     List.sum (module Float) ~f:(fun attendee -> score_I env attendee m) env.problem.attendees
   in
-  if negative then raw_score else Float.max raw_score 0.0
+  if negative then 10. *. raw_score else Float.max raw_score 0.0
 
 let compute_qfactors (p : problem) (s : solution) : float array =
   let arr = Array.create ~len:(Array.length s) 1.0 in
@@ -64,8 +64,7 @@ let get_scoring_env (p : problem) (s : solution) : scoring_env =
 
 let score_solution (p : problem) (s : solution) : float =
   (* Includes volume boost for positive. Negative musicians capped in score_musician  *)
-  let raw_score = Array.sum (module Float) ~f:(score_musician (get_scoring_env p s)) s in
-  raw_score *. 10.
+  Array.sum (module Float) ~f:(score_musician (get_scoring_env p s)) s
 
 let volumes_for_musicians (problem : problem) (solution : solution) : float list =
   let env = get_scoring_env problem solution in
