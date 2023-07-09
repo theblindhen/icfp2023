@@ -6222,7 +6222,6 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
-var $elm$core$Debug$log = _Debug_log;
 var $author$project$Main$SolutionReturned = function (a) {
 	return {$: 'SolutionReturned', a: a};
 };
@@ -6238,6 +6237,16 @@ var $author$project$Main$postExpectSolution = function (url) {
 			url: url
 		});
 };
+var $author$project$Main$postExpectSolutionWithBody = F2(
+	function (url, body) {
+		return $elm$http$Http$post(
+			{
+				body: body,
+				expect: $elm$http$Http$expectString($author$project$Main$SolutionReturned),
+				url: url
+			});
+	});
+var $elm$http$Http$stringBody = _Http_pair;
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -6253,6 +6262,13 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{problemId: problemId}),
+					$elm$core$Platform$Cmd$none);
+			case 'EdgeFieldUpdated':
+				var edge = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{edge: edge}),
 					$elm$core$Platform$Cmd$none);
 			case 'LoadProblem':
 				var problemId = msg.a;
@@ -6300,6 +6316,18 @@ var $author$project$Main$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
+			case 'Edge':
+				var edge = msg.a;
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								A2(
+								$author$project$Main$postExpectSolutionWithBody,
+								'http://localhost:3000/edge',
+								A2($elm$http$Http$stringBody, 'application/json', edge))
+							])));
 			case 'PlaceRandomly':
 				return _Utils_Tuple2(
 					model,
@@ -6411,7 +6439,6 @@ var $author$project$Main$update = F2(
 					}
 				} else {
 					var err = msg.a.a;
-					var _v3 = A2($elm$core$Debug$log, 'Error', err);
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7014,6 +7041,12 @@ var $author$project$Main$viewLoadSolution = function (loading) {
 						]));
 			},
 			loading));
+};
+var $author$project$Main$Edge = function (a) {
+	return {$: 'Edge', a: a};
+};
+var $author$project$Main$EdgeFieldUpdated = function (a) {
+	return {$: 'EdgeFieldUpdated', a: a};
 };
 var $author$project$Main$InitSim = {$: 'InitSim'};
 var $author$project$Main$LP = {$: 'LP'};
@@ -8538,6 +8571,29 @@ var $author$project$Main$viewProblem = F2(
 					_List_Nil,
 					_List_fromArray(
 						[
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+									$author$project$Main$Edge(m.edge)),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Place specified edges')
+								])),
+							$rundis$elm_bootstrap$Bootstrap$Form$Input$text(
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Form$Input$onInput($author$project$Main$EdgeFieldUpdated)
+								]))
+						])),
+					A2(
+					$elm$html$Html$div,
+					_List_Nil,
+					_List_fromArray(
+						[
 							$elm$html$Html$text(
 							A2($author$project$Main$instrumentDescription, m, p))
 						]))
@@ -8573,7 +8629,7 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 	{
 		init: function (_v0) {
 			return _Utils_Tuple2(
-				{count: 0, error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, loading: _List_Nil, playing: false, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
+				{count: 0, edge: '', error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, loading: _List_Nil, playing: false, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
 				$elm$core$Platform$Cmd$none);
 		},
 		subscriptions: function (model) {

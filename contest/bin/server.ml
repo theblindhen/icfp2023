@@ -36,6 +36,23 @@ let problem_handler req =
   current_round := 0;
   returnJson problem
 
+let edge_handler req =
+  let edges_str = Request.to_plain_text req in
+  Lwt.bind edges_str (fun edges_str ->
+      let edges = Edge_placer.parse_edges_flag (Some edges_str) in
+      match !current_problem with
+      | None -> returnError "No problem selected; cannot initialize solution"
+      | Some p ->
+          let edge = Edge_placer.place_edges p edges in
+          let solution, state = (Random_solver.random_placement_solution p edge, "") in
+          let solution_json =
+            solution |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
+          in
+          current_solution := Some solution;
+          current_state := state;
+          current_round := 0;
+          returnJson solution_json)
+
 let solutions_handler req =
   let id = Router.param req "id" in
   let solutions_dir = sprintf "../problems/solutions-%s" id in
@@ -134,6 +151,7 @@ let _ =
   |> App.get "/problem/:id" problem_handler
   |> App.get "/solutions/:id" solutions_handler
   |> App.post "/solution/:id/:name" solution_handler
+  |> App.post "/edge" edge_handler
   |> App.post "/place_randomly"
        (init_solution_handler
           (stateless_init_handler (fun p -> Random_solver.random_placement_solution p [])))
