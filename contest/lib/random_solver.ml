@@ -51,17 +51,22 @@ let random_solution_from_instrument_locii (p : problem) (instruments : position 
          match group with
          | [] -> already_placed
          | hd :: tl ->
-             musicians.(hd) <- { (musicians.(hd)) with pos = locus };
-             let already_placed = musicians.(hd).pos :: already_placed in
-             let tl_placements =
+             (* TODO: MAY BE ILLEGAL *)
+             let to_place, already_placed =
+               if is_valid_placement p already_placed locus then (
+                 musicians.(hd) <- { (musicians.(hd)) with pos = locus };
+                 (tl, musicians.(hd).pos :: already_placed))
+               else (hd :: tl, already_placed)
+             in
+             let placements =
                random_placements
                  (p : problem)
                  (fun () -> random_placement_around_locus p locus)
-                 (List.length tl) already_placed
+                 (List.length to_place) already_placed
              in
-             List.iter2_exn tl_placements tl ~f:(fun pos musician ->
+             List.iter2_exn placements to_place ~f:(fun pos musician ->
                  musicians.(musician) <- { (musicians.(musician)) with pos });
-             tl_placements @ already_placed)
+             placements @ already_placed)
   |> ignore;
   musicians
 

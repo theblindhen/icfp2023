@@ -145,3 +145,21 @@ let simulate_step_sol (p : Types.problem) (solution : Types.solution) ~(round : 
     solution)
   else (* NOOP *)
     solution
+
+let newton_solver (problem : Types.problem) : Types.solution =
+  let placements = init_placements problem in
+  let rec stage1 iteration last_instability =
+    if iteration > 100 && (Float.(last_instability < 0.00001) || iteration > 200) then iteration
+    else
+      let att_heat = att_heat_from_iteration_stage1 problem iteration in
+      (* Printf.printf "Iteration %d, heat %f\n%!" iteration att_heat; *)
+      let last_instability = simulate_step_stage1 problem ~att_heat placements in
+      stage1 (iteration + 1) last_instability
+  in
+  let iterations = stage1 0 Float.max_value in
+  Printf.printf "Problem %d converged in %d iterations." problem.problem_id iterations;
+  Printf.printf " Score: %s \n%!" (placement_score_raw problem placements |> Misc.string_of_score);
+  Printf.printf " Going to Stage 2 %!";
+  let solution = instrument_placement_to_stage2 problem placements in
+  Printf.printf " - DONE\n%!";
+  solution

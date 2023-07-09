@@ -38,7 +38,6 @@ let best_solution_score problem_id =
  * new file if the new score is better than all the previous ones. *)
 let write_solution_if_best (score : float) (problem_id : int) (solution : Types.solution) : unit =
   let best_previous_score = best_solution_score problem_id in
-  eprintf "Found best previous score\n%!";
   if Float.(score > best_previous_score) then (
     let solution_json =
       solution |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
@@ -55,4 +54,6 @@ let write_solution_if_best (score : float) (problem_id : int) (solution : Types.
     let filename = sprintf "%s/%.0f.json" dir_name score in
     eprintf "Writing solution to %s\n%!" filename;
     Out_channel.write_all filename ~data:solution_json)
-  else eprintf "Not writing solution with score %.0f (< %.0f)\n%!" score best_previous_score
+  else
+    eprintf "Not writing solution with score %s (< %s)\n%!" (Misc.string_of_score score)
+      (Misc.string_of_score best_previous_score)
