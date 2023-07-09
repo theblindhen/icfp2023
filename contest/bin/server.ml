@@ -39,7 +39,6 @@ let problem_handler req =
 let solutions_handler req =
   let id = Router.param req "id" in
   let solutions_dir = sprintf "../problems/solutions-%s" id in
-  printf "solutions dir: %s\n%!" solutions_dir;
   match Sys_unix.is_directory solutions_dir with
   | `Yes ->
       let solution_files =
@@ -47,7 +46,6 @@ let solutions_handler req =
         |> List.filter ~f:(fun s -> String.is_suffix ~suffix:".json" s)
         |> List.map ~f:(fun s -> String.chop_suffix_exn ~suffix:".json" s)
       in
-      printf "solutions: %s\n%!" (String.concat ~sep:"," solution_files);
       let result = String.concat ~sep:"," solution_files in
       returnJson result
   | _ -> returnError "No solutions found"
