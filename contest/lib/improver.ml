@@ -33,7 +33,7 @@ let get_score cache scores pos_of_i instrument_of_j =
   Hashtbl.Poly.find_exn cache
     (scores.(pos_of_i).musician.pos, scores.(instrument_of_j).musician.instrument)
 
-let improve (p : problem) (s : solution) ~(round : int) : solution =
+let swapper_without_q (p : problem) (s : solution) ~(round : int) : solution =
   (* TODO The env is assumed constant during the swaps, but this violates the qfactor
      computations.
   *)

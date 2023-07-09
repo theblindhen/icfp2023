@@ -120,7 +120,7 @@ let _ =
   |> App.post "/solution/:id/:name" solution_handler
   |> App.post "/place_randomly"
        (init_solution_handler (fun p -> Random_solver.random_placement_solution p []))
-  |> App.post "/swap/:n" (optimiser_handler Improver.improve)
+  |> App.post "/swap/:n" (optimiser_handler Improver.swapper_without_q)
   |> App.post "/lp/:n" (optimiser_handler Lp_solver.lp_optimize_solution)
   |> App.post "/init_sim" (init_solution_handler Physics.gui_init_solution)
   |> App.post "/step_sim/:n" (optimiser_handler Physics.gui_newton_solver_step)

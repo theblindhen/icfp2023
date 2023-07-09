@@ -49,7 +49,7 @@ let run_invocation inv =
       let optimized_solution =
         match inv.optimizer with
         | None -> solution
-        | Some Swap -> Improver.improve problem solution ~round:0
+        | Some Swap -> Improver.swapper_without_q problem solution ~round:0
         | Some LP -> Lp_solver.lp_optimize_solution problem solution ~round:0
       in
       Misc.validate_solution problem optimized_solution;
