@@ -30,17 +30,18 @@ let max_q (inl : int list) : float =
    as possible and that no pillars are blocking the view. *)
 let max_score_problem (p : problem) : float =
   let in_groups : instrument list list = List.sort_and_group p.musicians ~compare:Int.compare in
-  List.fold in_groups ~init:0.0 ~f:(fun acc inl ->
-      let q = max_q inl in
-      let base_score = max_score_instrument_without_q p (List.hd_exn inl) in
-      let score = if p.problem_id > 55 then base_score *. q else base_score in
-      acc +. (score *. float (List.length inl)))
+  10.
+  *. List.fold in_groups ~init:0.0 ~f:(fun acc inl ->
+         let q = max_q inl in
+         let base_score = max_score_instrument_without_q p (List.hd_exn inl) in
+         let score = if p.problem_id > 55 then base_score *. q else base_score in
+         acc +. (score *. float (List.length inl)))
 
 let newton_score_I (a : attendee) (i : Physics.placed_instrument) : float =
   if Float.(a.tastes.(i.instrument) < 0.0) then 0.0
   else
     let d_sq = distance_squared a.pos i.pos in
-    Float.round_up (1_000_000.0 *. a.tastes.(i.instrument) /. d_sq)
+    10. *. Float.round_up (1_000_000.0 *. a.tastes.(i.instrument) /. d_sq)
 
 let newton_score_instrument_without_q (p : problem) (i : Physics.placed_instrument) : float =
   List.sum (module Float) ~f:(fun a -> newton_score_I a i) p.attendees
@@ -49,16 +50,7 @@ let newton_score_instrument_without_q (p : problem) (i : Physics.placed_instrume
    pillars are blocking the view. *)
 let newton_score_problem (p : problem) : float =
   let placements = Physics.init_placements p in
-  let rec loop iteration last_instability =
-    if iteration > 100 && (Float.(last_instability < 0.00000000001) || iteration > 5000) then
-      iteration
-    else
-      let att_heat = Physics.att_heat_from_iteration_stage1 p iteration in
-      (* Printf.printf "Iteration %d, heat %f\n%!" iteration att_heat; *)
-      let last_instability = Physics.simulate_step_stage1 p ~att_heat placements in
-      loop (iteration + 1) last_instability
-  in
-  let _ = loop 0 Float.max_value in
+  let _iters = Physics.(newton_run_stage stay_stage1 step_stage1) p placements 0 in
   let in_groups : instrument list list = List.sort_and_group p.musicians ~compare:Int.compare in
   List.fold in_groups ~init:0.0 ~f:(fun acc inl ->
       let q = max_q inl in
