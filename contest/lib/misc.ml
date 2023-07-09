@@ -49,7 +49,10 @@ let validate_solution (p : problem) (s : solution) =
     Array.iter s ~f:(fun m ->
         Array.iter s ~f:(fun m' ->
             if m.id <> m'.id then
-              assert (Float.(Geometry.distance_squared m.pos m'.pos >= musician_radius_sq))))
+              let dist = Float.(Geometry.distance_squared m.pos m'.pos) in
+              if Float.(dist < musician_radius_sq) then
+                failwithf "Musicians %d and %d are too close (%f < %f)" m.id m'.id dist
+                  musician_radius_sq ()))
   in
   validate_musicians_distant ();
   ()

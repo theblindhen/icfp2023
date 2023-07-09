@@ -2,7 +2,7 @@ open Core
 open Geometry
 
 type force = { x : float; y : float }
-type placed_instrument = { instrument : Types.instrument; pos : Types.position }
+type placed_instrument = { instrument : Types.instrument; pos : Types.position } [@@deriving sexp]
 
 let from_points (a : Types.position) (b : Types.position) : force =
   { x = a.x -. b.x; y = a.y -. b.y }
@@ -124,10 +124,21 @@ let instrument_placement_to_stage2 ?(placer = `Honeycomb) (p : Types.problem)
   | `Honeycomb -> honeycomb_solution_from_instrument_locii p placements)
   |> Array.map ~f:(fun m -> { pos = m.pos; instrument = m.instrument })
 
-let solution_of_placement (placements : placed_instrument array) : Types.solution =
+let solution_of_placement (problem : Types.problem) (placements : placed_instrument array) :
+    Types.solution =
+  let musicians : Types.solution =
+    problem.musicians
+    |> Array.of_list
+    |> Array.mapi ~f:(fun id instrument : Types.musician ->
+           { id; instrument; pos = { x = 0.; y = 0. } })
+  in
+  let musician_pool = Misc.musician_group_by_instrument problem in
   placements
-  |> Array.mapi ~f:(fun idx i : Types.musician ->
-         { id = idx; instrument = i.instrument; pos = i.pos })
+  |> Array.iter ~f:(fun { instrument; pos } ->
+         let musician = List.hd_exn musician_pool.(instrument) in
+         musicians.(musician) <- { (musicians.(musician)) with pos };
+         musician_pool.(instrument) <- List.tl_exn musician_pool.(instrument));
+  musicians
 
 let att_heat_from_iteration_stage1 (problem : Types.problem) (iteration : int) : float =
   let iter_denom = Float.round_up (Float.of_int iteration /. 100.) in
@@ -182,23 +193,34 @@ let newton_solver (problem : Types.problem) : Types.solution =
   Printf.printf " - DONE\n%!";
   let iterations = run_stage2 problem music_placements iterations in
   Printf.printf "Stage 2 done by %d iterations.\n%!" iterations;
-  solution_of_placement music_placements
+  let sol = solution_of_placement problem music_placements in
+  sol
 
 (* GUI Entry points *)
-let gui_init_solution (p : Types.problem) : Types.solution =
-  init_placements p |> solution_of_placement
+let gui_init_solution (p : Types.problem) : Types.solution * string =
+  (init_placements p |> solution_of_placement p, "stage1")
 
-let gui_newton_solver_step (problem : Types.problem) (solution : Types.solution) ~(round : int) :
-    Types.solution =
+let placements_of_solution (solution : Types.solution) =
+  Array.map solution ~f:(fun m -> { pos = m.pos; instrument = m.instrument })
+
+let gui_newton_solver_step (problem : Types.problem) ((solution, state) : Types.solution * string)
+    ~(round : int) : Types.solution * string =
   let iteration = round in
-  let placements = Array.mapi solution ~f:(fun i m -> { pos = m.pos; instrument = i }) in
-  if Array.length solution < List.length problem.musicians then
+  let placements = placements_of_solution solution in
+  if Stdlib.(state = "stage1") then
     (* Stage 1 *)
     let last_instability = step_stage1 problem placements iteration in
-    if stay_stage1 last_instability (iteration + 1) then solution_of_placement placements
-    else (
-      print_endline "Stage 1 done!";
-      let music_placement = instrument_placement_to_stage2 problem placements in
-      solution_of_placement music_placement)
-  else (* Stage 2 *)
-    solution
+    if stay_stage1 last_instability (iteration + 1) then
+      (solution_of_placement problem placements, "stage1")
+    else
+      let music_placements = instrument_placement_to_stage2 problem placements in
+      (solution_of_placement problem music_placements, "stage2")
+  else if Stdlib.(state = "stage2") then (* Stage 2 *)
+    (solution, "stage3")
+    (* let last_instability = step_stage2 problem placements iteration in
+       if stay_stage2 last_instability (iteration + 1) then
+         (solution_of_placement problem placements, "stage2")
+       else (solution_of_placement problem placements, "stage3") *)
+  else (
+    print_endline "I'm done";
+    (solution, "stage3"))
