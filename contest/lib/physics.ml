@@ -19,6 +19,9 @@ let length_sq (v : force) : float = (v.x *. v.x) +. (v.y *. v.y)
 let move (p : Types.position) (f : force) : Types.position = { x = p.x +. f.x; y = p.y +. f.y }
 
 let placement_score_raw (p : Types.problem) (placement : placed_instrument array) : float =
+  let instrument_valency =
+    List.sort_and_group p.musicians ~compare:Int.compare |> List.map ~f:List.length |> Array.of_list
+  in
   placement
   |> Array.sum
        (module Float)
@@ -29,7 +32,8 @@ let placement_score_raw (p : Types.problem) (placement : placed_instrument array
            ~f:(fun a ->
              let v = from_points a.pos i.pos in
              let d = length v (* TODO: This is dumb *) in
-             a.tastes.(i.instrument) /. (d *. d)))
+             float_of_int instrument_valency.(i.instrument)
+             *. Float.max 0. (Float.round_up (1_000_000. *. a.tastes.(i.instrument) /. (d *. d)))))
 
 let force_I (i : placed_instrument) (a : Types.attendee) : force =
   let d_sq = length_sq (from_points a.pos i.pos) in
@@ -115,7 +119,9 @@ let simulate_step_sol_stage1 (p : Types.problem) (solution : Types.solution) ~(r
   (* let att_heat = 0.1 /. ((float_of_int round +. 10.) ** 1.75) in *)
   let placements = Array.map solution ~f:(fun m -> { instrument = m.instrument; pos = m.pos }) in
   let max_actual_move = simulate_step_stage1 p ~att_heat placements in
-  Printf.printf "Score: %2.4f (max move %e)\n%!" (placement_score_raw p placements) max_actual_move;
+  Printf.printf "Score: %s (max move %e)\n%!"
+    (placement_score_raw p placements |> Misc.string_of_score)
+    max_actual_move;
   solution_of_placement_stage1 placements
 
 let init_solution_sol_stage1 (p : Types.problem) : Types.solution =

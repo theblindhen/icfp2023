@@ -26,8 +26,10 @@ let run_newton (problem : Types.problem) =
       let last_instability = Physics.simulate_step_stage1 problem ~att_heat placements in
       loop (iteration + 1) last_instability
   in
-  Printf.printf "Problem %d converged in %d iterations\n" problem.problem_id
-    (loop 0 Float.max_value);
+  let iterations = loop 0 Float.max_value in
+  Printf.printf "Problem %d converged in %d iterations." problem.problem_id iterations;
+  Printf.printf " Score: %s \n%!"
+    (Physics.placement_score_raw problem placements |> Misc.string_of_score);
   ()
 
 let run_invocation inv =
