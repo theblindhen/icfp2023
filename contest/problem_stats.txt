@@ -6,6 +6,7 @@ room: 3649 x 4350
  attendees: 1000
  pillars: 0
  theoretical max score: 229_068_612_564
+ Newton max score: 11_035_560_866
 Best score: 1_408_506_431
   % of our score: 13.43
 
@@ -17,6 +18,7 @@ room: 8689 x 6523
  attendees: 1000
  pillars: 0
  theoretical max score: 133_707_593_745
+ Newton max score: 7_235_761_916
 Best score: 1_422_143_386
   % of our score: 13.56
 
@@ -28,6 +30,7 @@ room: 2426 x 6421
  attendees: 1000
  pillars: 0
  theoretical max score: 3_550_716_492
+ Newton max score: 235_797_720
 Best score: 92_261_796
   % of our score: 0.88
 
@@ -39,6 +42,7 @@ room: 9340 x 2339
  attendees: 1000
  pillars: 0
  theoretical max score: 1_972_048_654
+ Newton max score: 217_103_627
 Best score: 40_415_671
   % of our score: 0.39
 
@@ -50,6 +54,7 @@ room: 7859 x 5821
  attendees: 1000
  pillars: 0
  theoretical max score: 4_424_056_712
+ Newton max score: 206_347_877
 Best score: 72_943_997
   % of our score: 0.70
 
@@ -61,6 +66,7 @@ room: 4677 x 8826
  attendees: 1000
  pillars: 0
  theoretical max score: 3_508_627_467
+ Newton max score: 293_231_666
 Best score: 109_875_133
   % of our score: 1.05
 
@@ -72,6 +78,7 @@ room: 6111 x 9953
  attendees: 1000
  pillars: 0
  theoretical max score: 4_637_132_024
+ Newton max score: 144_580_830
 Best score: 88_596_424
   % of our score: 0.84
 
@@ -83,6 +90,7 @@ room: 2166 x 5248
  attendees: 5000
  pillars: 0
  theoretical max score: 25_912_422_540
+ Newton max score: 3_177_768_109
 Best score: 1_831_553_621
   % of our score: 17.46
 
@@ -94,6 +102,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 680_159_350
+ Newton max score: 196_224_604
 Best score: 87_842_100
   % of our score: 0.84
 
@@ -105,6 +114,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 415_905_527
+ Newton max score: 64_896_271
 Best score: 0
   % of our score: 0.00
 
@@ -116,6 +126,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 4_096_385_137
+ Newton max score: 708_941_956
 Best score: 244_315_168
   % of our score: 2.33
 
@@ -127,6 +138,7 @@ room: 1000 x 1000
  attendees: 5000
  pillars: 0
  theoretical max score: 7_026_138_212
+ Newton max score: 1_413_131_118
 Best score: 843_916_989
   % of our score: 8.05
 
@@ -138,6 +150,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 296_031_104
+ Newton max score: 84_302_575
 Best score: 0
   % of our score: 0.00
 
@@ -149,6 +162,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 9_068_867
+ Newton max score: 2_840_522
 Best score: 0
   % of our score: 0.00
 
@@ -160,6 +174,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 1_143_679_292
+ Newton max score: 248_885_107
 Best score: 16_768_119
   % of our score: 0.16
 
@@ -171,6 +186,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 162_996_283
+ Newton max score: 22_934_769
 Best score: 0
   % of our score: 0.00
 
@@ -182,6 +198,7 @@ room: 1547 x 3049
  attendees: 5000
  pillars: 0
  theoretical max score: 20_702_057
+ Newton max score: 14_908_123
 Best score: 407_390
   % of our score: 0.00
 
@@ -193,6 +210,7 @@ room: 4444 x 5794
  attendees: 5000
  pillars: 0
  theoretical max score: 155_522_929
+ Newton max score: 101_266_167
 Best score: 2_363_541
   % of our score: 0.02
 
@@ -204,6 +222,7 @@ room: 2954 x 7680
  attendees: 5000
  pillars: 0
  theoretical max score: 1_531_761
+ Newton max score: 1_416_042
 Best score: 221_150
   % of our score: 0.00
 
@@ -215,6 +234,7 @@ room: 6073 x 3064
  attendees: 500
  pillars: 0
  theoretical max score: 5_659_266
+ Newton max score: 4_232_865
 Best score: 161_045
   % of our score: 0.00
 
@@ -226,6 +246,7 @@ room: 5853 x 8495
  attendees: 1000
  pillars: 0
  theoretical max score: 209_932
+ Newton max score: 198_399
 Best score: 52_191
   % of our score: 0.00
 
@@ -237,6 +258,7 @@ room: 1000 x 1000
  attendees: 400
  pillars: 0
  theoretical max score: 190_128_374
+ Newton max score: 35_496_713
 Best score: 38_411_081
   % of our score: 0.37
 
@@ -248,6 +270,7 @@ room: 1000 x 1000
  attendees: 500
  pillars: 0
  theoretical max score: 185_023_990
+ Newton max score: 25_537_230
 Best score: 27_865_298
   % of our score: 0.27
 
@@ -259,6 +282,7 @@ room: 1000 x 1000
  attendees: 500
  pillars: 0
  theoretical max score: 317_055_383
+ Newton max score: 25_078_469
 Best score: 44_279_621
   % of our score: 0.42
 
@@ -270,6 +294,7 @@ room: 1000 x 1000
  attendees: 1500
  pillars: 0
  theoretical max score: 1_524_479_818
+ Newton max score: 168_172_726
 Best score: 188_761_481
   % of our score: 1.80
 
@@ -281,6 +306,7 @@ room: 1000 x 1000
  attendees: 1500
  pillars: 0
  theoretical max score: 822_190_628
+ Newton max score: 84_732_691
 Best score: 110_759_236
   % of our score: 1.06
 
@@ -292,6 +318,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 613_900_040
+ Newton max score: 65_342_600
 Best score: 93_082_339
   % of our score: 0.89
 
@@ -303,6 +330,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 569_000_397
+ Newton max score: 117_807_643
 Best score: 98_792_275
   % of our score: 0.94
 
@@ -314,6 +342,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 2_486_545_972
+ Newton max score: 577_730_855
 Best score: 270_094_687
   % of our score: 2.57
 
@@ -325,6 +354,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 4_506_436_450
+ Newton max score: 1_021_641_930
 Best score: 425_097_261
   % of our score: 4.05
 
@@ -336,6 +366,7 @@ room: 1462 x 9133
  attendees: 1000
  pillars: 0
  theoretical max score: 5_033_744_659
+ Newton max score: 599_514_048
 Best score: 141_215_164
   % of our score: 1.35
 
@@ -347,6 +378,7 @@ room: 3968 x 9921
  attendees: 1000
  pillars: 0
  theoretical max score: 2_565_176_389
+ Newton max score: 803_108_413
 Best score: 156_570_270
   % of our score: 1.49
 
@@ -358,6 +390,7 @@ room: 9963 x 9102
  attendees: 500
  pillars: 0
  theoretical max score: 488_546_690
+ Newton max score: 118_213_326
 Best score: 20_881_642
   % of our score: 0.20
 
@@ -369,6 +402,7 @@ room: 8882 x 5656
  attendees: 500
  pillars: 0
  theoretical max score: 1_169_424_836
+ Newton max score: 193_284_998
 Best score: 37_299_255
   % of our score: 0.36
 
@@ -380,6 +414,7 @@ room: 8085 x 3225
  attendees: 500
  pillars: 0
  theoretical max score: 1_598_144_446
+ Newton max score: 200_320_662
 Best score: 44_193_991
   % of our score: 0.42
 
@@ -391,6 +426,7 @@ room: 2159 x 1047
  attendees: 500
  pillars: 0
  theoretical max score: 301_320_066
+ Newton max score: 96_486_012
 Best score: 39_914_888
   % of our score: 0.38
 
@@ -402,6 +438,7 @@ room: 2372 x 1101
  attendees: 500
  pillars: 0
  theoretical max score: 1_733_830_177
+ Newton max score: 372_750_465
 Best score: 105_720_961
   % of our score: 1.01
 
@@ -413,6 +450,7 @@ room: 1369 x 2047
  attendees: 1000
  pillars: 0
  theoretical max score: 201_752_668
+ Newton max score: 58_146_403
 Best score: 9_215_775
   % of our score: 0.09
 
@@ -424,6 +462,7 @@ room: 4758 x 1374
  attendees: 1000
  pillars: 0
  theoretical max score: 146_296_095
+ Newton max score: 68_448_678
 Best score: 26_996_016
   % of our score: 0.26
 
@@ -435,6 +474,7 @@ room: 1000 x 1000
  attendees: 1000
  pillars: 0
  theoretical max score: 256_432_476
+ Newton max score: 45_427_774
 Best score: 11_513_139
   % of our score: 0.11
 
@@ -446,6 +486,7 @@ room: 1000 x 1000
  attendees: 400
  pillars: 0
  theoretical max score: 88_269_033
+ Newton max score: 30_518_961
 Best score: 5_913_628
   % of our score: 0.06
 
@@ -457,6 +498,7 @@ room: 1000 x 1000
  attendees: 100
  pillars: 0
  theoretical max score: 18_991_752
+ Newton max score: 10_746_134
 Best score: 6_483_522
   % of our score: 0.06
 
@@ -468,6 +510,7 @@ room: 1000 x 1000
  attendees: 100
  pillars: 0
  theoretical max score: 3_878_487
+ Newton max score: 2_557_899
 Best score: 1_232_877
   % of our score: 0.01
 
@@ -479,6 +522,7 @@ room: 1000 x 1000
  attendees: 400
  pillars: 0
  theoretical max score: 224_283_518
+ Newton max score: 42_251_512
 Best score: 26_062_393
   % of our score: 0.25
 
@@ -490,6 +534,7 @@ room: 1000 x 1000
  attendees: 400
  pillars: 0
  theoretical max score: 90_536_022
+ Newton max score: 36_493_312
 Best score: 10_660_042
   % of our score: 0.10
 
@@ -501,6 +546,7 @@ room: 9948 x 8811
  attendees: 300
  pillars: 0
  theoretical max score: 7_772_322
+ Newton max score: 6_924_220
 Best score: 811_464
   % of our score: 0.01
 
@@ -512,6 +558,7 @@ room: 8531 x 3600
  attendees: 200
  pillars: 0
  theoretical max score: 3_773_322
+ Newton max score: 2_570_473
 Best score: 1_603_816
   % of our score: 0.02
 
@@ -523,6 +570,7 @@ room: 5144 x 3291
  attendees: 200
  pillars: 0
  theoretical max score: 45_984_511
+ Newton max score: 10_516_511
 Best score: 5_440_334
   % of our score: 0.05
 
@@ -534,6 +582,7 @@ room: 6863 x 7049
  attendees: 300
  pillars: 0
  theoretical max score: 13_364_448
+ Newton max score: 10_127_239
 Best score: 943_270
   % of our score: 0.01
 
@@ -545,6 +594,7 @@ room: 4922 x 2260
  attendees: 300
  pillars: 0
  theoretical max score: 38_753_744
+ Newton max score: 9_281_678
 Best score: 8_433_006
   % of our score: 0.08
 
@@ -556,6 +606,7 @@ room: 7948 x 3504
  attendees: 400
  pillars: 0
  theoretical max score: 6_678_956
+ Newton max score: 290_455
 Best score: 2_165_437
   % of our score: 0.02
 
@@ -567,6 +618,7 @@ room: 7151 x 3876
  attendees: 400
  pillars: 0
  theoretical max score: 21_548_381
+ Newton max score: 11_180_361
 Best score: 4_249_016
   % of our score: 0.04
 
@@ -578,6 +630,7 @@ room: 7396 x 2367
  attendees: 400
  pillars: 0
  theoretical max score: 101_338_113
+ Newton max score: 8_543_168
 Best score: 6_677_491
   % of our score: 0.06
 
@@ -589,6 +642,7 @@ room: 7314 x 6807
  attendees: 400
  pillars: 0
  theoretical max score: 11_926_466
+ Newton max score: 1_825_887
 Best score: 1_807_065
   % of our score: 0.02
 
@@ -600,6 +654,7 @@ room: 4200 x 6234
  attendees: 300
  pillars: 0
  theoretical max score: 1_950_285
+ Newton max score: 769_043
 Best score: 614_698
   % of our score: 0.01
 
@@ -611,7 +666,8 @@ room: 6168 x 1514
  attendees: 400
  pillars: 194
     71 radii between 5.00 and 84.00
- theoretical max score: 1_038_681_005
+ theoretical max score: 895_083_511
+ Newton max score: 105_334_070
 Best score: 78_611_453
   % of our score: 0.75
 
@@ -623,7 +679,8 @@ room: 3039 x 2499
  attendees: 400
  pillars: 103
     58 radii between 5.00 and 83.00
- theoretical max score: 1_790_282_924
+ theoretical max score: 1_523_682_367
+ Newton max score: 146_890_715
 Best score: 116_040_654
   % of our score: 1.11
 
@@ -635,7 +692,8 @@ room: 3303 x 2620
  attendees: 400
  pillars: 32
     24 radii between 8.00 and 76.00
- theoretical max score: 1_161_203_159
+ theoretical max score: 1_696_361_383
+ Newton max score: 374_350_449
 Best score: 39_437_364
   % of our score: 0.38
 
@@ -647,7 +705,8 @@ room: 6688 x 5054
  attendees: 700
  pillars: 58
     45 radii between 5.00 and 84.00
- theoretical max score: 272_413_047
+ theoretical max score: 319_892_656
+ Newton max score: 82_510_014
 Best score: 23_836_345
   % of our score: 0.23
 
@@ -659,7 +718,8 @@ room: 8642 x 7123
  attendees: 400
  pillars: 47
     38 radii between 9.00 and 82.00
- theoretical max score: 19_625_362
+ theoretical max score: 20_355_656
+ Newton max score: 6_360_534
 Best score: 2_809_353
   % of our score: 0.03
 
@@ -671,7 +731,8 @@ room: 5135 x 8578
  attendees: 400
  pillars: 149
     67 radii between 5.00 and 84.00
- theoretical max score: 2_287_817_040
+ theoretical max score: 3_849_233_627
+ Newton max score: 654_796_314
 Best score: 45_452_797
   % of our score: 0.43
 
@@ -683,7 +744,8 @@ room: 8701 x 7942
  attendees: 400
  pillars: 81
     49 radii between 5.00 and 84.00
- theoretical max score: 1_997_658_546
+ theoretical max score: 3_476_640_492
+ Newton max score: 315_862_379
 Best score: 34_609_541
   % of our score: 0.33
 
@@ -695,7 +757,8 @@ room: 9997 x 9776
  attendees: 700
  pillars: 86
     50 radii between 6.00 and 84.00
- theoretical max score: 16_980_141_455
+ theoretical max score: 33_294_766_109
+ Newton max score: 318_250_617
 Best score: 86_830_658
   % of our score: 0.83
 
@@ -707,7 +770,8 @@ room: 5590 x 6364
  attendees: 700
  pillars: 78
     52 radii between 5.00 and 84.00
- theoretical max score: 4_314_971_826
+ theoretical max score: 6_522_032_650
+ Newton max score: 610_934_172
 Best score: 104_678_520
   % of our score: 1.00
 
@@ -719,7 +783,8 @@ room: 4544 x 3526
  attendees: 700
  pillars: 125
     63 radii between 5.00 and 84.00
- theoretical max score: 933_508_361
+ theoretical max score: 1_012_127_830
+ Newton max score: 113_748_227
 Best score: 52_501_288
   % of our score: 0.50
 
@@ -731,7 +796,8 @@ room: 7244 x 9899
  attendees: 700
  pillars: 86
     57 radii between 5.00 and 84.00
- theoretical max score: 2_561_024_488
+ theoretical max score: 2_735_893_865
+ Newton max score: 122_849_452
 Best score: 60_733_878
   % of our score: 0.58
 
@@ -743,7 +809,8 @@ room: 6079 x 1663
  attendees: 700
  pillars: 145
     71 radii between 5.00 and 84.00
- theoretical max score: 14_300_760_234
+ theoretical max score: 14_651_334_777
+ Newton max score: 723_376_490
 Best score: 235_551_140
   % of our score: 2.25
 
@@ -755,7 +822,8 @@ room: 3016 x 4070
  attendees: 700
  pillars: 157
     68 radii between 5.00 and 84.00
- theoretical max score: 16_131_792_613
+ theoretical max score: 18_345_672_116
+ Newton max score: 2_490_514_020
 Best score: 169_552_926
   % of our score: 1.62
 
@@ -767,7 +835,8 @@ room: 9745 x 1634
  attendees: 700
  pillars: 50
     1 radii between 18.00 and 18.00
- theoretical max score: 9_010_116_058
+ theoretical max score: 11_725_677_185
+ Newton max score: 1_090_740_090
 Best score: 156_220_318
   % of our score: 1.49
 
@@ -779,7 +848,8 @@ room: 8342 x 4137
  attendees: 700
  pillars: 17
     1 radii between 10.00 and 10.00
- theoretical max score: 1_041_155_537
+ theoretical max score: 1_183_031_152
+ Newton max score: 591_958_700
 Best score: 27_851_273
   % of our score: 0.27
 
@@ -791,7 +861,8 @@ room: 1550 x 9992
  attendees: 700
  pillars: 50
     1 radii between 18.00 and 18.00
- theoretical max score: 6_100_647_007
+ theoretical max score: 7_102_573_007
+ Newton max score: 374_722_693
 Best score: 132_502_896
   % of our score: 1.26
 
@@ -803,7 +874,8 @@ room: 6953 x 4553
  attendees: 700
  pillars: 214
     1 radii between 18.00 and 18.00
- theoretical max score: 7_508_362_753
+ theoretical max score: 12_981_400_945
+ Newton max score: 1_433_997_404
 Best score: 92_083_482
   % of our score: 0.88
 
@@ -815,7 +887,8 @@ room: 9314 x 3954
  attendees: 700
  pillars: 858
     1 radii between 18.00 and 18.00
- theoretical max score: 1_008_037_736
+ theoretical max score: 1_091_701_891
+ Newton max score: 320_421_805
 Best score: 27_752_402
   % of our score: 0.26
 
@@ -827,7 +900,8 @@ room: 8624 x 6031
  attendees: 700
  pillars: 27
     1 radii between 10.00 and 10.00
- theoretical max score: 3_644_588_455
+ theoretical max score: 4_050_823_040
+ Newton max score: 274_488_005
 Best score: 58_636_046
   % of our score: 0.56
 
@@ -839,7 +913,8 @@ room: 9603 x 9226
  attendees: 700
  pillars: 4
     1 radii between 10.00 and 10.00
- theoretical max score: 69_620_661
+ theoretical max score: 58_461_171
+ Newton max score: 21_934_965
 Best score: 12_037_726
   % of our score: 0.11
 
@@ -851,7 +926,8 @@ room: 4022 x 8752
  attendees: 700
  pillars: 16
     1 radii between 10.00 and 10.00
- theoretical max score: 1_559_461_717
+ theoretical max score: 1_464_357_176
+ Newton max score: 250_231_043
 Best score: 71_074_729
   % of our score: 0.68
 
@@ -863,7 +939,8 @@ room: 6417 x 6984
  attendees: 700
  pillars: 39
     1 radii between 5.00 and 5.00
- theoretical max score: 1_011_341_910
+ theoretical max score: 917_881_564
+ Newton max score: 200_051_957
 Best score: 60_922_615
   % of our score: 0.58
 
@@ -875,7 +952,8 @@ room: 3978 x 2318
  attendees: 700
  pillars: 17
     1 radii between 5.00 and 5.00
- theoretical max score: 2_254_081_742
+ theoretical max score: 1_915_432_091
+ Newton max score: 371_018_816
 Best score: 94_283_688
   % of our score: 0.90
 
@@ -887,7 +965,8 @@ room: 6067 x 4027
  attendees: 400
  pillars: 29
     23 radii between 9.00 and 104.00
- theoretical max score: 1_530_458_357
+ theoretical max score: 1_525_235_133
+ Newton max score: 436_918_716
 Best score: 18_388_438
   % of our score: 0.18
 
@@ -899,7 +978,8 @@ room: 1300 x 6058
  attendees: 700
  pillars: 91
     56 radii between 6.00 and 84.00
- theoretical max score: 1_502_076_608
+ theoretical max score: 1_275_320_406
+ Newton max score: 315_357_211
 Best score: 102_607_957
   % of our score: 0.98
 
@@ -911,7 +991,8 @@ room: 6887 x 3930
  attendees: 700
  pillars: 95
     61 radii between 9.00 and 103.00
- theoretical max score: 306_590_423
+ theoretical max score: 247_712_547
+ Newton max score: 74_899_410
 Best score: 26_875_343
   % of our score: 0.26
 
@@ -923,7 +1004,8 @@ room: 4785 x 2577
  attendees: 700
  pillars: 57
     44 radii between 6.00 and 101.00
- theoretical max score: 103_558_323
+ theoretical max score: 102_273_248
+ Newton max score: 40_558_332
 Best score: 22_627_793
   % of our score: 0.22
 
@@ -935,7 +1017,8 @@ room: 1855 x 5516
  attendees: 700
  pillars: 153
     77 radii between 5.00 and 104.00
- theoretical max score: 548_178_299
+ theoretical max score: 474_399_251
+ Newton max score: 178_631_417
 Best score: 49_609_097
   % of our score: 0.47
 
@@ -947,7 +1030,8 @@ room: 4172 x 6853
  attendees: 700
  pillars: 92
     60 radii between 8.00 and 104.00
- theoretical max score: 1_185_204_462
+ theoretical max score: 1_404_045_854
+ Newton max score: 175_466_096
 Best score: 43_530_948
   % of our score: 0.42
 
@@ -959,7 +1043,8 @@ room: 4504 x 4115
  attendees: 400
  pillars: 76
     52 radii between 5.00 and 83.00
- theoretical max score: 779_387_419
+ theoretical max score: 842_016_583
+ Newton max score: 71_869_669
 Best score: 28_670_318
   % of our score: 0.27
 
@@ -971,7 +1056,8 @@ room: 7586 x 5764
  attendees: 400
  pillars: 111
     63 radii between 5.00 and 83.00
- theoretical max score: 787_408_013
+ theoretical max score: 1_311_849_953
+ Newton max score: 406_283_574
 Best score: 18_820_977
   % of our score: 0.18
 
@@ -983,7 +1069,8 @@ room: 9797 x 4805
  attendees: 400
  pillars: 64
     43 radii between 6.00 and 84.00
- theoretical max score: 303_942_583
+ theoretical max score: 409_689_722
+ Newton max score: 63_402_485
 Best score: 16_031_656
   % of our score: 0.15
 
@@ -995,7 +1082,8 @@ room: 1680 x 4552
  attendees: 400
  pillars: 194
     75 radii between 6.00 and 84.00
- theoretical max score: 6_250_174_862
+ theoretical max score: 8_440_596_201
+ Newton max score: 1_056_449_321
 Best score: 73_192_732
   % of our score: 0.70
 
@@ -1007,7 +1095,8 @@ room: 8328 x 3370
  attendees: 400
  pillars: 174
     68 radii between 5.00 and 84.00
- theoretical max score: 336_138_688
+ theoretical max score: 515_743_839
+ Newton max score: 99_653_923
 Best score: 19_068_295
   % of our score: 0.18
 
@@ -1019,7 +1108,8 @@ room: 3196 x 8359
  attendees: 400
  pillars: 183
     75 radii between 5.00 and 84.00
- theoretical max score: 4_656_447_349
+ theoretical max score: 9_414_410_630
+ Newton max score: 2_660_904_879
 Best score: 49_608_028
   % of our score: 0.47
 

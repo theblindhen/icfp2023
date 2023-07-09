@@ -35,6 +35,7 @@ type json_placement = {
 
 type json_solution = {
   placements: json_placement list;
+  ?volumes: float list option;
 }
 
 type json_score = {

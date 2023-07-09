@@ -15,6 +15,7 @@ type stats = {
   pillar_count : int;
   pillar_radii_stats : pillar_radii_stats option;
   theoretical_max_score : float;
+  newton_max_score : float;
 }
 
 let problem_stats problem =
@@ -41,6 +42,7 @@ let problem_stats problem =
          let uniq = radii |> Set.of_list (module Float) |> Set.length in
          Some { min; max; uniq });
     theoretical_max_score = Approximations.max_score_problem problem;
+    newton_max_score = Approximations.newton_score_problem problem;
   }
 
 let solution_stats (problem_id : int) total_score =
@@ -71,6 +73,8 @@ let stats_to_string (problem_stats : stats) =
        sprintf "\n    %d radii between %2.2f and %2.2f" stats.uniq stats.min stats.max)
   ^ "\n theoretical max score: "
   ^ Int.to_string_hum (int_of_float problem_stats.theoretical_max_score)
+  ^ "\n Newton max score: "
+  ^ Int.to_string_hum (int_of_float problem_stats.newton_max_score)
 
 let () =
   let total_score = ref 0. in

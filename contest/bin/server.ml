@@ -1,7 +1,6 @@
 open Core
 open Contest
 open Opium
-open Physics
 
 let current_problem = ref None
 let current_solution = ref None
@@ -85,7 +84,7 @@ let optimiser_handler f req =
   let n = Router.param req "n" |> int_of_string in
   match (!current_problem, !current_solution) with
   | Some p, Some s ->
-      Printf.printf "Optimization round %d\n" !current_round;
+      Printf.printf "Optimization round %d\n%!" !current_round;
       let solution' =
         let rec repeat fp n s =
           if n = 0 then s
@@ -108,7 +107,7 @@ let save_handler _ =
       let solution_json = s |> Types.json_solution_of_solution |> Json_j.string_of_json_solution in
       let score = Score.score_solution p s in
       Misc.validate_solution p s;
-      Json_util.write_solution_if_best score p.problem_id s;
+      Json_util.write_solution_if_best score p s;
       returnJson solution_json
   | _ -> returnError "No problem or solution selected; cannot save solution"
 
@@ -123,7 +122,7 @@ let _ =
        (init_solution_handler (fun p -> Random_solver.random_placement_solution p []))
   |> App.post "/swap/:n" (optimiser_handler Improver.improve)
   |> App.post "/lp/:n" (optimiser_handler Lp_solver.lp_optimize_solution)
-  |> App.post "/init_sim" (init_solution_handler init_solution_sol_stage1)
-  |> App.post "/step_sim/:n" (optimiser_handler simulate_step_sol_stage1)
+  |> App.post "/init_sim" (init_solution_handler Physics.gui_init_solution)
+  |> App.post "/step_sim/:n" (optimiser_handler Physics.gui_newton_solver_step)
   |> App.post "/save" save_handler
   |> App.run_command

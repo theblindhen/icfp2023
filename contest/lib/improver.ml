@@ -23,7 +23,8 @@ let score_cache (env : Score.scoring_env) : (position * instrument, float) Hasht
           List.map constants ~f:(fun (c, a) -> Float.round_up (c *. a.tastes.(i)))
           |> List.sum (module Float) ~f:Fn.id
         in
-        Hashtbl.Poly.add_exn cache ~key:(m.pos, i) ~data:score
+        let capped_score = Float.max score 0.0 in
+        Hashtbl.Poly.add_exn cache ~key:(m.pos, i) ~data:capped_score
       done);
   printf "\n%!";
   cache
