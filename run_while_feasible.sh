@@ -1,11 +1,18 @@
 #!/bin/zsh
 TIMEOUT=10m
-PROBLEM=$1
 BIN=./_build/default/bin/main.exe
-rm -f _bailed_$1
 pushd contest
-while timeout $TIMEOUT $BIN $1 --lp --edges "$(./../random_edges.sh)"; do
-    echo "-- Retrying $1 --"
+while true; do
+    for i in $(shuf -e $*); do
+        if [ -f "../_bailed_$i" ]; then
+            continue
+        fi
+        edges="$(./../random_edges.sh)"
+        echo "Trying $i with edges '$edges'"
+        if ! timeout $TIMEOUT $BIN $i --lp --edges "$edges"; then
+            echo "Bailed on $i"
+            touch "../_bailed_$i"
+        fi
+    done
 done
 popd
-touch _bailed_$1
