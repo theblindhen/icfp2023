@@ -50,7 +50,7 @@ let run_invocation inv =
       in
       Misc.validate_solution problem optimized_solution;
       let optimised_score = Score.score_solution problem optimized_solution in
-      printf "Improved Problem %d with score: %s\n%!" inv.problem_id
+      printf "Optimized problem %d with score: %s\n%!" inv.problem_id
         (Misc.string_of_score optimised_score);
       Json_util.write_solution_if_best optimised_score inv.problem_id optimized_solution;
       (* write solution_json to file *)
