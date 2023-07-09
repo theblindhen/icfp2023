@@ -124,5 +124,15 @@ let simulate_step_sol_stage1 (p : Types.problem) (solution : Types.solution) ~(r
     max_actual_move;
   solution_of_placement_stage1 placements
 
-let init_solution_sol_stage1 (p : Types.problem) : Types.solution =
+let init_solution_sol (p : Types.problem) : Types.solution =
   init_placements p |> solution_of_placement_stage1
+
+let simulate_step_sol (p : Types.problem) (solution : Types.solution) ~(round : int) :
+    Types.solution =
+  if round < 1000 then simulate_step_sol_stage1 p solution ~round
+  else if round = 1000 then
+    (* switch from stage 1 to stage 2: Expand instrument locii to musicians *)
+    let placements = Array.map solution ~f:(fun m -> m.pos) in
+    Random_solver.random_solution_from_instrument_locii p placements
+  else (* NOOP *)
+    solution
