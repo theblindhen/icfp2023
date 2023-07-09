@@ -107,6 +107,7 @@ let lp_optimize_solution (problem : Types.problem) (prev_solution : Types.soluti
   let assignment_scores = Improver.score_cache (Score.get_scoring_env problem prev_solution) in
   let no_positions = Array.length prev_solution in
   let no_vars = no_positions * num_instruments problem in
+  let musician_is_fixed = Array.create ~len:(List.length problem.musicians) false in
   if no_vars > 10_000 then (
     let subset_factor = float_of_int no_vars /. 10_000.0 in
     let num_fixed_positions =
@@ -121,10 +122,9 @@ let lp_optimize_solution (problem : Types.problem) (prev_solution : Types.soluti
       let fixed_musician_indexes =
         Array.sub random_position_indexes ~pos:0 ~len:num_fixed_positions
       in
-      let musician_is_fixed = Array.create ~len:(List.length problem.musicians) false in
       Array.iter fixed_musician_indexes ~f:(fun idx -> musician_is_fixed.(idx) <- true);
       current_solution :=
         lp_assign_positions problem !current_solution assignment_scores musician_is_fixed
     done;
     !current_solution)
-  else lp_assign_positions problem prev_solution assignment_scores [||]
+  else lp_assign_positions problem prev_solution assignment_scores musician_is_fixed
