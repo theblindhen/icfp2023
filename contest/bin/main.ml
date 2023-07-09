@@ -114,20 +114,20 @@ let command =
        in
        print_endline
          ("Initializing with " ^ (sexp_of_initialization initialization |> Sexp.to_string_hum));
-       match opt with
+       (match opt with
        | [] -> ()
        | _ ->
            print_endline
              ("Optimizing with "
              ^ String.concat ~sep:" -> "
-                 (List.map opt ~f:(fun o -> sexp_of_optimizer o |> Sexp.to_string_hum)));
-           run_invocation
-             {
-               problem_id;
-               initialization;
-               optimizers = opt;
-               scale_height = parse_scale scale_height;
-               scale_width = parse_scale scale_width;
-             })
+                 (List.map opt ~f:(fun o -> sexp_of_optimizer o |> Sexp.to_string_hum))));
+       run_invocation
+         {
+           problem_id;
+           initialization;
+           optimizers = opt;
+           scale_height = parse_scale scale_height;
+           scale_width = parse_scale scale_width;
+         })
 
 let () = Command_unix.run command
