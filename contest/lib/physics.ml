@@ -104,52 +104,20 @@ let init_placements (p : Types.problem) : placed_instrument array =
   let num_instruments = Misc.instrument_count p in
   Array.init num_instruments ~f:(fun i -> { instrument = i; pos = center })
 
-let solution_of_placement_stage1 (placements : placed_instrument array) : Types.solution =
-  placements
-  |> Array.mapi ~f:(fun idx i : Types.musician ->
-         { id = idx; instrument = i.instrument; pos = i.pos })
-
-let simulate_step_sol_stage1 (p : Types.problem) (solution : Types.solution) ~(round : int) :
-    Types.solution =
-  (* Pretend we have a solution, but actually we're only placing the instruments
-  *)
-  ignore round;
-  let att_heat = att_heat_from_iteration_stage1 p round in
-  (* let att_heat = 0.1 /. Float.int_pow (float_of_int round +. 10.) 2 in *)
-  (* let att_heat = 0.1 /. ((float_of_int round +. 10.) ** 1.75) in *)
-  let placements = Array.map solution ~f:(fun m -> { instrument = m.instrument; pos = m.pos }) in
-  let max_actual_move = simulate_step_stage1 p ~att_heat placements in
-  Printf.printf "Score: %s (max move %e)\n%!"
-    (placement_score_raw p placements |> Misc.string_of_score)
-    max_actual_move;
-  solution_of_placement_stage1 placements
-
-let init_solution_sol (p : Types.problem) : Types.solution =
-  init_placements p |> solution_of_placement_stage1
-
 let instrument_placement_to_stage2 (p : Types.problem) (placements : placed_instrument array) :
     Types.solution =
   let placements = Array.map placements ~f:(fun i -> i.pos) in
   Random_solver.random_solution_from_instrument_locii p placements
 
-let simulate_step_sol (p : Types.problem) (solution : Types.solution) ~(round : int) :
-    Types.solution =
-  if round <= 200 then simulate_step_sol_stage1 p solution ~round
-  else if round = 201 then (
-    print_endline "Switching to stage 2";
-    (* switch from stage 1 to stage 2: Expand instrument locii to musicians *)
-    let placements = Array.mapi solution ~f:(fun i m -> { pos = m.pos; instrument = i }) in
-    let solution = instrument_placement_to_stage2 p placements in
-    print_endline "Placement done!";
-    (* Misc.validate_solution p solution; *)
-    solution)
-  else (* NOOP *)
-    solution
+let stay_stage1 iteration last_instability =
+  (* The condition to stay at stage 1 *)
+  Float.(last_instability > 0.0001) || iteration < 500
 
+(* Main entry point *)
 let newton_solver (problem : Types.problem) : Types.solution =
   let placements = init_placements problem in
   let rec stage1 iteration last_instability =
-    if iteration > 100 && (Float.(last_instability < 0.00001) || iteration > 200) then iteration
+    if stay_stage1 iteration last_instability then iteration
     else
       let att_heat = att_heat_from_iteration_stage1 problem iteration in
       (* Printf.printf "Iteration %d, heat %f\n%!" iteration att_heat; *)
@@ -158,8 +126,33 @@ let newton_solver (problem : Types.problem) : Types.solution =
   in
   let iterations = stage1 0 Float.max_value in
   Printf.printf "Problem %d converged in %d iterations." problem.problem_id iterations;
-  Printf.printf " Score: %s \n%!" (placement_score_raw problem placements |> Misc.string_of_score);
+  Printf.printf " Fake ideal score: %s \n%!"
+    (placement_score_raw problem placements |> Misc.string_of_score);
   Printf.printf " Going to Stage 2 %!";
   let solution = instrument_placement_to_stage2 problem placements in
   Printf.printf " - DONE\n%!";
   solution
+
+(* GUI Entry points *)
+let gui_solution_of_placement_stage1 (placements : placed_instrument array) : Types.solution =
+  placements
+  |> Array.mapi ~f:(fun idx i : Types.musician ->
+         { id = idx; instrument = i.instrument; pos = i.pos })
+
+let gui_init_solution (p : Types.problem) : Types.solution =
+  init_placements p |> gui_solution_of_placement_stage1
+
+let gui_newton_solver_step (problem : Types.problem) (solution : Types.solution) ~(round : int) :
+    Types.solution =
+  let iteration = round in
+  let placements = Array.mapi solution ~f:(fun i m -> { pos = m.pos; instrument = i }) in
+  if Array.length solution < List.length problem.musicians then
+    (* Stage 1 *)
+    let att_heat = att_heat_from_iteration_stage1 problem round in
+    let last_instability = simulate_step_stage1 problem ~att_heat placements in
+    if stay_stage1 (iteration + 1) last_instability then gui_solution_of_placement_stage1 placements
+    else (
+      print_endline "Stage 1 done!";
+      instrument_placement_to_stage2 problem placements)
+  else (* Stage 2 *)
+    solution
