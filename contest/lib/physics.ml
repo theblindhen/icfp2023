@@ -163,7 +163,6 @@ let honeycomb_solution_from_instrument_locii (p : Types.problem)
            | None -> already_placed
            | Some (hd, tl) ->
                if Random_solver.is_valid_placement p already_placed hd then (
-                 Printf.printf "placing at (%f, %f)\n%!" hd.x hd.y;
                  musicians.(musician.id) <- { musician with pos = hd };
                  hd :: already_placed)
                else iter tl already_placed
@@ -172,7 +171,7 @@ let honeycomb_solution_from_instrument_locii (p : Types.problem)
   |> ignore;
   musicians
 
-let instrument_placement_to_stage2 ?(placer = `Random) (p : Types.problem)
+let instrument_placement_to_stage2 ?(placer = `Honeycomb) (p : Types.problem)
     (placements : placed_instrument array) : placed_instrument array =
   let placements = Array.map placements ~f:(fun i -> i.pos) in
   (match placer with
