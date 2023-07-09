@@ -7,12 +7,6 @@
  (libraries contest core_unix.command_unix))
 
 (executable
- (public_name gui)
- (name gui)
- (modules gui)
- (libraries contest bogue))
-
-(executable
  (public_name stats)
  (name stats)
  (modules stats)
