@@ -234,6 +234,6 @@ let gui_newton_solver_step (problem : Types.problem) ((solution, stage) : Types.
       else (placements, "stage3")
     else (
       print_endline "I'm done";
-      (solution, "stage3"))
+      (placements, "stage3"))
   in
   (solution_of_placements problem placements, stage)
