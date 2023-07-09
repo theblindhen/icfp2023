@@ -1,5 +1,5 @@
 #!/bin/zsh
-TIMEOUT=10m
+TIMEOUT=20m
 BIN=./_build/default/bin/main.exe
 pushd contest
 while true; do

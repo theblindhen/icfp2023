@@ -90,10 +90,38 @@ let init_placements (p : Types.problem) : placed_instrument array =
   let num_instruments = Misc.instrument_count p in
   Array.init num_instruments ~f:(fun i -> { instrument = i; pos = center })
 
-let instrument_placement_to_stage2 (p : Types.problem) (placements : placed_instrument array) :
-    placed_instrument array =
+let honeycomb_solution_from_instrument_locii (p : Types.problem)
+    (instruments : Types.position array) : Types.solution =
+  let open Types in
+  let musicians : musician array =
+    p.musicians
+    |> Array.of_list
+    |> Array.mapi ~f:(fun id instrument -> { id; instrument; pos = instruments.(instrument) })
+  in
+  musicians
+  |> Array.fold ~init:[] ~f:(fun already_placed musician ->
+         let locus = instruments.(musician.instrument) in
+         let comb = Geometry.honey_comb_positions locus in
+         let rec iter (comb : Types.position Seq.t) already_placed =
+           match Seq.uncons comb with
+           | None -> already_placed
+           | Some (hd, tl) ->
+               if Random_solver.is_valid_placement p already_placed hd then (
+                 Printf.printf "placing at (%f, %f)\n%!" hd.x hd.y;
+                 musicians.(musician.id) <- { musician with pos = hd };
+                 hd :: already_placed)
+               else iter tl already_placed
+         in
+         iter comb already_placed)
+  |> ignore;
+  musicians
+
+let instrument_placement_to_stage2 ?(placer = `Honeycomb) (p : Types.problem)
+    (placements : placed_instrument array) : placed_instrument array =
   let placements = Array.map placements ~f:(fun i -> i.pos) in
-  Random_solver.random_solution_from_instrument_locii p placements
+  (match placer with
+  | `Random -> Random_solver.random_solution_from_instrument_locii p placements
+  | `Honeycomb -> honeycomb_solution_from_instrument_locii p placements)
   |> Array.mapi ~f:(fun i m -> { pos = m.pos; instrument = i })
 
 let solution_of_placement (placements : placed_instrument array) : Types.solution =

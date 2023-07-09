@@ -21,8 +21,11 @@ let random_placement_around_locus (p : problem) (locus : position) : position =
   in
   loop ()
 
-let is_valid_placement (_ : problem) (placed : position list) (potential : position) : bool =
-  placed |> List.for_all ~f:(fun x -> Float.(Geometry.distance x potential >= 10.0))
+let is_valid_placement (p : problem) (placed : position list) (potential : position) : bool =
+  let legal_rect = Misc.legal_musician_rect p in
+  placed
+  |> List.for_all ~f:(fun pos ->
+         Geometry.within_rect legal_rect pos && Float.(Geometry.distance pos potential >= 10.0))
 
 let random_placements (p : problem) (placer : unit -> position) (count : int)
     (already_placed : position list) : position list =
@@ -39,30 +42,6 @@ let random_placements (p : problem) (placer : unit -> position) (count : int)
   in
   random already_placed [] count 10_000
 
-let honey_comb_positions (init_pos : position) =
-  let rec snake (position : position) (ring_number : int) (ring_count : int) (direction : int) :
-      position Seq.t =
-    let next_pos direction =
-      let x = position.x in
-      let y = position.y in
-      match direction with
-      | 0 -> { x = x +. 10.0; y = y +. 0.0 }
-      | 1 -> { x = x +. 5.0; y = y +. 8.66 }
-      | 2 -> { x = x -. 5.0; y = y +. 8.66 }
-      | 3 -> { x = x -. 10.0; y = y +. 0.0 }
-      | 4 -> { x = x -. 5.0; y = y -. 8.66 }
-      | 5 -> { x = x +. 5.0; y = y -. 8.66 }
-      | _ -> failwith "direction must be between 0 and 5"
-    in
-    if ring_count >= (ring_number * 6) - 1 then
-      Seq.cons position (snake (next_pos direction) (ring_number + 1) 0 ((direction + 1) mod 6))
-    else if ring_count % ring_number = ring_number - 1 then
-      Seq.cons position
-        (snake (next_pos (direction + 1)) ring_number (ring_count + 1) ((direction + 1) mod 6))
-    else Seq.cons position (snake (next_pos direction) ring_number (ring_count + 1) direction)
-  in
-  snake init_pos 0 0 0
-
 let random_solution_from_instrument_locii (p : problem) (instruments : position array) : solution =
   let musicians =
     p.musicians
@@ -75,7 +54,6 @@ let random_solution_from_instrument_locii (p : problem) (instruments : position 
          match group with
          | [] -> already_placed
          | hd :: tl ->
-             (* TODO: MAY BE ILLEGAL *)
              let to_place, already_placed =
                if is_valid_placement p already_placed locus then (
                  musicians.(hd) <- { (musicians.(hd)) with pos = locus };
@@ -96,5 +74,5 @@ let random_solution_from_instrument_locii (p : problem) (instruments : position 
 
 let random_placement_solution (p : problem) (already_placed : position list) : solution =
   let count = List.length p.musicians - List.length already_placed in
-  random_placements p (fun () -> random_placement p) count already_placed
+  already_placed @ random_placements p (fun () -> random_placement p) count already_placed
   |> Misc.solution_of_positions p

@@ -45,15 +45,17 @@ let lp_of_problem (problem : Types.problem) (prev_solution : Types.solution)
   let constraints_total_instruments =
     (* the number of each instrument is bounded *)
     instrument_count
-    |> Array.mapi ~f:(fun instrument count ->
+    |> Array.concat_mapi ~f:(fun instrument count ->
            let instrument_vars =
              Array.filter_mapi vars ~f:(fun pos_idx pvars ->
                  if musician_is_fixed.(pos_idx) then None else Some pvars.(instrument))
            in
-           let instrument_sum =
-             Array.fold instrument_vars ~init:(c 0.0) ~f:(fun sum var -> var ++ sum)
-           in
-           instrument_sum <~ c (float_of_int count))
+           if Array.is_empty instrument_vars then [||]
+           else
+             let instrument_sum =
+               Array.fold instrument_vars ~init:(c 0.0) ~f:(fun sum var -> var ++ sum)
+             in
+             [| instrument_sum <~ c (float_of_int count) |])
     |> List.of_array
   in
   make objective (constraints_one_instrument @ constraints_total_instruments)
@@ -107,7 +109,6 @@ let lp_optimize_solution (problem : Types.problem) (prev_solution : Types.soluti
   let assignment_scores = Improver.score_cache (Score.get_scoring_env problem prev_solution) in
   let no_positions = Array.length prev_solution in
   let no_vars = no_positions * num_instruments problem in
-  let musician_is_fixed = Array.create ~len:(List.length problem.musicians) false in
   if no_vars > 10_000 then (
     let subset_factor = float_of_int no_vars /. 10_000.0 in
     let num_fixed_positions =
@@ -122,9 +123,12 @@ let lp_optimize_solution (problem : Types.problem) (prev_solution : Types.soluti
       let fixed_musician_indexes =
         Array.sub random_position_indexes ~pos:0 ~len:num_fixed_positions
       in
+      let musician_is_fixed = Array.create ~len:(List.length problem.musicians) false in
       Array.iter fixed_musician_indexes ~f:(fun idx -> musician_is_fixed.(idx) <- true);
       current_solution :=
         lp_assign_positions problem !current_solution assignment_scores musician_is_fixed
     done;
     !current_solution)
-  else lp_assign_positions problem prev_solution assignment_scores musician_is_fixed
+  else
+    let musician_is_fixed = Array.create ~len:(List.length problem.musicians) false in
+    lp_assign_positions problem prev_solution assignment_scores musician_is_fixed

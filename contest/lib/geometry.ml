@@ -164,6 +164,35 @@ let precompute_hearable ~(attendees : Types.position array) ~(musicians : Types.
   Timer.print_acc "sweep" sweep_time;
   result
 
+let honey_comb_positions (init_pos : Types.position) =
+  let rec snake (position : Types.position) (ring_number : int) (ring_count : int) (direction : int)
+      () =
+    let next_pos direction : Types.position =
+      let x = position.x in
+      let y = position.y in
+      match direction with
+      | 0 -> { x = x +. 10.0; y = y +. 0.0 }
+      | 1 -> { x = x +. 5.0; y = y +. 8.66 }
+      | 2 -> { x = x -. 5.0; y = y +. 8.66 }
+      | 3 -> { x = x -. 10.0; y = y +. 0.0 }
+      | 4 -> { x = x -. 5.0; y = y -. 8.66 }
+      | 5 -> { x = x +. 5.0; y = y -. 8.66 }
+      | _ -> failwith "direction must be between 0 and 5"
+    in
+    let open Int in
+    if ring_count >= (ring_number * 6) - 1 then
+      Seq.Cons (position, snake (next_pos direction) Int.(ring_number + 1) 0 ((direction + 1) mod 6))
+    else if ring_count % ring_number = ring_number - 1 then
+      Seq.Cons
+        ( position,
+          snake
+            (next_pos ((direction + 1) mod 6))
+            ring_number (ring_count + 1)
+            ((direction + 1) mod 6) )
+    else Seq.Cons (position, snake (next_pos direction) ring_number (ring_count + 1) direction)
+  in
+  snake init_pos 0 0 0
+
 (* TESTS *)
 
 let to_point (x, y) : point = { x; y }
