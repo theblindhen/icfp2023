@@ -4,6 +4,7 @@ open Opium
 
 let current_problem = ref None
 let current_solution = ref None
+let current_state = ref ""
 let current_round = ref 0
 let read_file path = In_channel.create path |> In_channel.input_all |> String.strip
 
@@ -72,34 +73,49 @@ let init_solution_handler f _ =
   match !current_problem with
   | None -> returnError "No problem selected; cannot initialize solution"
   | Some p ->
-      let solution = f p in
+      let solution, state = f p in
       let solution_json =
         solution |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
       in
       current_solution := Some solution;
+      current_state := state;
       current_round := 0;
       returnJson solution_json
 
 let optimiser_handler f req =
   let n = Router.param req "n" |> int_of_string in
   match (!current_problem, !current_solution) with
-  | Some p, Some s ->
-      Printf.printf "Optimization round %d\n%!" !current_round;
-      let solution' =
-        let rec repeat fp n s =
-          if n = 0 then s
+  | Some p, Some solution ->
+      Printf.printf "Optimization round %d\n" !current_round;
+      Printf.printf "\tOptimization state '%s'\n%!" !current_state;
+      let solution', state' =
+        let rec repeat fp n ss =
+          if n = 0 then ss
           else (
             current_round := !current_round + 1;
-            repeat fp (n - 1) (fp s ~round:!current_round))
+            repeat fp (n - 1) (fp ss ~round:!current_round))
         in
-        repeat (f p) n s
+        repeat (f p) n (solution, !current_state)
       in
+      Printf.printf "Got here\n%!";
       let solution_json =
         solution' |> Types.json_solution_of_solution |> Json_j.string_of_json_solution
       in
       current_solution := Some solution';
+      current_state := state';
       returnJson solution_json
   | _ -> returnError "No problem or solution selected; cannot optimize solution"
+
+let stateless_handler f =
+  let g (problem : Types.problem) ((solution, state) : Types.solution * string) ~(round : int) :
+      Types.solution * string =
+    (f problem solution ~round, state)
+  in
+  g
+
+let stateless_init_handler f =
+  let g (problem : Types.problem) : Types.solution * string = (f problem, "") in
+  g
 
 let save_handler _ =
   match (!current_problem, !current_solution) with
@@ -119,9 +135,10 @@ let _ =
   |> App.get "/solutions/:id" solutions_handler
   |> App.post "/solution/:id/:name" solution_handler
   |> App.post "/place_randomly"
-       (init_solution_handler (fun p -> Random_solver.random_placement_solution p []))
-  |> App.post "/swap/:n" (optimiser_handler Improver.swapper_without_q)
-  |> App.post "/lp/:n" (optimiser_handler Lp_solver.lp_optimize_solution)
+       (init_solution_handler
+          (stateless_init_handler (fun p -> Random_solver.random_placement_solution p [])))
+  |> App.post "/swap/:n" (optimiser_handler (stateless_handler Improver.swapper_without_q))
+  |> App.post "/lp/:n" (optimiser_handler (stateless_handler Lp_solver.lp_optimize_solution))
   |> App.post "/init_sim" (init_solution_handler Physics.gui_init_solution)
   |> App.post "/step_sim/:n" (optimiser_handler Physics.gui_newton_solver_step)
   |> App.post "/save" save_handler
