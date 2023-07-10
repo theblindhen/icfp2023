@@ -63,6 +63,8 @@ let swapper_without_q (p : problem) (s : solution) ~(round : int) : solution =
 
 let swapper_with_q (p : problem) (s : solution) ~(round : int) : solution =
   ignore round;
+  (* Set a timer to stop after 5 minutes. *)
+  let timeout = Time_ns.(add (now ()) (Span.of_min 5.)) in
   if p.problem_id <= 55 then failwith "This function only works for problems with q-factors";
   (* Sort s by id so there's no confusion. *)
   let s = Array.sorted_copy s ~compare:(fun a b -> Int.compare a.id b.id) in
@@ -115,21 +117,25 @@ let swapper_with_q (p : problem) (s : solution) ~(round : int) : solution =
         q_factor *. audience_contribution)
   in
   let iter = ref true in
-  while !iter do
+  let timed_out = ref false in
+  while !iter && not !timed_out do
     iter := false;
     for i = 0 to Array.length scores - 1 do
       for j = i + 1 to Array.length scores - 1 do
-        if scores.(i).instrument <> scores.(j).instrument then
-          let score_i = get_score i i in
-          let score_j = get_score j j in
-          let score_i' = get_score i j in
-          let score_j' = get_score j i in
-          if Float.(score_i' + score_j' > score_i + score_j) then (
-            printf "swapping %d and %d\n%!" i j;
-            iter := true;
-            let tmp = scores.(i).position_idx in
-            scores.(i).position_idx <- scores.(j).position_idx;
-            scores.(j).position_idx <- tmp)
+        (if scores.(i).instrument <> scores.(j).instrument && not !timed_out then
+           let score_i = get_score i i in
+           let score_j = get_score j j in
+           let score_i' = get_score i j in
+           let score_j' = get_score j i in
+           if Float.(score_i' + score_j' > score_i + score_j) then (
+             printf "swapping %d and %d\n%!" i j;
+             iter := true;
+             let tmp = scores.(i).position_idx in
+             scores.(i).position_idx <- scores.(j).position_idx;
+             scores.(j).position_idx <- tmp));
+        if Time_ns.(now () > timeout) && not !timed_out then (
+          printf "Swapper timed out. Finishing.\n%!";
+          timed_out := true)
       done
     done
   done;
