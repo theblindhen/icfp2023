@@ -7517,8 +7517,8 @@ var $author$project$Main$renderProblem = F4(
 				var focus = f.a;
 				return A2(
 					$elm$core$List$filter,
-					function (_v8) {
-						var musician = _v8.b;
+					function (_v9) {
+						var musician = _v9.b;
 						return !_Utils_eq(musician, focus);
 					},
 					musicians);
@@ -7531,16 +7531,16 @@ var $author$project$Main$renderProblem = F4(
 				var focus = f.a;
 				return A2(
 					$elm$core$List$filter,
-					function (_v6) {
-						var musician = _v6.b;
+					function (_v7) {
+						var musician = _v7.b;
 						return _Utils_eq(musician, focus);
 					},
 					musicians);
 			}
 		}();
 		var musicianShapes = function () {
-			var _v0 = m.musicianScores;
-			if (!_v0.b) {
+			var _v1 = m.musicianScores;
+			if (!_v1.b) {
 				return A2(
 					$joakin$elm_canvas$Canvas$group,
 					_List_Nil,
@@ -7554,8 +7554,8 @@ var $author$project$Main$renderProblem = F4(
 								]),
 							A2(
 								$elm$core$List$map,
-								function (_v1) {
-									var placement = _v1.a;
+								function (_v2) {
+									var placement = _v2.a;
 									return A2(
 										$joakin$elm_canvas$Canvas$circle,
 										_Utils_Tuple2(placement.x * scale, placement.y * scale),
@@ -7570,8 +7570,8 @@ var $author$project$Main$renderProblem = F4(
 								]),
 							A2(
 								$elm$core$List$map,
-								function (_v2) {
-									var placement = _v2.a;
+								function (_v3) {
+									var placement = _v3.a;
 									return A2(
 										$joakin$elm_canvas$Canvas$circle,
 										_Utils_Tuple2(placement.x * scale, placement.y * scale),
@@ -7580,20 +7580,20 @@ var $author$project$Main$renderProblem = F4(
 								focusedMusicians))
 						]));
 			} else {
-				var scores = _v0;
+				var scores = _v1;
 				var max = A2(
 					$elm$core$Maybe$withDefault,
-					0,
+					0.0,
 					$elm$core$List$maximum(scores));
 				return A2(
 					$joakin$elm_canvas$Canvas$group,
 					_List_Nil,
 					A2(
 						$elm$core$List$map,
-						function (_v3) {
-							var _v4 = _v3.a;
-							var placement = _v4.a;
-							var score = _v3.b;
+						function (_v4) {
+							var _v5 = _v4.a;
+							var placement = _v5.a;
+							var score = _v4.b;
 							return A2(
 								$joakin$elm_canvas$Canvas$shapes,
 								_List_fromArray(
@@ -7610,6 +7610,80 @@ var $author$project$Main$renderProblem = F4(
 									]));
 						},
 						A2($elm_community$list_extra$List$Extra$zip, musicians, scores)));
+			}
+		}();
+		var attendeeShapes = function () {
+			if (f.$ === 'Nothing') {
+				return A2(
+					$joakin$elm_canvas$Canvas$group,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$joakin$elm_canvas$Canvas$shapes,
+							_List_fromArray(
+								[
+									$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$blue)
+								]),
+							A2(
+								$elm$core$List$map,
+								function (a) {
+									return A2(
+										$joakin$elm_canvas$Canvas$circle,
+										_Utils_Tuple2(a.x * scale, a.y * scale),
+										3.0 * scale);
+								},
+								p.attendees))
+						]));
+			} else {
+				var focus = f.a;
+				var tastes = A2(
+					$elm$core$List$map,
+					function (a) {
+						return A2(
+							$elm$core$Maybe$withDefault,
+							0.0,
+							A2($elm_community$list_extra$List$Extra$getAt, focus, a.tastes));
+					},
+					p.attendees);
+				var max = A2(
+					$elm$core$Maybe$withDefault,
+					0.0,
+					$elm$core$List$maximum(tastes));
+				var min = A2(
+					$elm$core$Maybe$withDefault,
+					0.0,
+					$elm$core$List$minimum(tastes));
+				var range = max - min;
+				return A2(
+					$joakin$elm_canvas$Canvas$group,
+					_List_Nil,
+					A2(
+						$elm$core$List$map,
+						function (a) {
+							return A2(
+								$joakin$elm_canvas$Canvas$shapes,
+								_List_fromArray(
+									[
+										$joakin$elm_canvas$Canvas$Settings$stroke(
+										A3(
+											$avh4$elm_color$Color$hsl,
+											((A2(
+												$elm$core$Maybe$withDefault,
+												0.0,
+												A2($elm_community$list_extra$List$Extra$getAt, focus, a.tastes)) / range) * 2.0) / 3.0,
+											1.0,
+											0.5))
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$joakin$elm_canvas$Canvas$circle,
+										_Utils_Tuple2(a.x * scale, a.y * scale),
+										3.0 * scale)
+									]));
+						},
+						p.attendees));
 			}
 		}();
 		return A2(
@@ -7649,21 +7723,6 @@ var $author$project$Main$renderProblem = F4(
 					$joakin$elm_canvas$Canvas$shapes,
 					_List_fromArray(
 						[
-							$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$blue)
-						]),
-					A2(
-						$elm$core$List$map,
-						function (a) {
-							return A2(
-								$joakin$elm_canvas$Canvas$circle,
-								_Utils_Tuple2(a.x * scale, a.y * scale),
-								3.0 * scale);
-						},
-						p.attendees)),
-					A2(
-					$joakin$elm_canvas$Canvas$shapes,
-					_List_fromArray(
-						[
 							$joakin$elm_canvas$Canvas$Settings$fill($avh4$elm_color$Color$gray)
 						]),
 					A2(
@@ -7675,6 +7734,7 @@ var $author$project$Main$renderProblem = F4(
 								pillar.radius * scale);
 						},
 						p.pillars)),
+					attendeeShapes,
 					musicianShapes
 				]));
 	});

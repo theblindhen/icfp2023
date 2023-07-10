@@ -382,9 +382,25 @@ renderProblem m p s f =
                         (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) focusedMusicians)
                     ]
                 scores -> 
-                    let max = (List.maximum scores |> Maybe.withDefault 0)  in
+                    let max = (List.maximum scores |> Maybe.withDefault 0.0)  in
                         group [] 
                             (List.map (\((placement, _), score) -> shapes [stroke (Color.hsl (score / max * 2.0/3.0) 1.0 0.5)] [ circle (placement.x * scale, placement.y * scale) (5.0 * scale) ]) (Extra.zip musicians scores))
+
+        attendeeShapes =
+            case f of
+                Nothing -> group [] 
+                    [
+                        shapes
+                            [ stroke Color.blue ]
+                            (List.map (\a -> circle (a.x * scale, a.y * scale) (3.0 * scale)) p.attendees)
+                    ]
+                Just focus -> 
+                    let tastes = List.map (\a -> Extra.getAt focus a.tastes |> Maybe.withDefault 0.0) p.attendees in
+                    let max = (List.maximum tastes |> Maybe.withDefault 0.0)  in
+                    let min = (List.minimum tastes |> Maybe.withDefault 0.0)  in
+                    let range = max - min in
+                        group [] (List.map (\a -> 
+                            shapes [stroke (Color.hsl ((Extra.getAt focus a.tastes |> Maybe.withDefault 0.0) / range * 2.0/3.0) 1.0 0.5)] [circle (a.x * scale, a.y * scale) (3.0 * scale)]) p.attendees)
 
     in
         group []
@@ -395,11 +411,9 @@ renderProblem m p s f =
                 [ fill Color.gray ]
                 [ rect (Tuple.first p.stageBottomLeft * scale, Tuple.second p.stageBottomLeft * scale) (p.stageWidth * scale) (p.stageHeight * scale)] 
             , shapes
-                [ stroke Color.blue ]
-                (List.map (\a -> circle (a.x * scale, a.y * scale) (3.0 * scale)) p.attendees)
-            , shapes
                 [ fill Color.gray ]
                 (List.map (\pillar -> circle (Tuple.first pillar.center * scale, Tuple.second pillar.center * scale) (pillar.radius * scale)) p.pillars)
+            , attendeeShapes
             , musicianShapes
             ]
 
