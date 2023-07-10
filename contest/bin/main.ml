@@ -5,7 +5,7 @@ let random_solution (p : Types.problem) (already_placed : Types.position list) =
   Random_solver.random_placement_solution p already_placed
 
 type initialization = Random | Newton | Edge of Edge_placer.edges | LoadBest [@@deriving sexp]
-type optimizer = LP | Swap | Newton [@@deriving sexp]
+type optimizer = LP | Swap | Newton | Packaway [@@deriving sexp]
 
 type invocation = {
   problem_id : int;
@@ -20,6 +20,7 @@ let run_invocation inv =
   match Json_util.get_problem inv.problem_id with
   | None -> failwith "Failed to parse problem"
   | Some problem ->
+      Printf.printf "\nSolving problem %d\n%!" inv.problem_id;
       let problem =
         if Float.(inv.scale_height <> 1.0 || inv.scale_width <> 1.0) then (
           printf "Scaling stage with factors %f %f\n%!" inv.scale_width inv.scale_height;
@@ -45,7 +46,7 @@ let run_invocation inv =
       Misc.validate_solution problem solution;
       print_endline "Scoring solution...";
       let score = Score.score_solution problem solution in
-      printf "Initial solution score: %s\n" (Misc.string_of_score score);
+      printf "Initial solution score: %s\n%!" (Misc.string_of_score score);
       let _ =
         inv.optimizers
         |> List.fold ~init:solution ~f:(fun solution opt_flag ->
@@ -54,6 +55,7 @@ let run_invocation inv =
                  | Swap -> Improver.swapper problem ~round:0
                  | LP -> Lp_solver.lp_optimize_solution problem ~round:0
                  | Newton -> Physics.newton_optimizer problem ~max_iterations:1000
+                 | Packaway -> Packaway.pack_bad_musicians problem ~cutoff:0.
                in
                let solution = optimizer solution in
                Misc.validate_solution problem solution;
@@ -72,6 +74,7 @@ let parse_optimizer string : optimizer =
   | "lp" -> LP
   | "swap" -> Swap
   | "newton" -> Newton
+  | "packaway" -> Packaway
   | _ -> failwith "Invalid optimizer"
 
 let command =
