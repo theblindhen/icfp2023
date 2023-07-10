@@ -246,7 +246,7 @@ let step_stage2 problem placements iteration =
    Return the total number of iterations *)
 let newton_run_stage stay_stage step problem placements : int -> int =
   let rec loop (last_instability : float) (iteration : int) =
-    if iteration % 100 = 0 then Printf.printf "Iteration %d\n%!" iteration;
+    (* if iteration % 100 = 0 then Printf.printf "Iteration %d\n%!" iteration; *)
     if stay_stage last_instability iteration then
       let last_instability = step problem placements iteration in
       loop last_instability (iteration + 1)
