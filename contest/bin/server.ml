@@ -168,5 +168,5 @@ let _ =
   |> App.post "/init_sim" (init_solution_handler Physics.gui_init_solution)
   |> App.post "/step_sim/:n" (optimiser_handler Physics.gui_newton_solver_step)
   |> App.post "/save" save_handler
-  |> App.post "/musician_scores" musician_score_handler
+  |> App.get "/musician_scores" musician_score_handler
   |> App.run_command

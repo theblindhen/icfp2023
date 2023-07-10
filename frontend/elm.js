@@ -5341,6 +5341,9 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$FetchSolutions = function (a) {
 	return {$: 'FetchSolutions', a: a};
 };
+var $author$project$Main$LoadedMusicianScores = function (a) {
+	return {$: 'LoadedMusicianScores', a: a};
+};
 var $author$project$Main$LoadedProblem = function (a) {
 	return {$: 'LoadedProblem', a: a};
 };
@@ -6466,6 +6469,52 @@ var $author$project$Main$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
+			case 'LoadMusicianScores':
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$elm$http$Http$get(
+								{
+									expect: $elm$http$Http$expectString($author$project$Main$LoadedMusicianScores),
+									url: 'http://localhost:3000/musician_scores'
+								})
+							])));
+			case 'LoadedMusicianScores':
+				if (msg.a.$ === 'Ok') {
+					var res = msg.a.a;
+					var _v3 = A2(
+						$elm$json$Json$Decode$decodeString,
+						$elm$json$Json$Decode$list($elm$json$Json$Decode$float),
+						res);
+					if (_v3.$ === 'Ok') {
+						var scores = _v3.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{musicianScores: scores}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						var err = _v3.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									error: $elm$core$Maybe$Just(
+										'Failed to decode musician scores: ' + $elm$json$Json$Decode$errorToString(err))
+								}),
+							$elm$core$Platform$Cmd$none);
+					}
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('Failed')
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
 			default:
 				var playing = msg.a;
 				return _Utils_Tuple2(
@@ -7052,8 +7101,7 @@ var $author$project$Main$viewLoadSolution = function (loading) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'margin', '20px'),
-				A2($elm$html$Html$Attributes$style, 'padding', '5px')
+				A2($elm$html$Html$Attributes$style, 'margin', '20px')
 			]),
 		A2(
 			$elm$core$List$map,
@@ -7082,6 +7130,7 @@ var $author$project$Main$EdgeFieldUpdated = function (a) {
 var $author$project$Main$InitSim = {$: 'InitSim'};
 var $author$project$Main$LP = {$: 'LP'};
 var $author$project$Main$Load = {$: 'Load'};
+var $author$project$Main$LoadMusicianScores = {$: 'LoadMusicianScores'};
 var $author$project$Main$PlaceRandomly = {$: 'PlaceRandomly'};
 var $author$project$Main$Play = function (a) {
 	return {$: 'Play', a: a};
@@ -8546,6 +8595,17 @@ var $author$project$Main$viewProblem = F2(
 							$rundis$elm_bootstrap$Bootstrap$Button$button,
 							_List_fromArray(
 								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$LoadMusicianScores),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Load musician scores')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
 									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$InitSim),
 									$rundis$elm_bootstrap$Bootstrap$Button$primary
 								]),
@@ -8653,7 +8713,7 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 	{
 		init: function (_v0) {
 			return _Utils_Tuple2(
-				{count: 0, edge: '', error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, loading: _List_Nil, playing: false, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
+				{count: 0, edge: '', error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, loading: _List_Nil, musicianScores: _List_Nil, playing: false, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
 				$elm$core$Platform$Cmd$none);
 		},
 		subscriptions: function (model) {

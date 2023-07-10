@@ -59,6 +59,7 @@ type alias Model =
     , playing : Bool
     , loading : List String
     , edge : String
+    , musicianScores : List Float
     }
 
 type alias Placement =
@@ -85,6 +86,8 @@ type Msg
     | LoadSolution String
     | Save
     | FocusOnInstrument Int
+    | LoadMusicianScores
+    | LoadedMusicianScores (Result Http.Error String)
     | SolutionReturned (Result Http.Error String)
     | FetchSolutions (Result Http.Error String)
     | Play Bool
@@ -199,13 +202,24 @@ update msg model = case msg of
     SolutionReturned (Err err) -> ( { model | error = Just "Failed" }, Cmd.none )
     FetchSolutions (Ok res) -> ( { model | loading = String.split "," res }, Cmd.none)
     FetchSolutions (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
+    LoadMusicianScores -> ( model, Cmd.batch [
+        Http.get 
+            { url = "http://localhost:3000/musician_scores"
+            , expect = Http.expectString LoadedMusicianScores
+            }
+        ])
+    LoadedMusicianScores (Ok res) -> 
+        case decodeString (list float) res of
+            Ok scores -> ( { model | musicianScores = scores }, Cmd.none )
+            Err err -> ({ model | error = Just ("Failed to decode musician scores: " ++ errorToString err) }, Cmd.none )
+    LoadedMusicianScores (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
     Play playing -> ( { model | playing = playing }, Cmd.batch [ postExpectSolution "http://localhost:3000/step_sim/1" ] )
 
 
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing, playing = False, loading = [], edge = "" }, Cmd.none )
+        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing, playing = False, loading = [], edge = "", musicianScores = [] }, Cmd.none )
         , view = view
         , update = update
         , subscriptions = \model -> Sub.none
@@ -292,6 +306,7 @@ viewProblem m p =
                             [ BButton.onClick (nextFocus m.focus 1), BButton.primary ]) [ text "Next Instrument" ],
                     BButton.button [ BButton.onClick Load, BButton.primary ] [ text "Load" ],
                     BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ],
+                    BButton.button [ BButton.onClick LoadMusicianScores, BButton.primary ] [ text "Load musician scores" ],
                     BButton.button [ BButton.onClick InitSim, BButton.primary ] [ text "Init Sim" ],
                     BButton.button [ BButton.onClick (StepSim 1), BButton.primary ] [ text "Step Sim" ],
                     BButton.button [ BButton.onClick (StepSim 100), BButton.primary ] [ text "Step Sim 100" ],
