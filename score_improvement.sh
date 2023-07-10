@@ -1,8 +1,11 @@
 #!/bin/zsh
+
+# For human-readable large numbers
+export LC_ALL=en_US.UTF-8
+
 TOTAL_IMPROVEMENT_K=0
 for p in {1..90}; do
   if [ -d problems/solutions-$p ]; then
-    echo $p
     pushd problems/solutions-$p;
     # Files are <score>.json
     # Submitted solutions are <score>.json.submitted
