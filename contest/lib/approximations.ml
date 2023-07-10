@@ -19,11 +19,21 @@ let max_score_I (p : problem) (a : attendee) (i : instrument) : float =
 let max_score_instrument_without_q (p : problem) (i : instrument) : float =
   List.sum (module Float) ~f:(fun a -> max_score_I p a i) p.attendees
 
-(* Approximating the nth ring of the ith musician. The precise is i/3 = n(n+1) *)
-let max_q (inl : int list) : float =
-  let ring_approx (i : int) = Float.(max (round_up (sqrt (of_int i / 3.)) - 1.) 0.) in
-  let min_dl = List.mapi inl ~f:(fun i _ -> ring_approx i *. 10.) in
-  1.0 +. List.sum (module Float) ~f:(fun d -> if Float.(d = 0.) then 0. else 1. /. d) min_dl
+let max_q (m_count : int) : float =
+  if m_count < 1 then failwith "cannot calculate Q for less than 1 musician"
+  else
+    (* calculate the nth ring of the ith musician in a honeycomb *)
+    let ring_of_i (i : int) =
+      let rec iter n i = if i < 1 then n else iter (n + 1) (i - ((n + 1) * 6)) in
+      iter 0 i
+    in
+    let min_dl =
+      List.range ~start:`inclusive ~stop:`inclusive 0 (m_count - 1)
+      |> List.mapi ~f:(fun i _ ->
+             let r = ring_of_i i in
+             if r < 2 then Float.(of_int r * 10.) else Float.(of_int r * 10. * cos (Float.pi /. 6.)))
+    in
+    1.0 +. List.sum (module Float) ~f:(fun d -> if Float.(d = 0.) then 0. else 1. /. d) min_dl
 
 (* Assumes all positive instruments are as close on the plane as possible
    and not blocked, that all musicians with the same instrument are as close
@@ -32,7 +42,7 @@ let max_score_problem (p : problem) : float =
   let in_groups : instrument list list = List.sort_and_group p.musicians ~compare:Int.compare in
   10.
   *. List.fold in_groups ~init:0.0 ~f:(fun acc inl ->
-         let q = max_q inl in
+         let q = max_q (List.length inl) in
          let base_score = max_score_instrument_without_q p (List.hd_exn inl) in
          let score = if p.problem_id > 55 then base_score *. q else base_score in
          acc +. (score *. float (List.length inl)))
@@ -53,7 +63,18 @@ let newton_score_problem (p : problem) : float =
   let _iters = Physics.(newton_run_stage stay_stage1 step_stage1) p placements 0 in
   let in_groups : instrument list list = List.sort_and_group p.musicians ~compare:Int.compare in
   List.fold in_groups ~init:0.0 ~f:(fun acc inl ->
-      let q = max_q inl in
+      let q = max_q (List.length inl) in
       let base_score = newton_score_instrument_without_q p placements.(List.hd_exn inl) in
       let score = if p.problem_id > 55 then base_score *. q else base_score in
       acc +. (score *. float (List.length inl)))
+
+(* TESTS *)
+let%test_unit "max_q" =
+  [%test_eq: float] (max_q 1) 1.;
+  [%test_eq: float] (max_q 2) 1.1;
+  [%test_eq: float] (max_q 3) 1.2;
+  [%test_eq: float] (max_q 7) 1.6;
+  [%test_eq: bool] Float.(max_q 18 >= 2.2 && max_q 18 <= 2.4) true;
+  [%test_eq: bool] Float.(max_q 36 >= 2.8 && max_q 36 <= 3.0) true;
+  [%test_eq: bool] Float.(max_q 60 >= 3.4 && max_q 60 <= 3.7) true;
+  ()
