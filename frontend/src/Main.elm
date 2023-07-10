@@ -310,8 +310,9 @@ viewProblem m p =
 
 viewLoadSolution : List String -> Html Msg
 viewLoadSolution loading =
+    let sorted = loading |> List.map (\l -> String.toInt l |> Maybe.withDefault 0) |> List.sort |> List.map String.fromInt |> List.reverse in
     div [ ] 
-        (List.map (\l -> BButton.button [ BButton.primary, BButton.onClick (LoadSolution l) ] [text l]) loading)
+        (List.map (\l -> BButton.button [ BButton.primary, BButton.onClick (LoadSolution l) ] [text l]) sorted)
         
 
 view : Model -> Html Msg
