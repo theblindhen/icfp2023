@@ -66,6 +66,9 @@ let safe_move (p : Types.problem) (pos : Types.position) (f : force) : Types.pos
 type repel = NoMove | Force | None
 type anti_collision_reply = Cocentered | Force of force
 
+(* Return a random float from -scale to scale *)
+let random_centred scale = (Random.float 2.0 -. 1.0) *. scale
+
 let anti_collision_force (placements : placed_instrument array) (idx : int) (pos : Types.position) :
     anti_collision_reply =
   (* let fudge_distance = 130. in *)
@@ -78,6 +81,15 @@ let anti_collision_force (placements : placed_instrument array) (idx : int) (pos
       /. ((shell_dist_sq +. fudge_distance) *. (shell_dist_sq +. fudge_distance))
     else fudge_distance /. (shell_dist_sq *. shell_dist_sq)
   in
+  let boogie_axis_parallel (force : force) =
+    let open Float in
+    let boogie_axis_factor = 0.1 in
+    if force.x < 0.00001 && force.y > 0.001 then
+      { force with x = random_centred boogie_axis_factor }
+    else if force.y < 0.00001 && force.x > 0.001 then
+      { force with y = random_centred boogie_axis_factor }
+    else force
+  in
   Array.foldi placements
     ~init:(Force { x = 0.; y = 0. })
     ~f:(fun i force p ->
@@ -85,6 +97,7 @@ let anti_collision_force (placements : placed_instrument array) (idx : int) (pos
       | Cocentered -> Cocentered
       | Force force ->
           if i <> idx then
+            let force = boogie_axis_parallel force in
             let v = from_points pos p.pos in
             let d_sq = length_sq v in
             if Float.(d_sq < 0.1) then Cocentered
@@ -122,7 +135,7 @@ let simulate_step (p : Types.problem) ~(att_heat : float) ~(repel : repel)
              match anti_collision with
              | Cocentered ->
                  (* throw it to kingdom come *)
-                 { x = Random.float 100. -. 50.; y = Random.float 100. -. 50. }
+                 { x = random_centred 50.; y = random_centred 50. }
              | Force anti_collision ->
                  if Float.(length anti_collision > att_heat) then
                    scale_to_len repel_heat anti_collision
@@ -225,7 +238,6 @@ let att_heat_from_iteration_stage2 (problem : Types.problem) (iteration : int) :
     }
   in
   let len = length att_heat_force in
-  (* if iteration % 100 = 0 then Printf.printf "Iter %d: att_heat_force: %f\n%!" iteration len; *)
   len
 
 let stay_stage1 last_instability iteration =
@@ -291,11 +303,8 @@ let newton_run_stage stay_stage step problem placements : int -> int =
   ret
 
 (* Newton solver on all stages but Stage 1 *)
-let newton_solver' ?(optimize : bool = false) (problem : Types.problem) placements : int =
-  let stage2_heat_factor = if optimize then 0.05 else 1.0 in
-  let iterations =
-    newton_run_stage stay_stage2 (step_stage2 ~heat_factor:stage2_heat_factor) problem placements 0
-  in
+let newton_solver' ?(heat_factor : float = 1.0) (problem : Types.problem) placements : int =
+  let iterations = newton_run_stage stay_stage2 (step_stage2 ~heat_factor) problem placements 0 in
   Printf.printf "Stage 2 done by %d iterations.\n%!" iterations;
   let stay_stage3 = stay_stage_validated problem placements stay_stage3_raw stage3_iterations in
   let iterations = newton_run_stage stay_stage3 step_stage3 problem placements 0 in
@@ -316,10 +325,11 @@ let newton_solver (problem : Types.problem) : Types.solution =
   let sol = solution_of_placements problem music_placements in
   sol
 
-let newton_optimizer (problem : Types.problem) (solution : Types.solution) =
+let newton_optimizer ?(heat_factor : float = 0.1) (problem : Types.problem)
+    (solution : Types.solution) =
   let placements = placements_of_solution solution in
-  Printf.printf "Newton boogie on Problem %d\n%!" problem.problem_id;
-  newton_solver' ~optimize:true problem placements |> ignore;
+  Printf.printf "Newton boogie on Problem %d with heat %f\n%!" problem.problem_id heat_factor;
+  newton_solver' ~heat_factor problem placements |> ignore;
   let new_solution = solution_of_placements problem placements in
   let return_solution = ref new_solution in
   (try Misc.validate_solution problem solution with
@@ -346,7 +356,7 @@ let gui_newton_solver_step (problem : Types.problem) ((solution, stage) : Types.
         (music_placements, "stage2")
     else if Stdlib.(stage = "stage2") then
       (* Stage 2 *)
-      let _last_instability = step_stage2 problem placements iteration in
+      let _last_instability = step_stage2 problem ~heat_factor:1.0 placements iteration in
       (placements, "stage2")
     else (
       print_endline "I'm done";

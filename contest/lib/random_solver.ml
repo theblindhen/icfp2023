@@ -75,3 +75,32 @@ let random_placement_solution (p : problem) (already_placed : position list) : s
   let count = List.length p.musicians - List.length already_placed in
   already_placed @ random_placements p (fun () -> random_placement p) count already_placed
   |> Misc.solution_of_positions p
+
+let random_dropper (problem : problem) (solution : solution) ~(relative_max_score_threshold : float)
+    : solution =
+  (* Take all musicians with relatively low score and randomly drop them
+     elsewhere *)
+  let score_env = Score.get_scoring_env problem solution in
+  let musician_scores =
+    solution |> Array.map ~f:(fun m -> Score.score_musician ~negative:true score_env m)
+  in
+  let max_score = Array.max_elt musician_scores ~compare:Float.compare |> Option.value_exn in
+  let bad_musicians =
+    Array.foldi musician_scores ~init:Int.Set.empty ~f:(fun musician_id acc score ->
+        if Float.(score < relative_max_score_threshold * max_score) then Set.add acc musician_id
+        else acc)
+  in
+  Printf.printf "Randomly dropping %d musicians\n" (Set.length bad_musicians);
+  let good_musicians_pos =
+    Array.to_list solution
+    |> List.filter ~f:(fun m -> not (Set.mem bad_musicians m.id))
+    |> List.map ~f:(fun m -> m.pos)
+  in
+  let bad_placements =
+    random_placements problem
+      (fun () -> random_placement problem)
+      (Set.length bad_musicians) good_musicians_pos
+  in
+  List.iter2_exn (Set.to_list bad_musicians) bad_placements ~f:(fun m_id new_pos ->
+      solution.(m_id) <- { (solution.(m_id)) with pos = new_pos });
+  solution
