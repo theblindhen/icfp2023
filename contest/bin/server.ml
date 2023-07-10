@@ -144,6 +144,14 @@ let save_handler _ =
       returnJson solution_json
   | _ -> returnError "No problem or solution selected; cannot save solution"
 
+let musician_score_handler _ =
+  match (!current_problem, !current_solution) with
+  | Some p, Some s ->
+      let env = Score.get_scoring_env p s in
+      let scores = s |> Array.to_list |> List.map ~f:(Score.score_musician env) in
+      returnJson (`List (List.map scores ~f:(fun s -> `Float s)) |> Yojson.to_string)
+  | _ -> returnError "No problem or solution selected; cannot score solution"
+
 let _ =
   App.empty
   |> App.get "/" index_handler
@@ -160,4 +168,5 @@ let _ =
   |> App.post "/init_sim" (init_solution_handler Physics.gui_init_solution)
   |> App.post "/step_sim/:n" (optimiser_handler Physics.gui_newton_solver_step)
   |> App.post "/save" save_handler
+  |> App.post "/musician_scores" musician_score_handler
   |> App.run_command
