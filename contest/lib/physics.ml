@@ -320,7 +320,13 @@ let newton_optimizer (problem : Types.problem) (solution : Types.solution) =
   let placements = placements_of_solution solution in
   Printf.printf "Newton boogie on Problem %d\n%!" problem.problem_id;
   newton_solver' ~optimize:true problem placements |> ignore;
-  solution_of_placements problem placements
+  let new_solution = solution_of_placements problem placements in
+  let return_solution = ref new_solution in
+  (try Misc.validate_solution problem solution with
+  | _e ->
+      Printf.printf "Newton optimizer failed making a valid solution :'-(\n%!";
+      return_solution := solution);
+  !return_solution
 
 (* GUI Entry points *)
 let gui_init_solution (p : Types.problem) : Types.solution * string =
