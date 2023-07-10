@@ -32,28 +32,36 @@ let get_best_solution (problem : Types.problem) =
   let best_solution_file = sprintf "%.0f.json" best_score in
   get_solution problem best_solution_file
 
+let problem_folder (problem : Types.problem) =
+  let dir_name = sprintf "../problems/solutions-%d" problem.problem_id in
+  (match Sys_unix.is_directory dir_name with
+  | `No -> Caml_unix.mkdir dir_name 0o777
+  | _ -> ());
+  dir_name
+
+let write_solution_to_file (problem : Types.problem) (solution : Types.solution) (filename : string)
+    : unit =
+  let volumes = Score.volumes_for_musicians problem solution in
+  let solution_json =
+    Types.json_solution_of_solution ~volumes solution |> Json_j.string_of_json_solution
+  in
+  let path = sprintf "%s/%s" (problem_folder problem) filename in
+  eprintf "Writing solution to %s\n%!" path;
+  Out_channel.write_all path ~data:solution_json
+
 (** Write the solution to the "../problems/solutions-%d" directory. Only write a
  * new file if the new score is better than all the previous ones. *)
 let write_solution_if_best (score : float) (problem : Types.problem) (solution : Types.solution) :
     unit =
   let best_previous_score = best_solution_score problem.problem_id in
-  if Float.(score > best_previous_score) then (
-    let volumes = Score.volumes_for_musicians problem solution in
-    let solution_json =
-      Types.json_solution_of_solution ~volumes solution |> Json_j.string_of_json_solution
-    in
+  if Float.(score > best_previous_score) then
     (* Create the directory "../problems/solutions-%d" if it doesn't exist.
      * We're not using mkdir_p here because if there's some kind of problem with
      * our assumptions about directory layout we don't want files to be created
      * under the parent directory. *)
-    let dir_name = sprintf "../problems/solutions-%d" problem.problem_id in
-    (match Sys_unix.is_directory dir_name with
-    | `No -> Caml_unix.mkdir dir_name 0o777
-    | _ -> ());
     (* Write the file, omitting decimals (they should be 0). *)
-    let filename = sprintf "%s/%.0f.json" dir_name score in
-    eprintf "Writing solution to %s\n%!" filename;
-    Out_channel.write_all filename ~data:solution_json)
+    let filename = sprintf "%.0f.json" score in
+    write_solution_to_file problem solution filename
   else
     eprintf "Not writing solution with score %s (< %s)\n%!" (Misc.string_of_score score)
       (Misc.string_of_score best_previous_score)

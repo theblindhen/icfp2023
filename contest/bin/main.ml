@@ -13,6 +13,7 @@ type invocation = {
   optimizers : optimizer list;
   scale_height : float;
   scale_width : float;
+  save_file : string option;
 }
 [@@deriving sexp]
 
@@ -20,6 +21,17 @@ let run_invocation inv =
   match Json_util.get_problem inv.problem_id with
   | None -> failwith "Failed to parse problem"
   | Some problem ->
+      let validate_and_save ?(label : string = "") solution =
+        (match inv.save_file with
+        | None -> ()
+        | Some file -> Json_util.write_solution_to_file problem solution file);
+        printf "Validating %s solution...\n%!" label;
+        Misc.validate_solution problem solution;
+        let score = Score.score_solution problem solution in
+        printf "Problem %d: %s solution has score: %s\n%!" inv.problem_id label
+          (Misc.string_of_score score);
+        Json_util.write_solution_if_best score problem solution
+      in
       Printf.printf "\nSolving problem %d\n%!" inv.problem_id;
       let problem =
         if Float.(inv.scale_height <> 1.0 || inv.scale_width <> 1.0) then (
@@ -59,12 +71,7 @@ let run_invocation inv =
                  | Drop -> Random_solver.random_dropper problem ~relative_max_score_threshold:0.1
                in
                let solution = optimizer solution in
-               printf "Validating optimized solution...\n%!";
-               Misc.validate_solution problem solution;
-               let optimised_score = Score.score_solution problem solution in
-               printf "Optimized problem %d with score: %s\n%!" inv.problem_id
-                 (Misc.string_of_score optimised_score);
-               Json_util.write_solution_if_best optimised_score problem solution;
+               validate_and_save ~label:"optimized" solution;
                solution)
       in
       print_endline "All done"
@@ -82,7 +89,12 @@ let parse_optimizer string : optimizer =
 
 let command =
   Command.basic ~summary:"Run our solver on a problem"
-    (let%map_open.Command loadBest = flag "--loadBest" no_arg ~doc:"Load the previous best solution"
+    (let%map_open.Command save =
+       flag "-s" (optional string)
+         ~doc:
+           "Save the solution to a file (in addition to saving globally better solutions in our \
+            database)"
+     and loadBest = flag "--loadBest" no_arg ~doc:"Load the previous best solution"
      and opt =
        flag "-o" (listed (Arg_type.create parse_optimizer)) ~doc:"Optimizers, comma-separated"
      and newton = flag "--newton" no_arg ~doc:"Use Newton initial placement"
@@ -120,6 +132,7 @@ let command =
            optimizers = opt;
            scale_height = parse_scale scale_height;
            scale_width = parse_scale scale_width;
+           save_file = save;
          })
 
 let () = Command_unix.run command
