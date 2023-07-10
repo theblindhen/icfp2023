@@ -7020,10 +7020,41 @@ var $author$project$Main$viewLoadProblem = function (m) {
 var $author$project$Main$LoadSolution = function (a) {
 	return {$: 'LoadSolution', a: a};
 };
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$core$List$sort = function (xs) {
+	return A2($elm$core$List$sortBy, $elm$core$Basics$identity, xs);
+};
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var $author$project$Main$viewLoadSolution = function (loading) {
+	var sorted = $elm$core$List$reverse(
+		A2(
+			$elm$core$List$map,
+			$elm$core$String$fromInt,
+			$elm$core$List$sort(
+				A2(
+					$elm$core$List$map,
+					function (l) {
+						return A2(
+							$elm$core$Maybe$withDefault,
+							0,
+							$elm$core$String$toInt(l));
+					},
+					loading))));
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'margin', '20px'),
+				A2($elm$html$Html$Attributes$style, 'padding', '5px')
+			]),
 		A2(
 			$elm$core$List$map,
 			function (l) {
@@ -7040,7 +7071,7 @@ var $author$project$Main$viewLoadSolution = function (loading) {
 							$elm$html$Html$text(l)
 						]));
 			},
-			loading));
+			sorted));
 };
 var $author$project$Main$Edge = function (a) {
 	return {$: 'Edge', a: a};
@@ -7289,15 +7320,6 @@ var $elm$core$List$minimum = function (list) {
 		return $elm$core$Maybe$Nothing;
 	}
 };
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $author$project$Main$instrumentDescription = F2(
 	function (m, p) {
 		var _v0 = m.focus;
@@ -8391,7 +8413,9 @@ var $author$project$Main$viewProblem = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Attendes: '),
+							$elm$html$Html$text('Problem: '),
+							$elm$html$Html$text(m.problemId),
+							$elm$html$Html$text('; attendes: '),
 							$elm$html$Html$text(
 							$elm$core$String$fromInt(
 								$elm$core$List$length(p.attendees))),

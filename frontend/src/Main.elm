@@ -260,7 +260,9 @@ viewProblem m p =
             div [ style "display" "flex"
                 , style "height" "auto"
                 , style "align-items" "center" ] 
-                [ text "Attendes: "
+                [ text "Problem: "
+                , text m.problemId
+                , text "; attendes: "
                 , text (String.fromInt (List.length p.attendees))
                 , text "; musicians: "
                 , text (String.fromInt (List.length p.musicians)) ],
@@ -308,8 +310,9 @@ viewProblem m p =
 
 viewLoadSolution : List String -> Html Msg
 viewLoadSolution loading =
-    div [ ] 
-        (List.map (\l -> BButton.button [ BButton.primary, BButton.onClick (LoadSolution l) ] [text l]) loading)
+    let sorted = loading |> List.map (\l -> String.toInt l |> Maybe.withDefault 0) |> List.sort |> List.map String.fromInt |> List.reverse in
+    div [ style "margin" "20px" ] 
+        (List.map (\l -> BButton.button [ BButton.primary, BButton.onClick (LoadSolution l) ] [text l]) sorted)
         
 
 view : Model -> Html Msg
