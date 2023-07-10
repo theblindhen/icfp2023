@@ -59,6 +59,8 @@ type alias Model =
     , playing : Bool
     , loading : List String
     , edge : String
+    , musicianScores : List Float
+    , zoom : Int
     }
 
 type alias Placement =
@@ -85,6 +87,9 @@ type Msg
     | LoadSolution String
     | Save
     | FocusOnInstrument Int
+    | LoadMusicianScores
+    | Zoom Int
+    | LoadedMusicianScores (Result Http.Error String)
     | SolutionReturned (Result Http.Error String)
     | FetchSolutions (Result Http.Error String)
     | Play Bool
@@ -189,23 +194,35 @@ update msg model = case msg of
             { url = "http://localhost:3000/solutions/" ++ model.problemId
             , expect = Http.expectString FetchSolutions
             }])
+    Zoom i -> ( { model | zoom = i }, Cmd.none)
     LoadSolution s -> ( model, Cmd.batch [ postExpectSolution ("http://localhost:3000/solution/" ++ model.problemId ++ "/" ++ s) ])
-    FocusOnInstrument i -> ( { model | focus = Just i }, Cmd.none )
+    FocusOnInstrument i -> ( { model | focus = Just i, musicianScores = [] }, Cmd.none )
     SolutionReturned (Ok res) ->
         case decodeString decodeSolution res of
-            Ok solution -> ({ model | solution = Just solution, loading = [] }, 
+            Ok solution -> ({ model | solution = Just solution, loading = [], musicianScores = [] }, 
                 if model.playing then Cmd.batch [ postExpectSolution "http://localhost:3000/step_sim/1" ] else Cmd.none)
             Err err -> ({ model | error = Just ("Failed to decode solution: " ++ errorToString err) }, Cmd.none )
     SolutionReturned (Err err) -> ( { model | error = Just "Failed" }, Cmd.none )
     FetchSolutions (Ok res) -> ( { model | loading = String.split "," res }, Cmd.none)
     FetchSolutions (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
+    LoadMusicianScores -> ( model, Cmd.batch [
+        Http.get 
+            { url = "http://localhost:3000/musician_scores"
+            , expect = Http.expectString LoadedMusicianScores
+            }
+        ])
+    LoadedMusicianScores (Ok res) -> 
+        case decodeString (list float) res of
+            Ok scores -> ( { model | musicianScores = scores }, Cmd.none )
+            Err err -> ({ model | error = Just ("Failed to decode musician scores: " ++ errorToString err) }, Cmd.none )
+    LoadedMusicianScores (Err _) -> ( { model | error = Just "Failed" }, Cmd.none )
     Play playing -> ( { model | playing = playing }, Cmd.batch [ postExpectSolution "http://localhost:3000/step_sim/1" ] )
 
 
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing, playing = False, loading = [], edge = "" }, Cmd.none )
+        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing, playing = False, loading = [], edge = "", musicianScores = [], zoom = 1 }, Cmd.none )
         , view = view
         , update = update
         , subscriptions = \model -> Sub.none
@@ -276,7 +293,7 @@ viewProblem m p =
                     ( 1001, 1001 )
                     [ ]
                     [ clearScreen
-                    , renderProblem p m.solution m.focus
+                    , renderProblem m p m.solution m.focus
                     ]
                 ],
             div [ ] 
@@ -292,6 +309,9 @@ viewProblem m p =
                             [ BButton.onClick (nextFocus m.focus 1), BButton.primary ]) [ text "Next Instrument" ],
                     BButton.button [ BButton.onClick Load, BButton.primary ] [ text "Load" ],
                     BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ],
+                    BButton.button [ BButton.onClick (Zoom (m.zoom + 1)), BButton.primary ] [ text "Zoom in" ],
+                    BButton.button [ BButton.onClick (Zoom (m.zoom - 1)), BButton.primary ] [ text "Zoom out" ],
+                    BButton.button [ BButton.onClick LoadMusicianScores, BButton.primary ] [ text "Load musician scores" ],
                     BButton.button [ BButton.onClick InitSim, BButton.primary ] [ text "Init Sim" ],
                     BButton.button [ BButton.onClick (StepSim 1), BButton.primary ] [ text "Step Sim" ],
                     BButton.button [ BButton.onClick (StepSim 100), BButton.primary ] [ text "Step Sim 100" ],
@@ -331,10 +351,10 @@ view m =
 clearScreen =
     shapes [ fill Color.white ] [ rect ( 0, 0 ) 1000 1000 ]
 
-renderProblem : Problem -> Maybe Solution -> Maybe Focus -> Canvas.Renderable
-renderProblem p s f =
+renderProblem : Model -> Problem -> Maybe Solution -> Maybe Focus -> Canvas.Renderable
+renderProblem m p s f =
     let 
-        scale = 1000 / (max p.roomHeight p.roomWidth)
+        scale = (1000 * (toFloat m.zoom)) / (max p.roomHeight p.roomWidth)
 
         musicians = 
             case s of
@@ -351,6 +371,21 @@ renderProblem p s f =
                 Nothing -> []
                 Just focus -> List.filter (\(_, musician) -> musician == focus) musicians
 
+        musicianShapes =
+            case m.musicianScores of
+                [] -> group [] 
+                    [ shapes
+                        [ stroke Color.red ]
+                        (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) unfocusedMusicians)
+                    , shapes
+                        [ stroke Color.green ]
+                        (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) focusedMusicians)
+                    ]
+                scores -> 
+                    let max = (List.maximum scores |> Maybe.withDefault 0) * 2/3 in
+                        group [] 
+                            (List.map (\((placement, _), score) -> shapes [stroke (Color.hsl (score / max) 1.0 0.5)] [ circle (placement.x * scale, placement.y * scale) (5.0 * scale) ]) (Extra.zip musicians scores))
+
     in
         group []
             [ shapes
@@ -365,11 +400,6 @@ renderProblem p s f =
             , shapes
                 [ fill Color.gray ]
                 (List.map (\pillar -> circle (Tuple.first pillar.center * scale, Tuple.second pillar.center * scale) (pillar.radius * scale)) p.pillars)
-            , shapes
-                [ stroke Color.red ]
-                (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) unfocusedMusicians)
-            , shapes
-                [ stroke Color.green ]
-                (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) focusedMusicians)
+            , musicianShapes
             ]
 

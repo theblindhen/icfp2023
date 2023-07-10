@@ -5341,6 +5341,9 @@ var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$FetchSolutions = function (a) {
 	return {$: 'FetchSolutions', a: a};
 };
+var $author$project$Main$LoadedMusicianScores = function (a) {
+	return {$: 'LoadedMusicianScores', a: a};
+};
 var $author$project$Main$LoadedProblem = function (a) {
 	return {$: 'LoadedProblem', a: a};
 };
@@ -6390,6 +6393,13 @@ var $author$project$Main$update = F2(
 									url: 'http://localhost:3000/solutions/' + model.problemId
 								})
 							])));
+			case 'Zoom':
+				var i = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{zoom: i}),
+					$elm$core$Platform$Cmd$none);
 			case 'LoadSolution':
 				var s = msg.a;
 				return _Utils_Tuple2(
@@ -6405,7 +6415,8 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							focus: $elm$core$Maybe$Just(i)
+							focus: $elm$core$Maybe$Just(i),
+							musicianScores: _List_Nil
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'SolutionReturned':
@@ -6419,6 +6430,7 @@ var $author$project$Main$update = F2(
 								model,
 								{
 									loading: _List_Nil,
+									musicianScores: _List_Nil,
 									solution: $elm$core$Maybe$Just(solution)
 								}),
 							model.playing ? $elm$core$Platform$Cmd$batch(
@@ -6457,6 +6469,52 @@ var $author$project$Main$update = F2(
 								loading: A2($elm$core$String$split, ',', res)
 							}),
 						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								error: $elm$core$Maybe$Just('Failed')
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'LoadMusicianScores':
+				return _Utils_Tuple2(
+					model,
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								$elm$http$Http$get(
+								{
+									expect: $elm$http$Http$expectString($author$project$Main$LoadedMusicianScores),
+									url: 'http://localhost:3000/musician_scores'
+								})
+							])));
+			case 'LoadedMusicianScores':
+				if (msg.a.$ === 'Ok') {
+					var res = msg.a.a;
+					var _v3 = A2(
+						$elm$json$Json$Decode$decodeString,
+						$elm$json$Json$Decode$list($elm$json$Json$Decode$float),
+						res);
+					if (_v3.$ === 'Ok') {
+						var scores = _v3.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{musicianScores: scores}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						var err = _v3.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									error: $elm$core$Maybe$Just(
+										'Failed to decode musician scores: ' + $elm$json$Json$Decode$errorToString(err))
+								}),
+							$elm$core$Platform$Cmd$none);
+					}
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -7052,8 +7110,7 @@ var $author$project$Main$viewLoadSolution = function (loading) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'margin', '20px'),
-				A2($elm$html$Html$Attributes$style, 'padding', '5px')
+				A2($elm$html$Html$Attributes$style, 'margin', '20px')
 			]),
 		A2(
 			$elm$core$List$map,
@@ -7082,6 +7139,7 @@ var $author$project$Main$EdgeFieldUpdated = function (a) {
 var $author$project$Main$InitSim = {$: 'InitSim'};
 var $author$project$Main$LP = {$: 'LP'};
 var $author$project$Main$Load = {$: 'Load'};
+var $author$project$Main$LoadMusicianScores = {$: 'LoadMusicianScores'};
 var $author$project$Main$PlaceRandomly = {$: 'PlaceRandomly'};
 var $author$project$Main$Play = function (a) {
 	return {$: 'Play', a: a};
@@ -7091,6 +7149,9 @@ var $author$project$Main$StepSim = function (a) {
 	return {$: 'StepSim', a: a};
 };
 var $author$project$Main$Swap = {$: 'Swap'};
+var $author$project$Main$Zoom = function (a) {
+	return {$: 'Zoom', a: a};
+};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
@@ -7406,6 +7467,27 @@ var $joakin$elm_canvas$Canvas$group = F2(
 					drawable: $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableGroup(entities)
 				}));
 	});
+var $avh4$elm_color$Color$hsla = F4(
+	function (hue, sat, light, alpha) {
+		var _v0 = _Utils_Tuple3(hue, sat, light);
+		var h = _v0.a;
+		var s = _v0.b;
+		var l = _v0.c;
+		var m2 = (l <= 0.5) ? (l * (s + 1)) : ((l + s) - (l * s));
+		var m1 = (l * 2) - m2;
+		var hueToRgb = function (h__) {
+			var h_ = (h__ < 0) ? (h__ + 1) : ((h__ > 1) ? (h__ - 1) : h__);
+			return ((h_ * 6) < 1) ? (m1 + (((m2 - m1) * h_) * 6)) : (((h_ * 2) < 1) ? m2 : (((h_ * 3) < 2) ? (m1 + (((m2 - m1) * ((2 / 3) - h_)) * 6)) : m1));
+		};
+		var b = hueToRgb(h - (1 / 3));
+		var g = hueToRgb(h);
+		var r = hueToRgb(h + (1 / 3));
+		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, alpha);
+	});
+var $avh4$elm_color$Color$hsl = F3(
+	function (h, s, l) {
+		return A4($avh4$elm_color$Color$hsla, h, s, l, 1.0);
+	});
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $avh4$elm_color$Color$red = A4($avh4$elm_color$Color$RgbaSpace, 204 / 255, 0 / 255, 0 / 255, 1.0);
 var $joakin$elm_canvas$Canvas$Settings$stroke = function (color) {
@@ -7417,9 +7499,9 @@ var $elm$core$Tuple$pair = F2(
 		return _Utils_Tuple2(a, b);
 	});
 var $elm_community$list_extra$List$Extra$zip = $elm$core$List$map2($elm$core$Tuple$pair);
-var $author$project$Main$renderProblem = F3(
-	function (p, s, f) {
-		var scale = 1000 / A2($elm$core$Basics$max, p.roomHeight, p.roomWidth);
+var $author$project$Main$renderProblem = F4(
+	function (m, p, s, f) {
+		var scale = (1000 * m.zoom) / A2($elm$core$Basics$max, p.roomHeight, p.roomWidth);
 		var musicians = function () {
 			if (s.$ === 'Nothing') {
 				return _List_Nil;
@@ -7435,8 +7517,8 @@ var $author$project$Main$renderProblem = F3(
 				var focus = f.a;
 				return A2(
 					$elm$core$List$filter,
-					function (_v5) {
-						var musician = _v5.b;
+					function (_v8) {
+						var musician = _v8.b;
 						return !_Utils_eq(musician, focus);
 					},
 					musicians);
@@ -7449,11 +7531,85 @@ var $author$project$Main$renderProblem = F3(
 				var focus = f.a;
 				return A2(
 					$elm$core$List$filter,
-					function (_v3) {
-						var musician = _v3.b;
+					function (_v6) {
+						var musician = _v6.b;
 						return _Utils_eq(musician, focus);
 					},
 					musicians);
+			}
+		}();
+		var musicianShapes = function () {
+			var _v0 = m.musicianScores;
+			if (!_v0.b) {
+				return A2(
+					$joakin$elm_canvas$Canvas$group,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$joakin$elm_canvas$Canvas$shapes,
+							_List_fromArray(
+								[
+									$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$red)
+								]),
+							A2(
+								$elm$core$List$map,
+								function (_v1) {
+									var placement = _v1.a;
+									return A2(
+										$joakin$elm_canvas$Canvas$circle,
+										_Utils_Tuple2(placement.x * scale, placement.y * scale),
+										5.0 * scale);
+								},
+								unfocusedMusicians)),
+							A2(
+							$joakin$elm_canvas$Canvas$shapes,
+							_List_fromArray(
+								[
+									$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$green)
+								]),
+							A2(
+								$elm$core$List$map,
+								function (_v2) {
+									var placement = _v2.a;
+									return A2(
+										$joakin$elm_canvas$Canvas$circle,
+										_Utils_Tuple2(placement.x * scale, placement.y * scale),
+										5.0 * scale);
+								},
+								focusedMusicians))
+						]));
+			} else {
+				var scores = _v0;
+				var max = (A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$elm$core$List$maximum(scores)) * 2) / 3;
+				return A2(
+					$joakin$elm_canvas$Canvas$group,
+					_List_Nil,
+					A2(
+						$elm$core$List$map,
+						function (_v3) {
+							var _v4 = _v3.a;
+							var placement = _v4.a;
+							var score = _v3.b;
+							return A2(
+								$joakin$elm_canvas$Canvas$shapes,
+								_List_fromArray(
+									[
+										$joakin$elm_canvas$Canvas$Settings$stroke(
+										A3($avh4$elm_color$Color$hsl, score / max, 1.0, 0.5))
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$joakin$elm_canvas$Canvas$circle,
+										_Utils_Tuple2(placement.x * scale, placement.y * scale),
+										5.0 * scale)
+									]));
+						},
+						A2($elm_community$list_extra$List$Extra$zip, musicians, scores)));
 			}
 		}();
 		return A2(
@@ -7519,38 +7675,7 @@ var $author$project$Main$renderProblem = F3(
 								pillar.radius * scale);
 						},
 						p.pillars)),
-					A2(
-					$joakin$elm_canvas$Canvas$shapes,
-					_List_fromArray(
-						[
-							$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$red)
-						]),
-					A2(
-						$elm$core$List$map,
-						function (_v0) {
-							var placement = _v0.a;
-							return A2(
-								$joakin$elm_canvas$Canvas$circle,
-								_Utils_Tuple2(placement.x * scale, placement.y * scale),
-								5.0 * scale);
-						},
-						unfocusedMusicians)),
-					A2(
-					$joakin$elm_canvas$Canvas$shapes,
-					_List_fromArray(
-						[
-							$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$green)
-						]),
-					A2(
-						$elm$core$List$map,
-						function (_v1) {
-							var placement = _v1.a;
-							return A2(
-								$joakin$elm_canvas$Canvas$circle,
-								_Utils_Tuple2(placement.x * scale, placement.y * scale),
-								5.0 * scale);
-						},
-						focusedMusicians))
+					musicianShapes
 				]));
 	});
 var $elm$html$Html$canvas = _VirtualDom_node('canvas');
@@ -8441,7 +8566,7 @@ var $author$project$Main$viewProblem = F2(
 							_List_fromArray(
 								[
 									$author$project$Main$clearScreen,
-									A3($author$project$Main$renderProblem, p, m.solution, m.focus)
+									A4($author$project$Main$renderProblem, m, p, m.solution, m.focus)
 								]))
 						])),
 					A2(
@@ -8541,6 +8666,41 @@ var $author$project$Main$viewProblem = F2(
 							_List_fromArray(
 								[
 									$elm$html$Html$text('Save')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+									$author$project$Main$Zoom(m.zoom + 1)),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Zoom in')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+									$author$project$Main$Zoom(m.zoom - 1)),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Zoom out')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$LoadMusicianScores),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Load musician scores')
 								])),
 							A2(
 							$rundis$elm_bootstrap$Bootstrap$Button$button,
@@ -8653,7 +8813,7 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 	{
 		init: function (_v0) {
 			return _Utils_Tuple2(
-				{count: 0, edge: '', error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, loading: _List_Nil, playing: false, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
+				{count: 0, edge: '', error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, loading: _List_Nil, musicianScores: _List_Nil, playing: false, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing, zoom: 1},
 				$elm$core$Platform$Cmd$none);
 		},
 		subscriptions: function (model) {
