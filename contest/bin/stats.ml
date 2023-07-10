@@ -80,16 +80,61 @@ let stats_to_string total_score (problem_stats : stats) =
   ^ sprintf "%2.2f%%" (100. *. problem_stats.best_score /. problem_stats.newton_max_score)
   ^ "\n"
 
+let csv_headline =
+  "problem_id,room_dim,stage_dim,musicians_count,instrument_count,attendees_count,pillar_count,radii_num,radii_min,radii_max,best_score,%% \
+   of total score,theoretical_max_score,newton_max_score,%% our score / Newton max"
+
+let stats_to_csv total_score (problem_stats : stats) =
+  problem_stats.room_dim
+  ^ "," (* room_dim *)
+  ^ problem_stats.stage_dim
+  ^ "," (* stage_dim *)
+  ^ string_of_int problem_stats.musicians_count
+  ^ "," (* musicians_count *)
+  ^ string_of_int problem_stats.instrument_count
+  ^ "," (* instrument_count *)
+  ^ string_of_int problem_stats.attendees_count
+  ^ "," (* attendees_count *)
+  ^ string_of_int problem_stats.pillar_count
+  ^ "," (* pillar_count *)
+  ^ (if Option.is_none problem_stats.pillar_radii_stats then ",,"
+     else
+       let stats = Option.value_exn problem_stats.pillar_radii_stats in
+       sprintf "%d radii, %2.2f, %2.2f" stats.uniq stats.min stats.max)
+  ^ "," (* pillar_radii_stats *)
+  ^ string_of_float problem_stats.best_score
+  ^ "," (* best_score *)
+  ^ sprintf "%2.2f" (100. *. problem_stats.best_score /. total_score)
+  ^ "," (* %% of total score *)
+  ^ string_of_float problem_stats.theoretical_max_score
+  ^ "," (* theoretical_max_score *)
+  ^ string_of_float problem_stats.newton_max_score
+  ^ "," (* newton_max_score *)
+  ^ sprintf "%2.2f" (100. *. problem_stats.best_score /. problem_stats.newton_max_score)
+(* %% our score / Newton max *)
+
 let () =
+  (* read args*)
+  let args = Sys.get_argv () in
   let total_score = ref 0. in
   for i = 1 to problem_count do
     total_score := !total_score +. Json_util.best_solution_score i
   done;
-  for i = 1 to problem_count do
-    match Json_util.get_problem i with
-    | None -> print_endline (sprintf "Problem %02d: not found" i)
-    | Some problem ->
-        let stats = problem |> problem_stats |> stats_to_string !total_score in
-        print_endline (sprintf "Problem %02d:\n%s" i stats)
-  done;
-  Printf.printf "\n\nTotal score: %s\n" (Int.to_string_hum @@ int_of_float !total_score)
+  if Stdlib.(args.(1) = "--csv") then (
+    print_endline csv_headline;
+    for i = 1 to problem_count do
+      match Json_util.get_problem i with
+      | None -> ()
+      | Some problem ->
+          print_endline
+            (string_of_int i ^ "," ^ stats_to_csv !total_score (problem |> problem_stats))
+    done)
+  else (
+    for i = 1 to problem_count do
+      match Json_util.get_problem i with
+      | None -> print_endline (sprintf "Problem %02d: not found" i)
+      | Some problem ->
+          let stats = problem |> problem_stats |> stats_to_string !total_score in
+          print_endline (sprintf "Problem %02d:\n%s" i stats)
+    done;
+    Printf.printf "\n\nTotal score: %s\n" (Int.to_string_hum @@ int_of_float !total_score))
