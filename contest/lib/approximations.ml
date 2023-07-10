@@ -19,10 +19,14 @@ let max_score_I (p : problem) (a : attendee) (i : instrument) : float =
 let max_score_instrument_without_q (p : problem) (i : instrument) : float =
   List.sum (module Float) ~f:(fun a -> max_score_I p a i) p.attendees
 
-(* Approximating the nth ring of the ith musician. The precise is i/3 = n(n+1) *)
-let max_q (inl : int list) : float =
+let max_q (m_count : int) : float =
+  (* Approximating the nth ring of the ith musician. The precise is i/3 = n(n+1) *)
   let ring_approx (i : int) = Float.(max (round_up (sqrt (of_int i / 3.)) - 1.) 0.) in
-  let min_dl = List.mapi inl ~f:(fun i _ -> ring_approx i *. 10.) in
+  let min_dl =
+    List.range ~start:`inclusive ~stop:`inclusive 0 (m_count - 1)
+    |> List.mapi ~f:(fun i _ ->
+           if i < 2 then ring_approx i *. 10. else ring_approx i *. 10. *. Float.cos (Float.pi /. 6.))
+  in
   1.0 +. List.sum (module Float) ~f:(fun d -> if Float.(d = 0.) then 0. else 1. /. d) min_dl
 
 (* Assumes all positive instruments are as close on the plane as possible
@@ -32,7 +36,7 @@ let max_score_problem (p : problem) : float =
   let in_groups : instrument list list = List.sort_and_group p.musicians ~compare:Int.compare in
   10.
   *. List.fold in_groups ~init:0.0 ~f:(fun acc inl ->
-         let q = max_q inl in
+         let q = max_q (List.length inl) in
          let base_score = max_score_instrument_without_q p (List.hd_exn inl) in
          let score = if p.problem_id > 55 then base_score *. q else base_score in
          acc +. (score *. float (List.length inl)))
@@ -53,7 +57,7 @@ let newton_score_problem (p : problem) : float =
   let _iters = Physics.(newton_run_stage stay_stage1 step_stage1) p placements 0 in
   let in_groups : instrument list list = List.sort_and_group p.musicians ~compare:Int.compare in
   List.fold in_groups ~init:0.0 ~f:(fun acc inl ->
-      let q = max_q inl in
+      let q = max_q (List.length inl) in
       let base_score = newton_score_instrument_without_q p placements.(List.hd_exn inl) in
       let score = if p.problem_id > 55 then base_score *. q else base_score in
       acc +. (score *. float (List.length inl)))
