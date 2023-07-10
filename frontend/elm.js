@@ -7050,7 +7050,11 @@ var $author$project$Main$viewLoadSolution = function (loading) {
 					loading))));
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'margin', '20px'),
+				A2($elm$html$Html$Attributes$style, 'padding', '5px')
+			]),
 		A2(
 			$elm$core$List$map,
 			function (l) {

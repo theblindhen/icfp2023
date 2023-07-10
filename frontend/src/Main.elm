@@ -311,7 +311,7 @@ viewProblem m p =
 viewLoadSolution : List String -> Html Msg
 viewLoadSolution loading =
     let sorted = loading |> List.map (\l -> String.toInt l |> Maybe.withDefault 0) |> List.sort |> List.map String.fromInt |> List.reverse in
-    div [ ] 
+    div [ style "margin" "20px" ] 
         (List.map (\l -> BButton.button [ BButton.primary, BButton.onClick (LoadSolution l) ] [text l]) sorted)
         
 
