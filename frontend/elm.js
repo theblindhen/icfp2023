@@ -6422,6 +6422,7 @@ var $author$project$Main$update = F2(
 								model,
 								{
 									loading: _List_Nil,
+									musicianScores: _List_Nil,
 									solution: $elm$core$Maybe$Just(solution)
 								}),
 							model.playing ? $elm$core$Platform$Cmd$batch(
@@ -7455,6 +7456,27 @@ var $joakin$elm_canvas$Canvas$group = F2(
 					drawable: $joakin$elm_canvas$Canvas$Internal$Canvas$DrawableGroup(entities)
 				}));
 	});
+var $avh4$elm_color$Color$hsla = F4(
+	function (hue, sat, light, alpha) {
+		var _v0 = _Utils_Tuple3(hue, sat, light);
+		var h = _v0.a;
+		var s = _v0.b;
+		var l = _v0.c;
+		var m2 = (l <= 0.5) ? (l * (s + 1)) : ((l + s) - (l * s));
+		var m1 = (l * 2) - m2;
+		var hueToRgb = function (h__) {
+			var h_ = (h__ < 0) ? (h__ + 1) : ((h__ > 1) ? (h__ - 1) : h__);
+			return ((h_ * 6) < 1) ? (m1 + (((m2 - m1) * h_) * 6)) : (((h_ * 2) < 1) ? m2 : (((h_ * 3) < 2) ? (m1 + (((m2 - m1) * ((2 / 3) - h_)) * 6)) : m1));
+		};
+		var b = hueToRgb(h - (1 / 3));
+		var g = hueToRgb(h);
+		var r = hueToRgb(h + (1 / 3));
+		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, alpha);
+	});
+var $avh4$elm_color$Color$hsl = F3(
+	function (h, s, l) {
+		return A4($avh4$elm_color$Color$hsla, h, s, l, 1.0);
+	});
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $avh4$elm_color$Color$red = A4($avh4$elm_color$Color$RgbaSpace, 204 / 255, 0 / 255, 0 / 255, 1.0);
 var $joakin$elm_canvas$Canvas$Settings$stroke = function (color) {
@@ -7466,8 +7488,8 @@ var $elm$core$Tuple$pair = F2(
 		return _Utils_Tuple2(a, b);
 	});
 var $elm_community$list_extra$List$Extra$zip = $elm$core$List$map2($elm$core$Tuple$pair);
-var $author$project$Main$renderProblem = F3(
-	function (p, s, f) {
+var $author$project$Main$renderProblem = F4(
+	function (m, p, s, f) {
 		var scale = 1000 / A2($elm$core$Basics$max, p.roomHeight, p.roomWidth);
 		var musicians = function () {
 			if (s.$ === 'Nothing') {
@@ -7484,8 +7506,8 @@ var $author$project$Main$renderProblem = F3(
 				var focus = f.a;
 				return A2(
 					$elm$core$List$filter,
-					function (_v5) {
-						var musician = _v5.b;
+					function (_v8) {
+						var musician = _v8.b;
 						return !_Utils_eq(musician, focus);
 					},
 					musicians);
@@ -7498,11 +7520,85 @@ var $author$project$Main$renderProblem = F3(
 				var focus = f.a;
 				return A2(
 					$elm$core$List$filter,
-					function (_v3) {
-						var musician = _v3.b;
+					function (_v6) {
+						var musician = _v6.b;
 						return _Utils_eq(musician, focus);
 					},
 					musicians);
+			}
+		}();
+		var musicianShapes = function () {
+			var _v0 = m.musicianScores;
+			if (!_v0.b) {
+				return A2(
+					$joakin$elm_canvas$Canvas$group,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$joakin$elm_canvas$Canvas$shapes,
+							_List_fromArray(
+								[
+									$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$red)
+								]),
+							A2(
+								$elm$core$List$map,
+								function (_v1) {
+									var placement = _v1.a;
+									return A2(
+										$joakin$elm_canvas$Canvas$circle,
+										_Utils_Tuple2(placement.x * scale, placement.y * scale),
+										5.0 * scale);
+								},
+								unfocusedMusicians)),
+							A2(
+							$joakin$elm_canvas$Canvas$shapes,
+							_List_fromArray(
+								[
+									$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$green)
+								]),
+							A2(
+								$elm$core$List$map,
+								function (_v2) {
+									var placement = _v2.a;
+									return A2(
+										$joakin$elm_canvas$Canvas$circle,
+										_Utils_Tuple2(placement.x * scale, placement.y * scale),
+										5.0 * scale);
+								},
+								focusedMusicians))
+						]));
+			} else {
+				var scores = _v0;
+				var max = (A2(
+					$elm$core$Maybe$withDefault,
+					0,
+					$elm$core$List$maximum(scores)) * 2) / 3;
+				return A2(
+					$joakin$elm_canvas$Canvas$group,
+					_List_Nil,
+					A2(
+						$elm$core$List$map,
+						function (_v3) {
+							var _v4 = _v3.a;
+							var placement = _v4.a;
+							var score = _v3.b;
+							return A2(
+								$joakin$elm_canvas$Canvas$shapes,
+								_List_fromArray(
+									[
+										$joakin$elm_canvas$Canvas$Settings$stroke(
+										A3($avh4$elm_color$Color$hsl, score / max, 1.0, 0.5))
+									]),
+								_List_fromArray(
+									[
+										A2(
+										$joakin$elm_canvas$Canvas$circle,
+										_Utils_Tuple2(placement.x * scale, placement.y * scale),
+										5.0 * scale)
+									]));
+						},
+						A2($elm_community$list_extra$List$Extra$zip, musicians, scores)));
 			}
 		}();
 		return A2(
@@ -7568,38 +7664,7 @@ var $author$project$Main$renderProblem = F3(
 								pillar.radius * scale);
 						},
 						p.pillars)),
-					A2(
-					$joakin$elm_canvas$Canvas$shapes,
-					_List_fromArray(
-						[
-							$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$red)
-						]),
-					A2(
-						$elm$core$List$map,
-						function (_v0) {
-							var placement = _v0.a;
-							return A2(
-								$joakin$elm_canvas$Canvas$circle,
-								_Utils_Tuple2(placement.x * scale, placement.y * scale),
-								5.0 * scale);
-						},
-						unfocusedMusicians)),
-					A2(
-					$joakin$elm_canvas$Canvas$shapes,
-					_List_fromArray(
-						[
-							$joakin$elm_canvas$Canvas$Settings$stroke($avh4$elm_color$Color$green)
-						]),
-					A2(
-						$elm$core$List$map,
-						function (_v1) {
-							var placement = _v1.a;
-							return A2(
-								$joakin$elm_canvas$Canvas$circle,
-								_Utils_Tuple2(placement.x * scale, placement.y * scale),
-								5.0 * scale);
-						},
-						focusedMusicians))
+					musicianShapes
 				]));
 	});
 var $elm$html$Html$canvas = _VirtualDom_node('canvas');
@@ -8490,7 +8555,7 @@ var $author$project$Main$viewProblem = F2(
 							_List_fromArray(
 								[
 									$author$project$Main$clearScreen,
-									A3($author$project$Main$renderProblem, p, m.solution, m.focus)
+									A4($author$project$Main$renderProblem, m, p, m.solution, m.focus)
 								]))
 						])),
 					A2(

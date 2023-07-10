@@ -196,7 +196,7 @@ update msg model = case msg of
     FocusOnInstrument i -> ( { model | focus = Just i }, Cmd.none )
     SolutionReturned (Ok res) ->
         case decodeString decodeSolution res of
-            Ok solution -> ({ model | solution = Just solution, loading = [] }, 
+            Ok solution -> ({ model | solution = Just solution, loading = [], musicianScores = [] }, 
                 if model.playing then Cmd.batch [ postExpectSolution "http://localhost:3000/step_sim/1" ] else Cmd.none)
             Err err -> ({ model | error = Just ("Failed to decode solution: " ++ errorToString err) }, Cmd.none )
     SolutionReturned (Err err) -> ( { model | error = Just "Failed" }, Cmd.none )
@@ -290,7 +290,7 @@ viewProblem m p =
                     ( 1001, 1001 )
                     [ ]
                     [ clearScreen
-                    , renderProblem p m.solution m.focus
+                    , renderProblem m p m.solution m.focus
                     ]
                 ],
             div [ ] 
@@ -346,8 +346,8 @@ view m =
 clearScreen =
     shapes [ fill Color.white ] [ rect ( 0, 0 ) 1000 1000 ]
 
-renderProblem : Problem -> Maybe Solution -> Maybe Focus -> Canvas.Renderable
-renderProblem p s f =
+renderProblem : Model -> Problem -> Maybe Solution -> Maybe Focus -> Canvas.Renderable
+renderProblem m p s f =
     let 
         scale = 1000 / (max p.roomHeight p.roomWidth)
 
@@ -366,6 +366,21 @@ renderProblem p s f =
                 Nothing -> []
                 Just focus -> List.filter (\(_, musician) -> musician == focus) musicians
 
+        musicianShapes =
+            case m.musicianScores of
+                [] -> group [] 
+                    [ shapes
+                        [ stroke Color.red ]
+                        (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) unfocusedMusicians)
+                    , shapes
+                        [ stroke Color.green ]
+                        (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) focusedMusicians)
+                    ]
+                scores -> 
+                    let max = (List.maximum scores |> Maybe.withDefault 0) * 2/3 in
+                        group [] 
+                            (List.map (\((placement, _), score) -> shapes [stroke (Color.hsl (score / max) 1.0 0.5)] [ circle (placement.x * scale, placement.y * scale) (5.0 * scale) ]) (Extra.zip musicians scores))
+
     in
         group []
             [ shapes
@@ -380,11 +395,6 @@ renderProblem p s f =
             , shapes
                 [ fill Color.gray ]
                 (List.map (\pillar -> circle (Tuple.first pillar.center * scale, Tuple.second pillar.center * scale) (pillar.radius * scale)) p.pillars)
-            , shapes
-                [ stroke Color.red ]
-                (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) unfocusedMusicians)
-            , shapes
-                [ stroke Color.green ]
-                (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) focusedMusicians)
+            , musicianShapes
             ]
 
