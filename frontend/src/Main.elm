@@ -196,7 +196,7 @@ update msg model = case msg of
             }])
     Zoom i -> ( { model | zoom = i }, Cmd.none)
     LoadSolution s -> ( model, Cmd.batch [ postExpectSolution ("http://localhost:3000/solution/" ++ model.problemId ++ "/" ++ s) ])
-    FocusOnInstrument i -> ( { model | focus = Just i }, Cmd.none )
+    FocusOnInstrument i -> ( { model | focus = Just i, musicianScores = [] }, Cmd.none )
     SolutionReturned (Ok res) ->
         case decodeString decodeSolution res of
             Ok solution -> ({ model | solution = Just solution, loading = [], musicianScores = [] }, 

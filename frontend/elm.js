@@ -6415,7 +6415,8 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							focus: $elm$core$Maybe$Just(i)
+							focus: $elm$core$Maybe$Just(i),
+							musicianScores: _List_Nil
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'SolutionReturned':
