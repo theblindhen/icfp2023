@@ -1,4 +1,5 @@
 #!/bin/zsh
+TOTAL_IMPROVEMENT_K=0
 for p in {1..90}; do
   if [ -d problems/solutions-$p ]; then
     echo $p
@@ -20,6 +21,7 @@ for p in {1..90}; do
     # If BEST is better than BEST_SUBMITTED then print
     if [ "$BEST" -gt "$BEST_SUBMITTED" ]; then
       IMPROVEMENT=$(($BEST - $BEST_SUBMITTED));
+      TOTAL_IMPROVEMENT_K=$((TOTAL_IMPROVEMENT_K + IMPROVEMENT / 1000))
       echo "$p: improved by $IMPROVEMENT $NEW_SOLUTION"
     fi;
     popd
@@ -27,3 +29,5 @@ for p in {1..90}; do
     echo "$p : No solution!"
   fi;
 done
+echo
+echo "Total improvement: ~${TOTAL_IMPROVEMENT_K} thousands"
