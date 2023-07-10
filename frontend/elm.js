@@ -8391,7 +8391,9 @@ var $author$project$Main$viewProblem = F2(
 						]),
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Attendes: '),
+							$elm$html$Html$text('Problem: '),
+							$elm$html$Html$text(m.problemId),
+							$elm$html$Html$text('; Attendes: '),
 							$elm$html$Html$text(
 							$elm$core$String$fromInt(
 								$elm$core$List$length(p.attendees))),

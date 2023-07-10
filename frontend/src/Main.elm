@@ -260,7 +260,9 @@ viewProblem m p =
             div [ style "display" "flex"
                 , style "height" "auto"
                 , style "align-items" "center" ] 
-                [ text "Attendes: "
+                [ text "Problem: "
+                , text m.problemId
+                , text "; attendes: "
                 , text (String.fromInt (List.length p.attendees))
                 , text "; musicians: "
                 , text (String.fromInt (List.length p.musicians)) ],
