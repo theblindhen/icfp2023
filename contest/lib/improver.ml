@@ -61,6 +61,8 @@ let swapper_without_q (p : problem) (s : solution) ~(round : int) : solution =
   printf "Score should be: %f\n%!" (Array.sum (module Float) scores ~f:(fun s -> s.score));
   Array.map scores ~f:(fun s -> s.musician)
 
+exception Timed_out
+
 let swapper_with_q (p : problem) (s : solution) ~(round : int) : solution =
   ignore round;
   (* Set a timer to stop after 5 minutes. *)
@@ -117,28 +119,28 @@ let swapper_with_q (p : problem) (s : solution) ~(round : int) : solution =
         q_factor *. audience_contribution)
   in
   let iter = ref true in
-  let timed_out = ref false in
-  while !iter && not !timed_out do
-    iter := false;
-    for i = 0 to Array.length scores - 1 do
-      for j = i + 1 to Array.length scores - 1 do
-        (if scores.(i).instrument <> scores.(j).instrument && not !timed_out then
-           let score_i = get_score i i in
-           let score_j = get_score j j in
-           let score_i' = get_score i j in
-           let score_j' = get_score j i in
-           if Float.(score_i' + score_j' > score_i + score_j) then (
-             printf "swapping %d and %d\n%!" i j;
-             iter := true;
-             let tmp = scores.(i).position_idx in
-             scores.(i).position_idx <- scores.(j).position_idx;
-             scores.(j).position_idx <- tmp));
-        if Time_ns.(now () > timeout) && not !timed_out then (
-          printf "Swapper timed out. Finishing.\n%!";
-          timed_out := true)
-      done
-    done
-  done;
+  (try
+     while !iter do
+       iter := false;
+       for i = 0 to Array.length scores - 1 do
+         for j = i + 1 to Array.length scores - 1 do
+           (if scores.(i).instrument <> scores.(j).instrument then
+              let score_i = get_score i i in
+              let score_j = get_score j j in
+              let score_i' = get_score i j in
+              let score_j' = get_score j i in
+              if Float.(score_i' + score_j' > score_i + score_j) then (
+                printf "swapping %d and %d\n%!" i j;
+                iter := true;
+                let tmp = scores.(i).position_idx in
+                scores.(i).position_idx <- scores.(j).position_idx;
+                scores.(j).position_idx <- tmp));
+           if Time_ns.(now () > timeout) then raise Timed_out
+         done
+       done
+     done
+   with
+  | Timed_out -> printf "Swapper timed out. Finishing.\n%!");
   Array.map s ~f:(fun m -> { m with pos = s.(scores.(m.id).position_idx).pos })
 
 let swapper (p : problem) (s : solution) ~(round : int) : solution =
