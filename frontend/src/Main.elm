@@ -382,9 +382,9 @@ renderProblem m p s f =
                         (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) focusedMusicians)
                     ]
                 scores -> 
-                    let max = (List.maximum scores |> Maybe.withDefault 0) * 2/3 in
+                    let max = (List.maximum scores |> Maybe.withDefault 0)  in
                         group [] 
-                            (List.map (\((placement, _), score) -> shapes [stroke (Color.hsl (score / max) 1.0 0.5)] [ circle (placement.x * scale, placement.y * scale) (5.0 * scale) ]) (Extra.zip musicians scores))
+                            (List.map (\((placement, _), score) -> shapes [stroke (Color.hsl (score / max * 2.0/3.0) 1.0 0.5)] [ circle (placement.x * scale, placement.y * scale) (5.0 * scale) ]) (Extra.zip musicians scores))
 
     in
         group []

@@ -7581,10 +7581,10 @@ var $author$project$Main$renderProblem = F4(
 						]));
 			} else {
 				var scores = _v0;
-				var max = (A2(
+				var max = A2(
 					$elm$core$Maybe$withDefault,
 					0,
-					$elm$core$List$maximum(scores)) * 2) / 3;
+					$elm$core$List$maximum(scores));
 				return A2(
 					$joakin$elm_canvas$Canvas$group,
 					_List_Nil,
@@ -7599,7 +7599,7 @@ var $author$project$Main$renderProblem = F4(
 								_List_fromArray(
 									[
 										$joakin$elm_canvas$Canvas$Settings$stroke(
-										A3($avh4$elm_color$Color$hsl, score / max, 1.0, 0.5))
+										A3($avh4$elm_color$Color$hsl, ((score / max) * 2.0) / 3.0, 1.0, 0.5))
 									]),
 								_List_fromArray(
 									[
