@@ -35,8 +35,6 @@ let score_I_partial (env : scoring_env) (a : attendee) (self_id : int) (pos : po
     let d_sq = Geometry.distance_squared a.pos pos in
     1_000_000.0 /. d_sq
 
-type split_score = { prescore : float; qfactor : float }
-
 let score_musician ?(negative : bool option) (env : scoring_env) (m : musician) : float =
   let negative = Option.value negative ~default:false in
   let raw_score =
