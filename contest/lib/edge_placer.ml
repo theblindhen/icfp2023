@@ -142,9 +142,12 @@ let place_curvy_edge (p : problem) (already_placed : position list) (e : edge) :
           (min h max_musicians) West
   in
   (* Remove elements already in already_placed *)
+  Printf.printf "\t%d already placed,  %d new positions\n" (List.length already_placed)
+    (List.length new_pos);
   let new_pos =
-    List.filter new_pos ~f:(fun pos -> not (Random_solver.is_valid_placement p already_placed pos))
+    List.filter new_pos ~f:(fun pos -> Random_solver.is_valid_placement p already_placed pos)
   in
+  Printf.printf "\t%d new positions\n" (List.length new_pos);
   new_pos
 
 let place_curvy_edges (p : problem) (edges : edges) : position list =

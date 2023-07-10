@@ -79,3 +79,11 @@ let musician_group_by_instrument (problem : problem) : int list array =
   let musician_pool = Array.create ~len:num_instruments [] in
   List.iteri problem.musicians ~f:(fun m inst -> musician_pool.(inst) <- m :: musician_pool.(inst));
   musician_pool
+
+let sigmoid (x : float) : float =
+  let open Float in
+  1. /. (1. +. exp (-.x))
+
+let pole_function (x : float) : float =
+  let open Float in
+  abs (tan (abs ((x +. 1.) *. pi /. 2.)))
