@@ -282,7 +282,13 @@ let newton_optimizer (problem : Types.problem) (solution : Types.solution) ~(max
   let stay_stage _last_instability iteration = iteration < max_iterations in
   Printf.printf "Newton boogie on Problem %d for %d iterations\n" problem.problem_id max_iterations;
   newton_run_stage stay_stage step_stage2 problem placements 0 |> ignore;
-  solution_of_placements problem placements
+  let new_solution = solution_of_placements problem placements in
+  let return_solution = ref new_solution in
+  (try Misc.validate_solution problem solution with
+  | _e ->
+      Printf.printf "Newton optimizer failed making a valid solution :'-(\n%!";
+      return_solution := solution);
+  !return_solution
 
 (* GUI Entry points *)
 let gui_init_solution (p : Types.problem) : Types.solution * string =
