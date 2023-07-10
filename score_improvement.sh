@@ -22,7 +22,7 @@ for p in {1..90}; do
     if [ "$BEST" -gt "$BEST_SUBMITTED" ]; then
       IMPROVEMENT=$(($BEST - $BEST_SUBMITTED));
       TOTAL_IMPROVEMENT_K=$((TOTAL_IMPROVEMENT_K + IMPROVEMENT / 1000))
-      echo "$p: improved by $IMPROVEMENT $NEW_SOLUTION"
+      printf "$p: improved by %'.0f $NEW_SOLUTION\n" "$IMPROVEMENT"
     fi;
     popd
   else
@@ -30,4 +30,4 @@ for p in {1..90}; do
   fi;
 done
 echo
-echo "Total improvement: ~${TOTAL_IMPROVEMENT_K} thousands"
+printf "Total improvement: %'.0f thousands\n" "$TOTAL_IMPROVEMENT_K"
