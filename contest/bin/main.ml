@@ -54,10 +54,11 @@ let run_invocation inv =
                  match opt_flag with
                  | Swap -> Improver.swapper problem ~round:0
                  | LP -> Lp_solver.lp_optimize_solution problem ~round:0
-                 | Newton -> Physics.newton_optimizer problem ~max_iterations:1000
+                 | Newton -> Physics.newton_optimizer problem
                  | Packaway -> Packaway.pack_bad_musicians problem ~cutoff:0.
                in
                let solution = optimizer solution in
+               printf "Validating optimized solution...\n%!";
                Misc.validate_solution problem solution;
                let optimised_score = Score.score_solution problem solution in
                printf "Optimized problem %d with score: %s\n%!" inv.problem_id
