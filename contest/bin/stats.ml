@@ -81,37 +81,58 @@ let stats_to_string total_score (problem_stats : stats) =
   ^ "\n"
 
 let csv_headline =
-  "problem_id,room_dim,stage_dim,musicians_count,instrument_count,attendees_count,pillar_count,radii_num,radii_min,radii_max,best_score,%% \
-   of total score,theoretical_max_score,newton_max_score,%% our score / Newton max"
+  let static =
+    "problem_id,room_dim,stage_dim,musicians_count,instrument_count,attendees_count,pillar_count,radii_num,radii_min,radii_max,best_score,%% \
+     of total score,theoretical_max_score,newton_max_score,%% our score / Newton max"
+  in
+  static
+  ^ String.concat ~sep:""
+      (List.init 50 ~f:(fun i ->
+           sprintf ",n_cont %d,n_cont %% %d,n_count %d,n_ind_score %d" i i i i))
 
-let stats_to_csv total_score (problem_stats : stats) =
-  problem_stats.room_dim
-  ^ "," (* room_dim *)
-  ^ problem_stats.stage_dim
-  ^ "," (* stage_dim *)
-  ^ string_of_int problem_stats.musicians_count
-  ^ "," (* musicians_count *)
-  ^ string_of_int problem_stats.instrument_count
-  ^ "," (* instrument_count *)
-  ^ string_of_int problem_stats.attendees_count
-  ^ "," (* attendees_count *)
-  ^ string_of_int problem_stats.pillar_count
-  ^ "," (* pillar_count *)
-  ^ (if Option.is_none problem_stats.pillar_radii_stats then ",,"
-     else
-       let stats = Option.value_exn problem_stats.pillar_radii_stats in
-       sprintf "%d radii, %2.2f, %2.2f" stats.uniq stats.min stats.max)
-  ^ "," (* pillar_radii_stats *)
-  ^ string_of_float problem_stats.best_score
-  ^ "," (* best_score *)
-  ^ sprintf "%2.2f" (100. *. problem_stats.best_score /. total_score)
-  ^ "," (* %% of total score *)
-  ^ string_of_float problem_stats.theoretical_max_score
-  ^ "," (* theoretical_max_score *)
-  ^ string_of_float problem_stats.newton_max_score
-  ^ "," (* newton_max_score *)
-  ^ sprintf "%2.2f" (100. *. problem_stats.best_score /. problem_stats.newton_max_score)
-(* %% our score / Newton max *)
+let stats_to_csv (problem : problem) total_score (problem_stats : stats) =
+  let pre_calculated =
+    problem_stats.room_dim
+    ^ "," (* room_dim *)
+    ^ problem_stats.stage_dim
+    ^ "," (* stage_dim *)
+    ^ string_of_int problem_stats.musicians_count
+    ^ "," (* musicians_count *)
+    ^ string_of_int problem_stats.instrument_count
+    ^ "," (* instrument_count *)
+    ^ string_of_int problem_stats.attendees_count
+    ^ "," (* attendees_count *)
+    ^ string_of_int problem_stats.pillar_count
+    ^ "," (* pillar_count *)
+    ^ (if Option.is_none problem_stats.pillar_radii_stats then ",,"
+       else
+         let stats = Option.value_exn problem_stats.pillar_radii_stats in
+         sprintf "%d radii, %2.2f, %2.2f" stats.uniq stats.min stats.max)
+    ^ "," (* pillar_radii_stats *)
+    ^ string_of_float problem_stats.best_score
+    ^ "," (* best_score *)
+    ^ sprintf "%2.2f" (100. *. problem_stats.best_score /. total_score)
+    ^ "," (* %% of total score *)
+    ^ string_of_float problem_stats.theoretical_max_score
+    ^ "," (* theoretical_max_score *)
+    ^ string_of_float problem_stats.newton_max_score
+    ^ "," (* newton_max_score *)
+    ^ sprintf "%2.2f" (100. *. problem_stats.best_score /. problem_stats.newton_max_score)
+    (* %% our score / Newton max *)
+  in
+  let newton_scores =
+    Approximations.newton_score_problem_per_instrument problem
+    |> List.sort ~compare:(fun (count1, score1) (count2, score2) ->
+           Float.compare (Float.of_int count2 *. score2) (Float.of_int count1 *. score1))
+    |> (fun l -> List.take l 50)
+    |> List.map ~f:(fun (count, score) ->
+           sprintf ",%2.2f,%2.2f,%d,%2.2f"
+             (Float.of_int count *. score)
+             (100.0 *. Float.of_int count *. score /. problem_stats.best_score)
+             count score)
+    |> String.concat ~sep:""
+  in
+  pre_calculated ^ newton_scores
 
 let () =
   (* read args*)
@@ -127,7 +148,7 @@ let () =
       | None -> ()
       | Some problem ->
           print_endline
-            (string_of_int i ^ "," ^ stats_to_csv !total_score (problem |> problem_stats))
+            (string_of_int i ^ "," ^ stats_to_csv problem !total_score (problem |> problem_stats))
     done)
   else (
     for i = 1 to problem_count do
