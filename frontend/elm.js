@@ -6393,6 +6393,13 @@ var $author$project$Main$update = F2(
 									url: 'http://localhost:3000/solutions/' + model.problemId
 								})
 							])));
+			case 'Zoom':
+				var i = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{zoom: i}),
+					$elm$core$Platform$Cmd$none);
 			case 'LoadSolution':
 				var s = msg.a;
 				return _Utils_Tuple2(
@@ -7141,6 +7148,9 @@ var $author$project$Main$StepSim = function (a) {
 	return {$: 'StepSim', a: a};
 };
 var $author$project$Main$Swap = {$: 'Swap'};
+var $author$project$Main$Zoom = function (a) {
+	return {$: 'Zoom', a: a};
+};
 var $joakin$elm_canvas$Canvas$Internal$Canvas$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
@@ -7490,7 +7500,7 @@ var $elm$core$Tuple$pair = F2(
 var $elm_community$list_extra$List$Extra$zip = $elm$core$List$map2($elm$core$Tuple$pair);
 var $author$project$Main$renderProblem = F4(
 	function (m, p, s, f) {
-		var scale = 1000 / A2($elm$core$Basics$max, p.roomHeight, p.roomWidth);
+		var scale = (1000 * m.zoom) / A2($elm$core$Basics$max, p.roomHeight, p.roomWidth);
 		var musicians = function () {
 			if (s.$ === 'Nothing') {
 				return _List_Nil;
@@ -8660,6 +8670,30 @@ var $author$project$Main$viewProblem = F2(
 							$rundis$elm_bootstrap$Bootstrap$Button$button,
 							_List_fromArray(
 								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+									$author$project$Main$Zoom(m.zoom + 1)),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Zoom in')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
+									$rundis$elm_bootstrap$Bootstrap$Button$onClick(
+									$author$project$Main$Zoom(m.zoom - 1)),
+									$rundis$elm_bootstrap$Bootstrap$Button$primary
+								]),
+							_List_fromArray(
+								[
+									$elm$html$Html$text('Zoom out')
+								])),
+							A2(
+							$rundis$elm_bootstrap$Bootstrap$Button$button,
+							_List_fromArray(
+								[
 									$rundis$elm_bootstrap$Bootstrap$Button$onClick($author$project$Main$LoadMusicianScores),
 									$rundis$elm_bootstrap$Bootstrap$Button$primary
 								]),
@@ -8778,7 +8812,7 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 	{
 		init: function (_v0) {
 			return _Utils_Tuple2(
-				{count: 0, edge: '', error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, loading: _List_Nil, musicianScores: _List_Nil, playing: false, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing},
+				{count: 0, edge: '', error: $elm$core$Maybe$Nothing, focus: $elm$core$Maybe$Nothing, loading: _List_Nil, musicianScores: _List_Nil, playing: false, problem: $elm$core$Maybe$Nothing, problemId: '', solution: $elm$core$Maybe$Nothing, zoom: 1},
 				$elm$core$Platform$Cmd$none);
 		},
 		subscriptions: function (model) {
