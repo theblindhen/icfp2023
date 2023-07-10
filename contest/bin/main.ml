@@ -5,7 +5,7 @@ let random_solution (p : Types.problem) (already_placed : Types.position list) =
   Random_solver.random_placement_solution p already_placed
 
 type initialization = Random | Newton | Edge of Edge_placer.edges | LoadBest [@@deriving sexp]
-type optimizer = LP | Swap | Newton | HardNewton | Packaway | Drop [@@deriving sexp]
+type optimizer = LP | Swap | Newton | Packaway | Drop [@@deriving sexp]
 
 type invocation = {
   problem_id : int;
@@ -54,8 +54,7 @@ let run_invocation inv =
                  match opt_flag with
                  | Swap -> Improver.swapper problem ~round:0
                  | LP -> Lp_solver.lp_optimize_solution problem ~round:0
-                 | Newton -> Physics.newton_optimizer problem ~heat_factor:0.0001
-                 | HardNewton -> Physics.newton_optimizer problem ~heat_factor:0.05
+                 | Newton -> Physics.newton_optimizer problem ~max_iterations:1000
                  | Packaway -> Packaway.pack_bad_musicians problem ~cutoff:0.
                  | Drop -> Random_solver.random_dropper problem ~relative_max_score_threshold:0.1
                in
@@ -77,7 +76,6 @@ let parse_optimizer string : optimizer =
   | "lp" -> LP
   | "swap" -> Swap
   | "newton" -> Newton
-  | "hardnewton" -> HardNewton
   | "packaway" -> Packaway
   | "drop" -> Drop
   | _ -> failwith "Invalid optimizer"

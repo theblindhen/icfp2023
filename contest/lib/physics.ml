@@ -66,9 +66,6 @@ let safe_move (p : Types.problem) (pos : Types.position) (f : force) : Types.pos
 type repel = NoMove | Force | None
 type anti_collision_reply = Cocentered | Force of force
 
-(* Return a random float from -scale to scale *)
-let random_centred scale = (Random.float 2.0 -. 1.0) *. scale
-
 let anti_collision_force (placements : placed_instrument array) (idx : int) (pos : Types.position) :
     anti_collision_reply =
   (* let fudge_distance = 130. in *)
@@ -81,15 +78,6 @@ let anti_collision_force (placements : placed_instrument array) (idx : int) (pos
       /. ((shell_dist_sq +. fudge_distance) *. (shell_dist_sq +. fudge_distance))
     else fudge_distance /. (shell_dist_sq *. shell_dist_sq)
   in
-  let boogie_axis_parallel (force : force) =
-    let open Float in
-    let boogie_axis_factor = 0.1 in
-    if force.x < 0.00001 && force.y > 0.001 then
-      { force with x = random_centred boogie_axis_factor }
-    else if force.y < 0.00001 && force.x > 0.001 then
-      { force with y = random_centred boogie_axis_factor }
-    else force
-  in
   Array.foldi placements
     ~init:(Force { x = 0.; y = 0. })
     ~f:(fun i force p ->
@@ -97,7 +85,6 @@ let anti_collision_force (placements : placed_instrument array) (idx : int) (pos
       | Cocentered -> Cocentered
       | Force force ->
           if i <> idx then
-            let force = boogie_axis_parallel force in
             let v = from_points pos p.pos in
             let d_sq = length_sq v in
             if Float.(d_sq < 0.1) then Cocentered
@@ -115,10 +102,9 @@ let has_collision (placements : placed_instrument array) (idx : int) (pos : Type
 (* Simulate a step of the placement algorithm. Returns the maximum distance moved
    by any instrument. *)
 let simulate_step (p : Types.problem) ~(att_heat : float) ~(repel : repel)
-    ?(repel_heat : float option = None) (placements : placed_instrument array) :
+    (placements : placed_instrument array) :
     (* let simulate_step (p : Types.problem) ~(att_heat : float) (placements : placed_instrument array) : *)
     float =
-  let repel_heat = Option.value repel_heat ~default:(att_heat *. 5.) in
   let forces = Array.map placements ~f:(fun i -> force_over_attendees p i) in
   let max_truncated_force =
     List.zip_exn (List.of_array placements) (List.of_array forces)
@@ -135,10 +121,10 @@ let simulate_step (p : Types.problem) ~(att_heat : float) ~(repel : repel)
              match anti_collision with
              | Cocentered ->
                  (* throw it to kingdom come *)
-                 { x = random_centred 50.; y = random_centred 50. }
+                 { x = Random.float 100. -. 50.; y = Random.float 100. -. 50. }
              | Force anti_collision ->
                  if Float.(length anti_collision > att_heat) then
-                   scale_to_len repel_heat anti_collision
+                   scale_to_len (att_heat *. 5.) anti_collision
                  else add att_move anti_collision
            in
            let pos, _ = safe_move p placed_i.pos desired_move in
@@ -214,7 +200,6 @@ let placements_of_solution (solution : Types.solution) =
 
 let stage1_iterations = 1
 let stage2_iterations = 1000
-let stage3_iterations = 1000
 
 let att_heat_from_iteration_stage1 (problem : Types.problem) (iteration : int) : float =
   let iter_denom = Float.round_up (Float.of_int iteration /. 100.) in
@@ -223,21 +208,20 @@ let att_heat_from_iteration_stage1 (problem : Types.problem) (iteration : int) :
   in
   length att_heat_force /. 10.
 
-(* Sigmoidal heat, goes from yscale to 0.1 from x going from 0 to roughly 12 *)
-let sigmoid_heat (yscale : float) (x : float) = (Misc.sigmoid (6. -. x) *. yscale) +. 0.1
-
 let att_heat_from_iteration_stage2 (problem : Types.problem) (iteration : int) : float =
   (* Sigmoid will change from roughly -6 to 6 *)
   let x = Float.of_int iteration /. Float.of_int stage2_iterations *. 12. in
   let across_factor = 200. in
   (* How many steps across the scene initially *)
+  let tail_sig scale = (Misc.sigmoid (6. -. x) *. scale) +. 0.1 in
   let att_heat_force : force =
     {
-      x = sigmoid_heat (problem.stage_width /. across_factor) x;
-      y = sigmoid_heat (problem.stage_height /. across_factor) x;
+      x = tail_sig problem.stage_width /. across_factor;
+      y = tail_sig problem.stage_height /. across_factor;
     }
   in
   let len = length att_heat_force in
+  if iteration % 100 = 0 then Printf.printf "Iter %d: att_heat_force: %f\n" iteration len;
   len
 
 let stay_stage1 last_instability iteration =
@@ -248,46 +232,15 @@ let stay_stage2 last_instability iteration =
   (* The condition to stay at stage 2 *)
   iteration < 500 || (Float.(last_instability > 0.000001) && iteration < stage2_iterations)
 
-let stay_stage_validated (problem : Types.problem) (placements : placed_instrument array) stay_stage
-    max_iterations =
-  (* Condition to stay until validated (up to a max iterations) *)
-  let f last_instability iteration =
-    if iteration > 3 * max_iterations then false
-    else if iteration % 100 = 0 then (
-      let solution = solution_of_placements problem placements in
-      let validation_failed = ref false in
-      (try Misc.validate_solution problem solution with
-      | _e -> validation_failed := true);
-      if !validation_failed then
-        (* Printf.printf "Validation failed at iteration %d\n%!" iteration; *)
-        true
-      else iteration <= max_iterations && stay_stage last_instability iteration)
-    else true
-  in
-  f
-
-let stay_stage3_raw last_instability _iteration = Float.(last_instability > 0.000001)
-
 (* Take a single step in Newton Stage 1. Return the instability *)
 let step_stage1 problem placements iteration =
   let att_heat = att_heat_from_iteration_stage1 problem iteration in
   simulate_step problem placements ~att_heat ~repel:None
 
 (* Take a single step in Newton Stage 2. Return the instability *)
-let step_stage2 problem ~(heat_factor : float) placements iteration =
-  let att_heat = heat_factor *. att_heat_from_iteration_stage2 problem iteration in
+let step_stage2 problem placements iteration =
+  let att_heat = att_heat_from_iteration_stage2 problem iteration in
   simulate_step problem placements ~att_heat ~repel:Force
-
-(* Take a single step in Newton Stage 3. Return the instability *)
-let step_stage3 problem placements iteration =
-  (*  Slowly heat up the repel heat to push musicians apart *)
-  let att_heat = 0.0 in
-  let sigmoid_yscale = 10. in
-  let sigmoid_x = 12. -. (Float.of_int iteration /. Float.of_int stage3_iterations *. 12.) in
-  let repel_heat = Some (sigmoid_heat sigmoid_yscale sigmoid_x) in
-  (* if iteration % 100 = 0 then
-     Printf.printf "Iter %d: repel_heat: %f\n%!" iteration (Option.value_exn repel_heat); *)
-  simulate_step problem placements ~att_heat ~repel:Force ~repel_heat
 
 (* Run Newton Stage 1, updating the placements imperatively.
    Return the total number of iterations *)
@@ -303,12 +256,11 @@ let newton_run_stage stay_stage step problem placements : int -> int =
   ret
 
 (* Newton solver on all stages but Stage 1 *)
-let newton_solver' ?(heat_factor : float = 1.0) (problem : Types.problem) placements : int =
-  let iterations = newton_run_stage stay_stage2 (step_stage2 ~heat_factor) problem placements 0 in
+let newton_solver' (problem : Types.problem) placements : int =
+  let run_stage2 = newton_run_stage stay_stage2 step_stage2 in
+  Printf.printf " - DONE\n%!";
+  let iterations = run_stage2 problem placements 0 in
   Printf.printf "Stage 2 done by %d iterations.\n%!" iterations;
-  let stay_stage3 = stay_stage_validated problem placements stay_stage3_raw stage3_iterations in
-  let iterations = newton_run_stage stay_stage3 step_stage3 problem placements 0 in
-  Printf.printf "Stage 3 done by %d iterations.\n%!" iterations;
   iterations
 
 (* Main entry point *)
@@ -325,18 +277,12 @@ let newton_solver (problem : Types.problem) : Types.solution =
   let sol = solution_of_placements problem music_placements in
   sol
 
-let newton_optimizer ?(heat_factor : float = 0.1) (problem : Types.problem)
-    (solution : Types.solution) =
+let newton_optimizer (problem : Types.problem) (solution : Types.solution) ~(max_iterations : int) =
   let placements = placements_of_solution solution in
-  Printf.printf "Newton boogie on Problem %d with heat %f\n%!" problem.problem_id heat_factor;
-  newton_solver' ~heat_factor problem placements |> ignore;
-  let new_solution = solution_of_placements problem placements in
-  let return_solution = ref new_solution in
-  (try Misc.validate_solution problem solution with
-  | _e ->
-      Printf.printf "Newton optimizer failed making a valid solution :'-(\n%!";
-      return_solution := solution);
-  !return_solution
+  let stay_stage _last_instability iteration = iteration < max_iterations in
+  Printf.printf "Newton boogie on Problem %d for %d iterations\n" problem.problem_id max_iterations;
+  newton_run_stage stay_stage step_stage2 problem placements 0 |> ignore;
+  solution_of_placements problem placements
 
 (* GUI Entry points *)
 let gui_init_solution (p : Types.problem) : Types.solution * string =
@@ -356,7 +302,7 @@ let gui_newton_solver_step (problem : Types.problem) ((solution, stage) : Types.
         (music_placements, "stage2")
     else if Stdlib.(stage = "stage2") then
       (* Stage 2 *)
-      let _last_instability = step_stage2 problem ~heat_factor:1.0 placements iteration in
+      let _last_instability = step_stage2 problem placements iteration in
       (placements, "stage2")
     else (
       print_endline "I'm done";
