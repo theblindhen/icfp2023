@@ -60,6 +60,7 @@ type alias Model =
     , loading : List String
     , edge : String
     , musicianScores : List Float
+    , zoom : Int
     }
 
 type alias Placement =
@@ -87,6 +88,7 @@ type Msg
     | Save
     | FocusOnInstrument Int
     | LoadMusicianScores
+    | Zoom Int
     | LoadedMusicianScores (Result Http.Error String)
     | SolutionReturned (Result Http.Error String)
     | FetchSolutions (Result Http.Error String)
@@ -192,8 +194,9 @@ update msg model = case msg of
             { url = "http://localhost:3000/solutions/" ++ model.problemId
             , expect = Http.expectString FetchSolutions
             }])
+    Zoom i -> ( { model | zoom = i }, Cmd.none)
     LoadSolution s -> ( model, Cmd.batch [ postExpectSolution ("http://localhost:3000/solution/" ++ model.problemId ++ "/" ++ s) ])
-    FocusOnInstrument i -> ( { model | focus = Just i }, Cmd.none )
+    FocusOnInstrument i -> ( { model | focus = Just i, musicianScores = [] }, Cmd.none )
     SolutionReturned (Ok res) ->
         case decodeString decodeSolution res of
             Ok solution -> ({ model | solution = Just solution, loading = [], musicianScores = [] }, 
@@ -219,7 +222,7 @@ update msg model = case msg of
 main : Program () Model Msg
 main =
     Browser.element
-        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing, playing = False, loading = [], edge = "", musicianScores = [] }, Cmd.none )
+        { init = \() -> ( { count = 0, error = Nothing, problemId = "", problem = Nothing, solution = Nothing, focus = Nothing, playing = False, loading = [], edge = "", musicianScores = [], zoom = 1 }, Cmd.none )
         , view = view
         , update = update
         , subscriptions = \model -> Sub.none
@@ -306,6 +309,8 @@ viewProblem m p =
                             [ BButton.onClick (nextFocus m.focus 1), BButton.primary ]) [ text "Next Instrument" ],
                     BButton.button [ BButton.onClick Load, BButton.primary ] [ text "Load" ],
                     BButton.button [ BButton.onClick Save, BButton.primary ] [ text "Save" ],
+                    BButton.button [ BButton.onClick (Zoom (m.zoom + 1)), BButton.primary ] [ text "Zoom in" ],
+                    BButton.button [ BButton.onClick (Zoom (m.zoom - 1)), BButton.primary ] [ text "Zoom out" ],
                     BButton.button [ BButton.onClick LoadMusicianScores, BButton.primary ] [ text "Load musician scores" ],
                     BButton.button [ BButton.onClick InitSim, BButton.primary ] [ text "Init Sim" ],
                     BButton.button [ BButton.onClick (StepSim 1), BButton.primary ] [ text "Step Sim" ],
@@ -349,7 +354,7 @@ clearScreen =
 renderProblem : Model -> Problem -> Maybe Solution -> Maybe Focus -> Canvas.Renderable
 renderProblem m p s f =
     let 
-        scale = 1000 / (max p.roomHeight p.roomWidth)
+        scale = (1000 * (toFloat m.zoom)) / (max p.roomHeight p.roomWidth)
 
         musicians = 
             case s of
@@ -377,9 +382,9 @@ renderProblem m p s f =
                         (List.map (\(placement, _) -> circle (placement.x * scale, placement.y * scale) (5.0 * scale)) focusedMusicians)
                     ]
                 scores -> 
-                    let max = (List.maximum scores |> Maybe.withDefault 0) * 2/3 in
+                    let max = (List.maximum scores |> Maybe.withDefault 0)  in
                         group [] 
-                            (List.map (\((placement, _), score) -> shapes [stroke (Color.hsl (score / max) 1.0 0.5)] [ circle (placement.x * scale, placement.y * scale) (5.0 * scale) ]) (Extra.zip musicians scores))
+                            (List.map (\((placement, _), score) -> shapes [stroke (Color.hsl (score / max * 2.0/3.0) 1.0 0.5)] [ circle (placement.x * scale, placement.y * scale) (5.0 * scale) ]) (Extra.zip musicians scores))
 
     in
         group []
