@@ -133,7 +133,7 @@ let swapper_with_q (p : problem) (s : solution) ~(round : int) : solution =
               let score_i' = get_score i j in
               let score_j' = get_score j i in
               if Float.(score_i' + score_j' > score_i + score_j) then (
-                printf "swapping %d and %d\n%!" i j;
+                (* printf "swapping %d and %d\n%!" i j; *)
                 Hashtbl.Poly.clear get_score_cache.(scores.(i).instrument);
                 Hashtbl.Poly.clear get_score_cache.(scores.(j).instrument);
                 iter := true;
