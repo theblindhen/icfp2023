@@ -11,7 +11,7 @@ All in Copenhagen, Denmark
 
 We used OCaml this year, and Elm client + OCaml server for visualization.
 
-dwdw## Strategy
+## Strategy
 
 We had a selection of ways to initialize a solution and another selection of
 ways to improve a solution, described below. In practice, most of our score came
@@ -44,7 +44,7 @@ a sequence:
 
 - LP: Optimal swapping based on linear programming. Ignoring the q-factors,
   assigning musicians to a fixed set of positions is formulated as linear
-  programming and solved optimal. This was too slow on large maps, so later we
+  programming and solved optimally. This was too slow on large maps, so later we
   improved it to randomly select a subset of positions and solve this optimally,
   then iterating this a number of times.
 
@@ -70,7 +70,7 @@ and LP optimizations. Our best position was around 16th place.
 As usual, we were quite unprepared and none of us had written much OCaml for a
 long time. We realized 2 hours before the contest that OCaml 5.0 wouldn't run on
 Windows which one team member used, and we had no spare Linux machine. We tried
-WSL, VMWare and VirtualBox but they ended up unsatisfactory.
+WSL, VMWare and VirtualBox during the first day but they were all unacceptable.
 
 Visulization was another pain point. We had expected to use the Bogue library
 built on SDL. After sinking a few hours into a rudimentary visualisation, we
@@ -78,15 +78,15 @@ realized it rendered completely borked on Mac, which another team member used.
 
 ### 24-48h: The long haul
 
-During Saturday, we didn't have much visible progress, and fell down the high
-score, but made good preparatory work for the remaining contest:
+During Saturday, we didn't have much visible progress, and fell down the
+rankings, but made good preparatory work for the remaining contest:
 
 - Implementing support for the q-factor and pillar extensions.
 
 - Our Windows team member got set up with a GitHub Codespaces, which worked
   quite well.
 
-- We scratched the fledgling Bogue GUI and rewrote it as an OCaml server + Elm
+- We scrapped the fledgling Bogue GUI and wrote a new as an OCaml server + Elm
   client. This was a big success and allowed all four members to run the GUI.
 
 - We designed the radial sweep scoring function and sunk a good few hours into
@@ -99,7 +99,7 @@ score, but made good preparatory work for the remaining contest:
 
 - Worked on improving the LP implementation. A big laugh here was when we
   got a factor x100 speedup in setting up the system by swapping the operands of
-  an add operation (exposing a poor algorithm in the underlying library).
+  an add operation.
 
 ### 48h-72h: The final sprint
 
@@ -124,7 +124,8 @@ The Newtonian physics turned out to be problematic to mature. It contained many
 magic constants that had to be carefully balanced to each other, and it was hard
 to ensure that it ended up in a legal state. We also never got to integrate any
 of our ideas for integrating line-of-sight, and this completely cripples the
-algorithm's efficacy on the problem.
+algorithm's efficacy on many problems. Nevertheless, it did give us a few
+billion points.
 
 Another improvement came from integrating q-scoring into the swap algorithm.
 This was complicated because we tried to limit the computational cost of
