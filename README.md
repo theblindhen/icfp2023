@@ -11,6 +11,32 @@ Kasper Svendsen
 
 All in Copenhagen, Denmark
 
+Strategy
+--------
+
+We had a selection of ways to initialize a solution and another selection of
+ways to improve a solution.
+
+A solution could be initialized by:
+* Randomly placing musicians on the stage.
+* Placing a row of musicians along one or more edges, then placing the rest
+  randomly.
+* Various arrangements that tried to maximise or minimise visibility.
+* Loading the best solution from a previous run.
+* Interpreting the score contributions of audience members as forces, then
+  moving musicians stepwise by those forces. In the first phase, all musicians
+  of the same instrument were collapsed into one point, and those points could
+  overlap. In the second phase, the instruments were separated into individual
+  musicians, and they were not allowed to overlap.
+
+The initial solution could then be improved by chaining _optimizers_ together in
+a sequence:
+* We could swap pairs of musicians, performing all advantageous swaps until
+  there was no way to increase the score by swapping a pair of musicians.
+  It was very fast (constant time) to determine whether a swap was good by
+  caching all the "hearability" data that remained valid as long as no
+  musicians moved.
+
 How to build
 ------------
 
