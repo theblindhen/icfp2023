@@ -25,7 +25,7 @@ A solution could be initialized by:
   randomly.
 - Load: Loading the best solution from a previous run.
 - Newtonian physics: We use audience member tastes as forces, pushing or pulling
-  musicians. This had three stages: 1. One point per musician, with no repelling
+  musicians. This had three stages: 1. One point per instrument, with no repelling
   forces between them; 2. Explode the instruments into individual musicians,
   introducing forces to repel musicians from each other to minimize overlap. 3.
   Remove audience member forces, keeping only the repelling forces to get to a
@@ -72,7 +72,7 @@ long time. We realized 2 hours before the contest that OCaml 5.0 wouldn't run on
 Windows which one team member used, and we had no spare Linux machine. We tried
 WSL, VMWare and VirtualBox during the first day but they were all unacceptable.
 
-Visulization was another pain point. We had expected to use the Bogue library
+Visualization was another pain point. We had expected to use the Bogue library
 built on SDL. After sinking a few hours into a rudimentary visualisation, we
 realized it rendered completely borked on Mac, which another team member used.
 
